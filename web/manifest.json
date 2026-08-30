@@ -1,11 +1,11 @@
 {
-    "name": "app_filmes",
-    "short_name": "app_filmes",
+    "name": "App Filmes",
+    "short_name": "App Filmes",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Filmes populares do TMDB, com trailer e informações de cada filme.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

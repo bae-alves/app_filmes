@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- O app consome a API do TMDB e carrega imagens/trailer pela rede.
+         Os manifestos de debug/profile já declaram esta permissão; sem esta
+         linha, a build de release ficaria sem acesso à internet. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="app_filmes"
         android:name="${applicationName}"

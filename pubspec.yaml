@@ -1,5 +1,5 @@
 name: app_filmes
-description: "A new Flutter project."
+description: "Filmes populares do TMDB, com trailer e informações de cada filme."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -34,6 +34,13 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  dio: ^5.11.0
+  retrofit: ^4.10.0
+  json_annotation: ^4.12.0
+  pretty_dio_logger: ^1.4.0
+  flutter_dotenv: ^6.0.1
+  youtube_player_flutter: ^10.0.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +52,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  build_runner: ^2.15.1
+  retrofit_generator: ^10.2.9
+  json_serializable: ^6.14.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -57,10 +67,11 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  # O arquivo .env guarda as credenciais do TMDB e é carregado em tempo de
+  # execução pelo flutter_dotenv. Ele está no .gitignore: cada desenvolvedor
+  # mantém a sua própria cópia (veja o .env.example).
+  assets:
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
