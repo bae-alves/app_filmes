@@ -14,6 +14,13 @@ analyzer:
     # Código gerado pelo build_runner (retrofit / json_serializable): não é
     # escrito à mão, então não faz sentido analisá-lo.
     - "**/*.g.dart"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   # The lint rules applied to this project can be customized in the

@@ -1,6 +1,7 @@
 import '../../utils/result.dart';
 import '../api_models/movie.dart';
 import '../api_models/movie_details.dart';
+import '../api_models/movie_genre.dart';
 import '../api_models/video.dart';
 
 /// Fonte única da verdade sobre filmes para a aplicação.
@@ -17,6 +18,21 @@ abstract class MoviesRepository {
     int page = 1,
     bool forceRefresh = false,
   });
+
+  /// Pesquisa filmes pelo nome.
+  Future<Result<List<Movie>>> searchMovies({
+    required String query,
+    int page = 1,
+  });
+
+  /// Busca filmes filtrando pelos gêneros informados.
+  Future<Result<List<Movie>>> discoverMovies({
+    List<int>? genreIds,
+    int page = 1,
+  });
+
+  /// Lista de gêneros de filmes disponíveis no TMDB.
+  Future<Result<List<MovieGenre>>> getMovieGenres();
 
   /// Detalhes do filme [movieId].
   Future<Result<MovieDetails>> getMovieDetails(int movieId);

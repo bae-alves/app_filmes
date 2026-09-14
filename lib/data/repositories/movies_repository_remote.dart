@@ -6,6 +6,7 @@ import '../api_models/movie_details.dart';
 import '../api_models/video.dart';
 import '../services/tmdb_rest_client.dart';
 import 'movies_repository.dart';
+import '../api_models/movie_genre.dart';
 
 /// Implementação de [MoviesRepository] apoiada na API do TMDB.
 ///
@@ -87,6 +88,91 @@ class MoviesRepositoryRemote implements MoviesRepository {
       return Result.ok(_pickBestTrailer(videos));
     } on Object catch (error) {
       return Result.error(_asException('Falha ao carregar o trailer', error));
+    }
+  }
+
+  @override
+  Future<Result<List<Movie>>> searchMovies({
+    required String query,
+    int page = 1,
+  }) async {
+    try {
+      final response = await _restClient.searchMovies(
+        query: query,
+        page: page,
+      );
+
+      if (!_isSuccess(response.response.statusCode)) {
+        return Result.error(
+          _httpException(
+            'Falha ao pesquisar filmes',
+            response.response,
+          ),
+        );
+      }
+
+      final movies = response.data.results ?? const <Movie>[];
+      return Result.ok(movies);
+    } on Object catch (error) {
+      return Result.error(
+        _asException('Falha ao pesquisar filmes', error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<Movie>>> discoverMovies({
+    List<int>? genreIds,
+    int page = 1,
+  }) async {
+    try {
+      final withGenres = genreIds?.isNotEmpty == true
+          ? genreIds!.join(',')
+          : null;
+
+      final response = await _restClient.discoverMovies(
+        withGenres: withGenres,
+        page: page,
+      );
+
+      if (!_isSuccess(response.response.statusCode)) {
+        return Result.error(
+          _httpException(
+            'Falha ao filtrar filmes',
+            response.response,
+          ),
+        );
+      }
+
+      final movies = response.data.results ?? const <Movie>[];
+      return Result.ok(movies);
+    } on Object catch (error) {
+      return Result.error(
+        _asException('Falha ao filtrar filmes', error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<MovieGenre>>> getMovieGenres() async {
+    try {
+      final response = await _restClient.getMovieGenres();
+
+      if (!_isSuccess(response.response.statusCode)) {
+        return Result.error(
+          _httpException(
+            'Falha ao carregar os gêneros',
+            response.response,
+          ),
+        );
+      }
+
+      final genres = response.data.genres ?? const <MovieGenre>[];
+      return Result.ok(genres);
+    } on Object catch (error) {
+      return Result.error(
+        _asException('Falha ao carregar os gêneros', error),
+      );
     }
   }
 

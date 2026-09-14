@@ -19,6 +19,7 @@ class Movie {
     this.releaseDate,
     this.voteAverage,
     this.voteCount,
+    this.genreIds,
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) => _$MovieFromJson(json);
@@ -49,6 +50,8 @@ class Movie {
 
   /// Quantidade de votos que compõem a [voteAverage].
   final int? voteCount;
+
+  final List<int>? genreIds;
 
   Map<String, dynamic> toJson() => _$MovieToJson(this);
 }

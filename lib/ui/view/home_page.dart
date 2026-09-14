@@ -38,6 +38,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -62,6 +63,94 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+Future<void> _openAdvancedFilter() async {
+  await widget.viewModel.loadGenres();
+
+  if (!mounted) return;
+
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (context) {
+      return ListenableBuilder(
+        listenable: widget.viewModel,
+        builder: (context, _) {
+          final viewModel = widget.viewModel;
+
+          if (viewModel.isLoadingGenres) {
+            return const SizedBox(
+              height: 300,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (viewModel.genresError != null) {
+            return const SizedBox(
+              height: 300,
+              child: Center(
+                child: Text('Não foi possível carregar os gêneros.'),
+              ),
+            );
+          }
+
+          return SafeArea(
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'Filtro avançado',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: viewModel.genres.length,
+                    itemBuilder: (context, index) {
+                      final genre = viewModel.genres[index];
+
+                      return CheckboxListTile(
+                        title: Text(genre.name),
+                        value: viewModel.selectedGenreIds.contains(
+                          genre.id,
+                        ),
+                        onChanged: (_) {
+                          viewModel.toggleGenre(genre.id);
+                        },
+                      );
+                    },
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () async {
+                        await viewModel.applyGenreFilter();
+
+                        if (!context.mounted) return;
+
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Aplicar filtros'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -85,12 +174,77 @@ class _HomePageState extends State<HomePage> {
           }
 
           if (viewModel.isEmpty) {
-            return const Center(
-              child: Text('Nenhum filme encontrado no momento.'),
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextField(
+                    controller: _searchController,
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (_) => _search(),
+                    decoration: InputDecoration(
+                      labelText: 'Nome do filme',
+                      hintText: 'Digite o nome do filme',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: _search,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.tune),
+                            tooltip: 'Filtro avançado',
+                            onPressed: _openAdvancedFilter,
+                          ),
+                        ],
+                      ),
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const Expanded(
+                  child: Center(
+                    child: Text('Nenhum filme encontrado no momento.'),
+                  ),
+                ),
+              ],
             );
           }
 
-          return RefreshIndicator(
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: TextField(
+                  controller: _searchController,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (_) => _search(),
+                  decoration: InputDecoration(
+                    labelText: 'Nome do filme',
+                    hintText: 'Digite o nome do filme',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: _search,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.tune),
+                          tooltip: 'Filtro avançado',
+                          onPressed: _openAdvancedFilter,
+                        ),
+                      ],
+                    ),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: RefreshIndicator(
             onRefresh: () => viewModel.load(forceRefresh: true),
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -104,10 +258,23 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
+          ),
+              ),
+            ],
           );
-        },
+        }
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _search() {
+    widget.viewModel.search(_searchController.text);
   }
 }
 
