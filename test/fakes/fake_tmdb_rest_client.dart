@@ -2,6 +2,7 @@ import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/movie_page_response.dart';
 import 'package:app_filmes/data/api_models/videos_response.dart';
 import 'package:app_filmes/data/services/tmdb_rest_client.dart';
+import 'package:app_filmes/data/api_models/movie_genres_response.dart';
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -49,6 +50,36 @@ class FakeTmdbRestClient implements TmdbRestClient {
     popularCallCount++;
     _maybeThrow();
     return _wrap(popularPage);
+  }
+
+  @override
+  Future<HttpResponse<MoviePageResponse>> searchMovies({
+    required String query,
+    int page = 1,
+    String language = tmdbDefaultLanguage,
+    bool includeAdult = false,
+  }) async {
+    _maybeThrow();
+    return _wrap(popularPage);
+  }
+
+  @override
+  Future<HttpResponse<MoviePageResponse>> discoverMovies({
+    String? withGenres,
+    int page = 1,
+    String language = tmdbDefaultLanguage,
+    String sortBy = 'popularity.desc',
+  }) async {
+    _maybeThrow();
+    return _wrap(popularPage);
+  }
+
+  @override
+  Future<HttpResponse<MovieGenresResponse>> getMovieGenres({
+    String language = tmdbDefaultLanguage,
+  }) async {
+    _maybeThrow();
+    return _wrap(const MovieGenresResponse());
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:retrofit/retrofit.dart';
 import '../api_models/movie_details.dart';
 import '../api_models/movie_page_response.dart';
 import '../api_models/videos_response.dart';
+import '../api_models/movie_genres_response.dart';
 
 part 'tmdb_rest_client.g.dart';
 
@@ -50,6 +51,27 @@ abstract class TmdbRestClient {
   Future<HttpResponse<VideosResponse>> getMovieVideos(
     @Path('movie_id') int movieId, {
     @Query('language') String? language,
+  });
+
+  @GET('/search/movie')
+  Future<HttpResponse<MoviePageResponse>> searchMovies({
+    @Query('query') required String query,
+    @Query('page') int page = 1,
+    @Query('language') String language = tmdbDefaultLanguage,
+    @Query('include_adult') bool includeAdult = false,
+  });
+
+  @GET('/discover/movie')
+  Future<HttpResponse<MoviePageResponse>> discoverMovies({
+    @Query('with_genres') String? withGenres,
+    @Query('page') int page = 1,
+    @Query('language') String language = tmdbDefaultLanguage,
+    @Query('sort_by') String sortBy = 'popularity.desc',
+  });
+
+  @GET('/genre/movie/list')
+  Future<HttpResponse<MovieGenresResponse>> getMovieGenres({
+    @Query('language') String language = tmdbDefaultLanguage,
   });
 }
 

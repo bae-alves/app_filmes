@@ -3,6 +3,7 @@ import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/video.dart';
 import 'package:app_filmes/data/repositories/movies_repository.dart';
 import 'package:app_filmes/utils/result.dart';
+import 'package:app_filmes/data/api_models/movie_genre.dart';
 
 /// Repositório em memória usado nos testes de view model e de widget.
 ///
@@ -12,9 +13,15 @@ import 'package:app_filmes/utils/result.dart';
 class FakeMoviesRepository implements MoviesRepository {
   FakeMoviesRepository({
     this.popularMovies = const [],
+    this.searchMoviesResult = const [],
+    this.discoverMoviesResult = const [],
+    this.movieGenres = const [],
     this.detailsById = const {},
     this.trailersById = const {},
     this.popularError,
+    this.searchError,
+    this.discoverError,
+    this.genresError,
     this.detailsError,
     this.trailerError,
   });
@@ -38,11 +45,29 @@ class FakeMoviesRepository implements MoviesRepository {
   /// Quando definido, [getMovieTrailer] falha com esta exceção.
   final Exception? trailerError;
 
+  /// Quando definido, [searchMovies] falha com esta exceção.
+  final Exception? searchError;
+
+  /// Quando definido, [discoverMovies] falha com esta exceção.
+  final Exception? discoverError;
+
+  /// Quando definido, [getMovieGenres] falha com esta exceção.
+  final Exception? genresError;
+
   /// Ids passados para [getMovieDetails], na ordem em que chegaram.
   final List<int> requestedDetailIds = [];
 
   /// Ids passados para [getMovieTrailer], na ordem em que chegaram.
   final List<int> requestedTrailerIds = [];
+
+  /// Filmes devolvidos por [searchMovies].
+  final List<Movie> searchMoviesResult;
+
+  /// Filmes devolvidos por [discoverMovies].
+  final List<Movie> discoverMoviesResult;
+
+  /// Gêneros devolvidos por [getMovieGenres].
+  final List<MovieGenre> movieGenres;
 
   /// Quantas vezes [getPopularMovies] foi chamado com `forceRefresh: true`.
   int forcedRefreshCount = 0;
@@ -56,6 +81,36 @@ class FakeMoviesRepository implements MoviesRepository {
     final error = popularError;
     if (error != null) return Result.error(error);
     return Result.ok(popularMovies);
+  }
+
+  @override
+  Future<Result<List<Movie>>> searchMovies({
+    required String query,
+    int page = 1,
+  }) async {
+    final error = searchError;
+    if (error != null) return Result.error(error);
+
+    return Result.ok(searchMoviesResult);
+  }
+
+  @override
+  Future<Result<List<Movie>>> discoverMovies({
+    List<int>? genreIds,
+    int page = 1,
+  }) async {
+    final error = discoverError;
+    if (error != null) return Result.error(error);
+
+    return Result.ok(discoverMoviesResult);
+  }
+
+  @override
+  Future<Result<List<MovieGenre>>> getMovieGenres() async {
+    final error = genresError;
+    if (error != null) return Result.error(error);
+
+    return Result.ok(movieGenres);
   }
 
   @override
