@@ -5,7 +5,7 @@ O app roda em **Android e web**. As pastas `linux/`, `macos/`, `windows/` e
 
 ## Por que não desktop
 
-O player do trailer (`youtube_player_flutter`) roda dentro de uma WebView, e
+O player do trailer (`youtube_player_iframe`) roda dentro de uma WebView, e
 foi essa dependência que tirou o desktop do alvo. Sem trailer, a tela de
 detalhes perde a sua função principal.
 
@@ -25,6 +25,7 @@ flutter create --platforms=ios .
   Playwright, só enxergam texto depois de ligar a árvore de acessibilidade.
 - O idioma e a região vêm do navegador, e não do sistema.
 - O Flutter baixa imagens por XHR, então o servidor precisa mandar CORS. A
-  miniatura WebP do YouTube não manda, a JPEG manda. Por isso, na web, o
-  `TrailerPlayer` usa o player do `youtube_player_iframe` com
-  `ThumbnailFormat.jpeg`: o `youtube_player_flutter` não repassa o formato.
+  miniatura WebP do YouTube não manda, a JPEG manda. Por isso o
+  `TrailerPlayer` usa `ThumbnailFormat.jpeg`. É também o motivo de usar o
+  `youtube_player_iframe` direto: o `youtube_player_flutter` não repassa o
+  formato.

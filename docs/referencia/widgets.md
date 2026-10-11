@@ -64,8 +64,9 @@ Modo completo, em ordem: grupos Assinatura (`flatrate`), Grátis (`free` +
 
 - `TrailerPlayerBuilder`: `Widget Function(BuildContext context, String youtubeKey)`.
 - `defaultTrailerPlayerBuilder`: devolve `TrailerPlayer(youtubeKey: ...)`.
-- `TrailerPlayer`: player do YouTube (`youtube_player_flutter`), sem
-  reprodução automática, com botão de tela cheia.
+- `TrailerPlayer`: player do YouTube (`youtube_player_iframe`), sem
+  reprodução automática, com botão de tela cheia e os controles do próprio
+  YouTube.
 
 Nos testes, passe um builder que devolve um `Text` com a chave: o player real
 precisa de WebView.

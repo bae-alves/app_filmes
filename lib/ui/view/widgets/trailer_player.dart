@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart' as iframe;
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 /// Constrói o widget que reproduz o trailer identificado por [youtubeKey].
 ///
@@ -20,7 +18,7 @@ Widget defaultTrailerPlayerBuilder(BuildContext context, String youtubeKey) =>
 
 /// Reproduz o trailer do filme hospedado no YouTube.
 ///
-/// Encapsula o pacote `youtube_player_flutter` para que o resto da UI dependa
+/// Encapsula o pacote `youtube_player_iframe` para que o resto da UI dependa
 /// apenas deste widget, e não da API de terceiros.
 class TrailerPlayer extends StatefulWidget {
   const TrailerPlayer({super.key, required this.youtubeKey});
@@ -69,19 +67,14 @@ class _TrailerPlayerState extends State<TrailerPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    // Enquanto o player carrega, aparece a miniatura do vídeo. Na web o Flutter
-    // a baixa por XHR, e a WebP do YouTube não tem CORS: a imagem falha e o
-    // console mostra erro. A JPEG do mesmo CDN tem. O youtube_player_flutter
-    // não repassa o formato, mas na web ele só embrulha este mesmo player do
-    // youtube_player_iframe, sem nada a mais.
-    // ponytail: voltar a usar só o wrapper quando ele repassar
-    // `thumbnailFormat`.
-    if (kIsWeb) {
-      return iframe.YoutubePlayer(
-        controller: _controller,
-        thumbnailFormat: ThumbnailFormat.jpeg,
-      );
-    }
-    return YoutubePlayer(controller: _controller);
+    return YoutubePlayer(
+      controller: _controller,
+      // Sem isso, rolar a tela até o player sumir reinicia o vídeo.
+      keepAlive: true,
+      // Enquanto o player carrega, aparece a miniatura do vídeo. Na web o
+      // Flutter a baixa por XHR, e a WebP do YouTube não tem CORS: a imagem
+      // falha e o console mostra erro. A JPEG do mesmo CDN tem.
+      thumbnailFormat: ThumbnailFormat.jpeg,
+    );
   }
 }
