@@ -61,6 +61,11 @@ class WatchProvidersSection extends StatelessWidget {
 
     final theme = Theme.of(context);
     final link = region.link == null ? null : Uri.tryParse(region.link!);
+    // A API não fornece deep link por serviço: a página do TMDB lista os links
+    // para cada um deles no país do usuário. Logos e botão abrem essa página.
+    final openLink = link == null
+        ? null
+        : () => launchUrl(link, mode: LaunchMode.externalApplication);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,16 +73,13 @@ class WatchProvidersSection extends StatelessWidget {
         for (final (label, providers) in groups) ...[
           Text(label, style: theme.textTheme.labelLarge),
           const SizedBox(height: 6),
-          _LogoWrap(providers: providers, size: 40),
+          _LogoWrap(providers: providers, size: 40, onTap: openLink),
           const SizedBox(height: 12),
         ],
-        if (link != null)
+        if (openLink != null)
           TextButton.icon(
             key: linkKey,
-            // A API não fornece deep link por serviço: a página do TMDB lista
-            // os links para cada um deles no país do usuário.
-            onPressed: () =>
-                launchUrl(link, mode: LaunchMode.externalApplication),
+            onPressed: openLink,
             icon: const Icon(LucideIcons.externalLink, size: 18),
             label: Text(l10n.watchProvidersSeeWhere),
           ),
@@ -114,9 +116,12 @@ class WatchProvidersSection extends StatelessWidget {
 
 /// Fileira (com quebra de linha) de logos de serviços.
 class _LogoWrap extends StatelessWidget {
-  const _LogoWrap({required this.providers, required this.size});
+  const _LogoWrap({required this.providers, required this.size, this.onTap});
 
   final List<WatchProvider> providers;
+
+  /// Chamado ao tocar em qualquer logo. `null` deixa os logos sem toque.
+  final VoidCallback? onTap;
 
   /// Lado do logo, em pixels lógicos.
   final double size;
@@ -128,7 +133,7 @@ class _LogoWrap extends StatelessWidget {
       runSpacing: 8,
       children: [
         for (final provider in providers)
-          _ProviderLogo(provider: provider, size: size),
+          _ProviderLogo(provider: provider, size: size, onTap: onTap),
       ],
     );
   }
@@ -139,10 +144,15 @@ class _LogoWrap extends StatelessWidget {
 /// Logos de marcas não existem no Lucide, por isso vêm do servidor de imagens
 /// do TMDB; o ícone [LucideIcons.tv] só aparece se a imagem faltar ou falhar.
 class _ProviderLogo extends StatelessWidget {
-  const _ProviderLogo({required this.provider, required this.size});
+  const _ProviderLogo({
+    required this.provider,
+    required this.size,
+    this.onTap,
+  });
 
   final WatchProvider provider;
   final double size;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -160,17 +170,22 @@ class _ProviderLogo extends StatelessWidget {
       child: Semantics(
         label: name,
         image: true,
-        child: ClipRRect(
+        button: onTap != null,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(size / 5),
-          child: url == null
-              ? fallback
-              : Image.network(
-                  url,
-                  width: size,
-                  height: size,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => fallback,
-                ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(size / 5),
+            child: url == null
+                ? fallback
+                : Image.network(
+                    url,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => fallback,
+                  ),
+          ),
         ),
       ),
     );

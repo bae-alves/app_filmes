@@ -58,7 +58,9 @@ A `HomePage` dá a cada cartão a chave `ValueKey(movie.id)`.
 Modo completo, em ordem: grupos Assinatura (`flatrate`), Grátis (`free` +
 `ads`), Alugar (`rent`) e Comprar (`buy`), cada um ordenado por
 `displayPriority` e omitido se vazio; botão "Ver onde assistir" (se houver
-`link`); crédito "Fonte: JustWatch". Logos de 40 px com o nome no tooltip.
+`link`); crédito "Fonte: JustWatch". Logos de 40 px com o nome no tooltip;
+tocar num logo abre o mesmo `link` do botão. No modo `compact`, os logos não
+respondem ao toque.
 
 ## `TrailerPlayer` e `TrailerPlayerBuilder`
 

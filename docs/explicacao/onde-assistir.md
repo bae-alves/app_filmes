@@ -24,7 +24,7 @@ em "Comprar": são ofertas diferentes.
 
 O TMDB não fornece deep link por serviço. Há um link por país, para a página
 "onde assistir" do próprio TMDB, que leva a cada serviço. O botão "Ver onde
-assistir" abre essa página. Links diretos exigiriam uma parceria paga com a
+assistir" e os logos dos serviços abrem essa página. Links diretos exigiriam uma parceria paga com a
 JustWatch.
 
 ## Por que guardar todos os países

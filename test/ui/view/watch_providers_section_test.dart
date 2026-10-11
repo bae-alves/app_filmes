@@ -2,6 +2,7 @@ import 'package:app_filmes/data/api_models/watch_providers.dart';
 import 'package:app_filmes/l10n/app_localizations.dart';
 import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/movie_fixtures.dart';
@@ -41,6 +42,29 @@ void main() {
     // Apple TV está em "Alugar" e em "Comprar": um logo em cada grupo.
     expect(find.byTooltip('Apple TV'), findsNWidgets(2));
 
+    expect(find.byKey(WatchProvidersSection.linkKey), findsOneWidget);
+    expect(find.text('Fonte: JustWatch'), findsOneWidget);
+  });
+
+  testWidgets('tocar no logo de um serviço abre a página do link, que continua',
+      (tester) async {
+    // No teste não há plugin nativo: o url_launcher cai neste canal.
+    const channel = MethodChannel('plugins.flutter.io/url_launcher');
+    final opened = <Map<Object?, Object?>>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+        (call) async {
+      if (call.method == 'launch') opened.add(call.arguments as Map);
+      return true;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null));
+    await tester.pumpWidget(buildSection(dunaProvidersBr));
+
+    await tester.tap(find.byTooltip('Netflix'));
+    await tester.pump();
+
+    expect(opened.single['url'], dunaProvidersBr.link);
+    expect(opened.single['useWebView'], isFalse, reason: 'abre fora do app');
     expect(find.byKey(WatchProvidersSection.linkKey), findsOneWidget);
     expect(find.text('Fonte: JustWatch'), findsOneWidget);
   });

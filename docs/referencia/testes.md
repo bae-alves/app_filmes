@@ -16,7 +16,7 @@ flutter analyze   # análise estática
 | `test/ui/view_model/home_view_model_test.dart` | 5 | Estados de carregamento e erro da home. |
 | `test/ui/view_model/movie_details_view_model_test.dart` | 8 | Detalhes, trailer e onde assistir; falhas toleradas e a de onde assistir sinalizada. |
 | `test/ui/view/home_to_details_navigation_test.dart` | 16 | Navegação da home aos detalhes, em pt e en, o elenco com fonte grande e o "Ver todos", a falha em onde assistir e o fim das listas acima da barra de navegação. |
-| `test/ui/view/watch_providers_section_test.dart` | 5 | Grupos, ordem, indisponível, modo compacto, pt e en. |
+| `test/ui/view/watch_providers_section_test.dart` | 6 | Grupos, ordem, toque no logo, indisponível, modo compacto, pt e en. |
 
 ## Fakes
 
