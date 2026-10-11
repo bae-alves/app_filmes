@@ -178,6 +178,33 @@ void main() {
       expect(restClient.detailsCallCount, 1);
     });
 
+    test('cheio, apaga o filme salvo há mais tempo para guardar o novo',
+        () async {
+      const max = MoviesRepositoryRemote.detailsCacheMaxEntries;
+      final now = DateTime.now();
+      SharedPreferences.setMockInitialValues({
+        // O id 1 é o mais antigo; nenhum venceu.
+        for (var id = 1; id <= max; id++)
+          'movie_details:$appLanguage:$id': jsonEncode({
+            'savedAt': now.subtract(Duration(minutes: max - id)).millisecondsSinceEpoch,
+            'details': matrixDetails.toJson(),
+          }),
+      });
+      final storage = await SharedPreferences.getInstance();
+      final full = MoviesRepositoryRemote(
+        restClient: restClient..details = dunaDetails,
+        language: appLanguage,
+        preferences: storage,
+      );
+
+      await full.getMovieDetails(dunaId);
+
+      expect(storage.getKeys(), hasLength(max));
+      expect(storage.containsKey('movie_details:$appLanguage:1'), isFalse);
+      expect(storage.containsKey('movie_details:$appLanguage:2'), isTrue);
+      expect(storage.containsKey('movie_details:$appLanguage:$dunaId'), isTrue);
+    });
+
     test('devolve Error quando o serviço falha', () async {
       restClient.errorToThrow = Exception('boom');
 

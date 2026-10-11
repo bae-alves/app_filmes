@@ -12,7 +12,7 @@ flutter analyze   # análise estática
 | `test/utils/formatters_test.dart` | 10 | Ano, duração e nota, em pt e en. |
 | `test/utils/user_locale_test.dart` | 4 | Idioma do TMDB a partir dos idiomas do dispositivo. |
 | `test/data/api_models/movie_details_test.dart` | 5 | Diretores, classificação indicativa por país e ida e volta do JSON do cache. |
-| `test/data/repositories/movies_repository_remote_test.dart` | 25 | Cache (inclusive o salvo no aparelho), erros HTTP e de rede, escolha do trailer, onde assistir por região, idioma enviado ao TMDB. |
+| `test/data/repositories/movies_repository_remote_test.dart` | 26 | Cache (inclusive o salvo no aparelho e o seu limite), erros HTTP e de rede, escolha do trailer, onde assistir por região, idioma enviado ao TMDB. |
 | `test/ui/view_model/home_view_model_test.dart` | 5 | Estados de carregamento e erro da home. |
 | `test/ui/view_model/movie_details_view_model_test.dart` | 8 | Detalhes, trailer e onde assistir; falhas toleradas. |
 | `test/ui/view/home_to_details_navigation_test.dart` | 12 | Navegação da home aos detalhes, em pt e en, e o elenco com fonte grande. |

@@ -44,6 +44,10 @@ class MoviesRepositoryRemote implements MoviesRepository {
   /// Por quanto tempo os detalhes de um filme salvos localmente valem.
   static const detailsCacheTtl = Duration(hours: 24);
 
+  /// Quantos filmes o cache de detalhes guarda, no máximo. Cada entrada leva a
+  /// equipe técnica inteira, e na web o localStorage tem poucos MB.
+  static const detailsCacheMaxEntries = 50;
+
   /// Prefixo das chaves do cache de detalhes (`movie_details:<idioma>:<id>`).
   static const _detailsKeyPrefix = 'movie_details:';
 
@@ -121,10 +125,8 @@ class MoviesRepositoryRemote implements MoviesRepository {
 
     // Salvar é só um extra: se falhar (ex.: localStorage cheio na web), a tela
     // abre do mesmo jeito.
-    // ponytail: sem limite de entradas; se o localStorage encher dentro das
-    // 24h, os filmes seguintes só deixam de ser salvos. Limitar a quantidade se
-    // isso acontecer.
     try {
+      await _evictOldestDetails(keep: cacheKey);
       await _preferences.setString(
         cacheKey,
         jsonEncode({
@@ -297,6 +299,34 @@ class MoviesRepositoryRemote implements MoviesRepository {
       if (key.startsWith(_detailsKeyPrefix) && _readCachedDetails(key) == null) {
         _preferences.remove(key);
       }
+    }
+  }
+
+  /// Apaga os detalhes salvos mais antigos até caber mais um filme sem passar
+  /// de [detailsCacheMaxEntries]. [keep] é a entrada que vai ser sobrescrita:
+  /// não ocupa espaço novo, então não entra na conta.
+  Future<void> _evictOldestDetails({required String keep}) async {
+    final entries = [
+      for (final key in _preferences.getKeys())
+        if (key.startsWith(_detailsKeyPrefix) && key != keep)
+          (key: key, savedAt: _savedAt(key)),
+    ]..sort((a, b) => a.savedAt.compareTo(b.savedAt));
+    final excess = entries.length - detailsCacheMaxEntries + 1;
+    if (excess <= 0) return;
+    for (final entry in entries.take(excess)) {
+      await _preferences.remove(entry.key);
+    }
+  }
+
+  /// Quando a entrada em [key] foi salva, ou 0 se estiver corrompida — assim
+  /// ela é a primeira a sair.
+  int _savedAt(String key) {
+    try {
+      final entry =
+          jsonDecode(_preferences.getString(key)!) as Map<String, dynamic>;
+      return entry['savedAt'] as int;
+    } on Object {
+      return 0;
     }
   }
 
