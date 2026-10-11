@@ -40,6 +40,9 @@ dependencies:
   pretty_dio_logger: ^1.4.0
   flutter_dotenv: ^6.0.1
   youtube_player_flutter: ^10.0.1
+  # Já vem com o youtube_player_flutter; importado direto só na web, para
+  # escolher o formato da miniatura (veja TrailerPlayer).
+  youtube_player_iframe: ^6.0.2
   url_launcher: ^6.3.2
   # Ícones da interface (https://lucide.dev). Logos de serviços de streaming
   # não fazem parte do Lucide: vêm como imagem do TMDB.

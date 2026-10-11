@@ -24,3 +24,7 @@ flutter create --platforms=ios .
 - A UI é desenhada num `<canvas>`. Ferramentas que leem o DOM, como o
   Playwright, só enxergam texto depois de ligar a árvore de acessibilidade.
 - O idioma e a região vêm do navegador, e não do sistema.
+- O Flutter baixa imagens por XHR, então o servidor precisa mandar CORS. A
+  miniatura WebP do YouTube não manda, a JPEG manda. Por isso, na web, o
+  `TrailerPlayer` usa o player do `youtube_player_iframe` com
+  `ThumbnailFormat.jpeg`: o `youtube_player_flutter` não repassa o formato.

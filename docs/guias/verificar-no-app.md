@@ -50,4 +50,6 @@ VIEWPORT=1100x1700 node .claude/skills/run-app-filmes/driver.mjs
 - Textos no idioma certo, incluindo números (`8,4` em pt, `8.4` em en).
 - Valores do TMDB podem mudar entre idiomas: a duração de um mesmo filme às
   vezes difere entre `pt-BR` e `en-US`.
-- `errors` no driver: o erro de CORS em `i3.ytimg.com` é esperado.
+- `errors` no driver: deve vir vazio. Um erro de CORS em `i3.ytimg.com`
+  indica que a miniatura do trailer voltou a ser WebP (veja
+  [Plataformas](../explicacao/plataformas.md#o-que-muda-na-web)).
