@@ -151,6 +151,11 @@
     "description": "Crédito obrigatório pelos termos do TMDB: os dados de streaming vêm da JustWatch. Não traduza o nome JustWatch."
   },
 
+  "watchProvidersLoadError": "Não foi possível carregar onde assistir",
+  "@watchProvidersLoadError": {
+    "description": "Aviso na seção \"Onde assistir\" quando a consulta falha. Diferente de watchProvidersUnavailable: aqui não se sabe se o filme está em algum serviço."
+  },
+
   "castTitle": "Elenco",
   "@castTitle": {
     "description": "Título da seção da tela de detalhes com os atores principais."

@@ -100,6 +100,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get watchProvidersAttribution => 'Fonte: JustWatch';
 
   @override
+  String get watchProvidersLoadError =>
+      'Não foi possível carregar onde assistir';
+
+  @override
   String get castTitle => 'Elenco';
 
   @override

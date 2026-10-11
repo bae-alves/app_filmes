@@ -260,6 +260,26 @@ void main() {
     expect(tapped, same(dunaMovie));
   });
 
+  testWidgets('falha em onde assistir não aparece como "indisponível"',
+      (tester) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie],
+      detailsById: const {dunaId: dunaDetails},
+      watchProvidersError: Exception('falha de rede'),
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Não foi possível carregar onde assistir'),
+      200,
+      scrollable: detailsScrollable,
+    );
+    expect(find.byKey(WatchProvidersSection.unavailableKey), findsNothing);
+  });
+
   group('em inglês', () {
     testWidgets('a home e os detalhes aparecem traduzidos e formatados',
         (tester) async {

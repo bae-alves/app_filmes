@@ -106,6 +106,7 @@ void main() {
 
     expect(repository.requestedWatchRegions, ['US']);
     expect(viewModel.watchProviders, same(dunaProvidersUs));
+    expect(viewModel.watchProvidersFailed, isFalse);
   });
 
   test('watchProviders é null quando o filme não está em nenhum serviço',
@@ -138,6 +139,7 @@ void main() {
 
     expect(viewModel.details?.title, 'Duna: Parte Dois');
     expect(viewModel.watchProviders, isNull);
+    expect(viewModel.watchProvidersFailed, isTrue);
     expect(viewModel.error, isNull, reason: 'a tela ainda é utilizável');
   });
 }

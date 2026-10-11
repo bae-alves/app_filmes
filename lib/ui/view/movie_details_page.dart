@@ -192,7 +192,14 @@ class _DetailsContent extends StatelessWidget {
                 style: theme.textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
-              WatchProvidersSection(region: viewModel.watchProviders),
+              if (viewModel.watchProvidersFailed)
+                Text(
+                  l10n.watchProvidersLoadError,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.colorScheme.outline),
+                )
+              else
+                WatchProvidersSection(region: viewModel.watchProviders),
             ],
           ),
         ),

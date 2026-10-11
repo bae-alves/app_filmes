@@ -33,13 +33,12 @@ A resposta do TMDB traz todos os países de uma vez, sem parâmetro de região.
 O repositório guarda a resposta inteira por filme e só escolhe o país na
 saída. Se a região do usuário mudar, a resposta já está em memória.
 
-## Por que uma falha aparece como "indisponível"
+## Por que uma falha não aparece como "indisponível"
 
-Se a consulta falhar, a seção mostra a mesma mensagem de um filme sem
-serviços. Um estado de erro próprio, com botão de tentar de novo, seria mais
-honesto, mas pesaria numa seção secundária da tela. A troca está marcada no
-código com um comentário `ponytail:` e pode mudar se aparecerem falsos
-negativos.
+Se a consulta falhar, a seção diz que não foi possível carregar, e não que o
+filme não está em nenhum serviço: seria um falso negativo. Não há botão de
+tentar de novo, porque a seção é secundária. Reabrir a tela já tenta de novo,
+já que o repositório não guarda a falha em cache.
 
 ## Por que existe o modo compacto
 

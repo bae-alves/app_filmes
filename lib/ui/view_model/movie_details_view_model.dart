@@ -34,6 +34,7 @@ class MovieDetailsViewModel extends ChangeNotifier {
   MovieDetails? _details;
   Video? _trailer;
   WatchProviderRegion? _watchProviders;
+  bool _watchProvidersFailed = false;
   bool _isLoading = false;
   Exception? _error;
 
@@ -50,8 +51,12 @@ class MovieDetailsViewModel extends ChangeNotifier {
   }
 
   /// Serviços onde o filme pode ser assistido na [watchRegion], ou `null`
-  /// quando ele não está disponível em nenhum (ou a consulta falhou).
+  /// quando ele não está disponível em nenhum (veja [watchProvidersFailed]).
   WatchProviderRegion? get watchProviders => _watchProviders;
+
+  /// A consulta de onde assistir falhou. A tela avisa da falha em vez de dizer
+  /// que o filme não está em nenhum serviço.
+  bool get watchProvidersFailed => _watchProvidersFailed;
 
   /// Indica que há uma requisição em andamento.
   bool get isLoading => _isLoading;
@@ -103,10 +108,10 @@ class MovieDetailsViewModel extends ChangeNotifier {
     switch (await watchProvidersRequest) {
       case Ok<WatchProviderRegion?>(:final value):
         _watchProviders = value;
+        _watchProvidersFailed = false;
       case Error<WatchProviderRegion?>(:final error):
-        // ponytail: falha vira "indisponível" na tela; criar um estado de erro
-        // próprio se usuários reclamarem de falso negativo.
         _watchProviders = null;
+        _watchProvidersFailed = true;
         if (kDebugMode) {
           debugPrint(
             'Não foi possível carregar onde assistir o filme $movieId: $error',

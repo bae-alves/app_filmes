@@ -101,6 +101,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get watchProvidersAttribution => 'Source: JustWatch';
 
   @override
+  String get watchProvidersLoadError => 'Couldn\'t load where to watch';
+
+  @override
   String get castTitle => 'Cast';
 
   @override

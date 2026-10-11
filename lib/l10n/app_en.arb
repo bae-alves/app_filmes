@@ -32,6 +32,7 @@
   "watchProvidersUnavailable": "Not available for streaming in your region",
   "watchProvidersSeeWhere": "See where to watch",
   "watchProvidersAttribution": "Source: JustWatch",
+  "watchProvidersLoadError": "Couldn't load where to watch",
   "castTitle": "Cast",
   "directedBy": "Directed by {names}",
   "certificationLabel": "Age rating: {certification}"

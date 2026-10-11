@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'Fonte: JustWatch'**
   String get watchProvidersAttribution;
 
+  /// Aviso na seção "Onde assistir" quando a consulta falha. Diferente de watchProvidersUnavailable: aqui não se sabe se o filme está em algum serviço.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar onde assistir'**
+  String get watchProvidersLoadError;
+
   /// Título da seção da tela de detalhes com os atores principais.
   ///
   /// In pt, this message translates to:
