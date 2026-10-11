@@ -62,16 +62,22 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(details?.title ?? widget.fallbackTitle ?? 'Detalhes'),
+            title: Text(
+              details?.title ??
+                  widget.fallbackTitle ??
+                  AppLocalizations.of(context).detailsFallbackTitle,
+            ),
           ),
           body: switch ((viewModel.isLoading, viewModel.error, details)) {
             (true, _, null) => const Center(child: CircularProgressIndicator()),
-            (_, final Exception error, null) => _ErrorState(
-                message: error.toString(),
+            // O detalhe técnico do erro vai para o log (veja a view model);
+            // o usuário vê uma mensagem traduzida.
+            (_, Exception(), null) => _ErrorState(
+                message: AppLocalizations.of(context).detailsLoadError,
                 onRetry: viewModel.load,
               ),
-            (_, _, null) => const Center(
-                child: Text('Não encontramos informações sobre este filme.'),
+            (_, _, null) => Center(
+                child: Text(AppLocalizations.of(context).detailsNotFound),
               ),
             (_, _, _) => _DetailsContent(
                 viewModel: viewModel,
@@ -97,10 +103,12 @@ class _DetailsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
     final details = viewModel.details!;
     final year = formatReleaseYear(details.releaseDate);
-    final runtime = formatRuntime(details.runtime);
-    final rating = formatRating(details.voteAverage);
+    final runtime = formatRuntime(details.runtime, l10n);
+    final rating = formatRating(details.voteAverage, locale);
     final genres = details.genres ?? const <Genre>[];
 
     return ListView(
@@ -117,7 +125,7 @@ class _DetailsContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                details.title ?? details.originalTitle ?? 'Sem título',
+                details.title ?? details.originalTitle ?? l10n.untitled,
                 style: theme.textTheme.headlineSmall,
               ),
               if (details.tagline?.isNotEmpty == true) ...[
@@ -144,17 +152,17 @@ class _DetailsContent extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 20),
-              Text('Sinopse', style: theme.textTheme.titleMedium),
+              Text(l10n.synopsisTitle, style: theme.textTheme.titleMedium),
               const SizedBox(height: 6),
               Text(
                 details.overview?.isNotEmpty == true
                     ? details.overview!
-                    : 'Sinopse não disponível.',
+                    : l10n.synopsisUnavailable,
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 20),
               Text(
-                AppLocalizations.of(context).watchProvidersTitle,
+                l10n.watchProvidersTitle,
                 style: theme.textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -211,13 +219,13 @@ class _TrailerSection extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) =>
                     const SizedBox.shrink(),
               ),
-            const Center(
+            Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.videocam_off_outlined),
-                  SizedBox(height: 8),
-                  Text('Trailer não disponível'),
+                  const Icon(Icons.videocam_off_outlined),
+                  const SizedBox(height: 8),
+                  Text(AppLocalizations.of(context).trailerUnavailable),
                 ],
               ),
             ),
@@ -280,7 +288,10 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            FilledButton(onPressed: onRetry, child: const Text('Tentar novamente')),
+            FilledButton(
+              onPressed: onRetry,
+              child: Text(AppLocalizations.of(context).retry),
+            ),
           ],
         ),
       ),

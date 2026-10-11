@@ -98,6 +98,126 @@ abstract class AppLocalizations {
     Locale('pt'),
   ];
 
+  /// Botão das telas de erro que repete o carregamento.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar novamente'**
+  String get retry;
+
+  /// Substitui o título de um filme que o TMDB devolve sem nome.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem título'**
+  String get untitled;
+
+  /// Substitui a sinopse de um filme que o TMDB devolve sem texto (cartão da home e tela de detalhes).
+  ///
+  /// In pt, this message translates to:
+  /// **'Sinopse não disponível.'**
+  String get synopsisUnavailable;
+
+  /// Duração do filme com horas e minutos (ex.: 2h 46min). Mantenha curto: aparece numa linha de metadados.
+  ///
+  /// In pt, this message translates to:
+  /// **'{hours}h {minutes}min'**
+  String runtimeHoursMinutes(int hours, int minutes);
+
+  /// Duração do filme exata em horas (ex.: 2h).
+  ///
+  /// In pt, this message translates to:
+  /// **'{hours}h'**
+  String runtimeHours(int hours);
+
+  /// Duração de um filme com menos de uma hora (ex.: 45min).
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes}min'**
+  String runtimeMinutes(int minutes);
+
+  /// Título da tela inicial, que lista os filmes populares do momento.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filmes populares'**
+  String get homeTitle;
+
+  /// Aviso da tela inicial quando a lista (populares, pesquisa ou filtro) volta vazia.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum filme encontrado no momento.'**
+  String get homeEmpty;
+
+  /// Erro da tela inicial quando a lista de filmes não carrega. O detalhe técnico vai só para o log.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os filmes.'**
+  String get homeLoadError;
+
+  /// Rótulo do campo de pesquisa da tela inicial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do filme'**
+  String get searchLabel;
+
+  /// Texto de exemplo dentro do campo de pesquisa vazio.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite o nome do filme'**
+  String get searchHint;
+
+  /// Dica e rótulo de acessibilidade do botão de lupa que dispara a pesquisa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pesquisar'**
+  String get searchTooltip;
+
+  /// Botão da tela inicial e título da folha que filtra os filmes por gênero.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filtro avançado'**
+  String get advancedFilter;
+
+  /// Botão da folha de filtro avançado que aplica os gêneros marcados.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aplicar filtros'**
+  String get applyFilters;
+
+  /// Erro da folha de filtro avançado quando a lista de gêneros não carrega.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os gêneros.'**
+  String get genresLoadError;
+
+  /// Título da barra superior da tela de detalhes enquanto o nome do filme não é conhecido.
+  ///
+  /// In pt, this message translates to:
+  /// **'Detalhes'**
+  String get detailsFallbackTitle;
+
+  /// Erro da tela de detalhes quando as informações do filme não carregam. O detalhe técnico vai só para o log.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar este filme.'**
+  String get detailsLoadError;
+
+  /// Aviso da tela de detalhes quando o carregamento termina sem erro, mas sem dados.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não encontramos informações sobre este filme.'**
+  String get detailsNotFound;
+
+  /// Título da seção da tela de detalhes com o resumo do filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sinopse'**
+  String get synopsisTitle;
+
+  /// Aviso no lugar do player quando o filme não tem trailer publicado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trailer não disponível'**
+  String get trailerUnavailable;
+
   /// Título da seção da tela de detalhes que lista os serviços de streaming do filme.
   ///
   /// In pt, this message translates to:

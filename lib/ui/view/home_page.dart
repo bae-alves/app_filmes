@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/api_models/movie.dart';
+import '../../l10n/app_localizations.dart';
 import '../view_model/home_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
 import 'movie_details_page.dart';
@@ -86,10 +87,10 @@ Future<void> _openAdvancedFilter() async {
           }
 
           if (viewModel.genresError != null) {
-            return const SizedBox(
+            return SizedBox(
               height: 300,
               child: Center(
-                child: Text('Não foi possível carregar os gêneros.'),
+                child: Text(AppLocalizations.of(context).genresLoadError),
               ),
             );
           }
@@ -97,11 +98,11 @@ Future<void> _openAdvancedFilter() async {
           return SafeArea(
             child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
+                Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Text(
-                    'Filtro avançado',
-                    style: TextStyle(
+                    AppLocalizations.of(context).advancedFilter,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -139,7 +140,7 @@ Future<void> _openAdvancedFilter() async {
 
                         Navigator.of(context).pop();
                       },
-                      child: const Text('Aplicar filtros'),
+                      child: Text(AppLocalizations.of(context).applyFilters),
                     ),
                   ),
                 ),
@@ -154,8 +155,9 @@ Future<void> _openAdvancedFilter() async {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Filmes populares')),
+      appBar: AppBar(title: Text(l10n.homeTitle)),
       body: ListenableBuilder(
         listenable: widget.viewModel,
         builder: (context, _) {
@@ -165,10 +167,11 @@ Future<void> _openAdvancedFilter() async {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final error = viewModel.error;
-          if (error != null) {
+          // O detalhe técnico do erro vai para o log (veja a view model); o
+          // usuário vê uma mensagem traduzida.
+          if (viewModel.error != null) {
             return _ErrorState(
-              message: error.toString(),
+              message: l10n.homeLoadError,
               onRetry: () => viewModel.load(forceRefresh: true),
             );
           }
@@ -176,89 +179,31 @@ Future<void> _openAdvancedFilter() async {
           if (viewModel.isEmpty) {
             return Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: TextField(
-                    controller: _searchController,
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (_) => _search(),
-                    decoration: InputDecoration(
-                      labelText: 'Nome do filme',
-                      hintText: 'Digite o nome do filme',
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.search),
-                            onPressed: _search,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.tune),
-                            tooltip: 'Filtro avançado',
-                            onPressed: _openAdvancedFilter,
-                          ),
-                        ],
-                      ),
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const Expanded(
-                  child: Center(
-                    child: Text('Nenhum filme encontrado no momento.'),
-                  ),
-                ),
+                _buildSearchField(l10n),
+                Expanded(child: Center(child: Text(l10n.homeEmpty))),
               ],
             );
           }
 
           return Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: _searchController,
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (_) => _search(),
-                  decoration: InputDecoration(
-                    labelText: 'Nome do filme',
-                    hintText: 'Digite o nome do filme',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.search),
-                          onPressed: _search,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.tune),
-                          tooltip: 'Filtro avançado',
-                          onPressed: _openAdvancedFilter,
-                        ),
-                      ],
-                    ),
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-              ),
+              _buildSearchField(l10n),
               Expanded(
                 child: RefreshIndicator(
-            onRefresh: () => viewModel.load(forceRefresh: true),
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: viewModel.movies.length,
-              itemBuilder: (context, index) {
-                final movie = viewModel.movies[index];
-                return MovieCard(
-                  key: ValueKey(movie.id),
-                  movie: movie,
-                  onTap: () => _openDetails(movie),
-                );
-              },
-            ),
-          ),
+                  onRefresh: () => viewModel.load(forceRefresh: true),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: viewModel.movies.length,
+                    itemBuilder: (context, index) {
+                      final movie = viewModel.movies[index];
+                      return MovieCard(
+                        key: ValueKey(movie.id),
+                        movie: movie,
+                        onTap: () => _openDetails(movie),
+                      );
+                    },
+                  ),
+                ),
               ),
             ],
           );
@@ -271,6 +216,42 @@ Future<void> _openAdvancedFilter() async {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  /// Campo de pesquisa com os botões de pesquisar e de filtro avançado.
+  ///
+  /// Aparece tanto com a lista cheia quanto vazia: o usuário precisa poder
+  /// pesquisar de novo depois de uma busca sem resultado.
+  Widget _buildSearchField(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _searchController,
+        textInputAction: TextInputAction.search,
+        onSubmitted: (_) => _search(),
+        decoration: InputDecoration(
+          labelText: l10n.searchLabel,
+          hintText: l10n.searchHint,
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.search),
+                tooltip: l10n.searchTooltip,
+                onPressed: _search,
+              ),
+              IconButton(
+                icon: const Icon(Icons.tune),
+                tooltip: l10n.advancedFilter,
+                onPressed: _openAdvancedFilter,
+              ),
+            ],
+          ),
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
   }
 
   void _search() {
@@ -299,7 +280,7 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onRetry,
-              child: const Text('Tentar novamente'),
+              child: Text(AppLocalizations.of(context).retry),
             ),
           ],
         ),

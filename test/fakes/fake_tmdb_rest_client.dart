@@ -47,15 +47,20 @@ class FakeTmdbRestClient implements TmdbRestClient {
   /// Quantidade de chamadas a [getMovieDetails].
   int detailsCallCount = 0;
 
+  /// Idiomas recebidos pelos endpoints com `language` obrigatório (todos,
+  /// menos [getMovieVideos]), na ordem das chamadas.
+  final List<String> requestedLanguages = [];
+
   /// Idiomas pedidos a [getMovieVideos], na ordem das chamadas.
   final List<String?> requestedVideoLanguages = [];
 
   @override
   Future<HttpResponse<MoviePageResponse>> getPopularMovies({
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     popularCallCount++;
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(popularPage);
   }
@@ -64,9 +69,10 @@ class FakeTmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> searchMovies({
     required String query,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     bool includeAdult = false,
   }) async {
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(popularPage);
   }
@@ -75,17 +81,19 @@ class FakeTmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> discoverMovies({
     String? withGenres,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     String sortBy = 'popularity.desc',
   }) async {
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(popularPage);
   }
 
   @override
   Future<HttpResponse<MovieGenresResponse>> getMovieGenres({
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(const MovieGenresResponse());
   }
@@ -93,9 +101,10 @@ class FakeTmdbRestClient implements TmdbRestClient {
   @override
   Future<HttpResponse<MovieDetails>> getMovieDetails(
     int movieId, {
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     detailsCallCount++;
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(details ?? MovieDetails(id: movieId));
   }

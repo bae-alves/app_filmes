@@ -22,12 +22,15 @@ void main() {
   /// O player real depende de uma WebView, que não existe no ambiente de
   /// teste; o stub imprime a chave recebida, o que permite verificar que o
   /// trailer certo chegou à tela.
-  Widget buildApp(FakeMoviesRepository repository) {
+  Widget buildApp(
+    FakeMoviesRepository repository, {
+    Locale locale = const Locale('pt'),
+  }) {
     return MaterialApp(
       // A tela de detalhes usa textos traduzidos (seção "Onde assistir").
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('pt'),
+      locale: locale,
       home: HomePage(
         viewModel: HomeViewModel(moviesRepository: repository),
         detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
@@ -175,7 +178,9 @@ void main() {
     await tester.pumpWidget(buildApp(repository));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('falha de rede'), findsOneWidget);
+    expect(find.text('Não foi possível carregar os filmes.'), findsOneWidget);
+    // O detalhe técnico vai para o log, não para o usuário.
+    expect(find.textContaining('falha de rede'), findsNothing);
 
     await tester.tap(find.text('Tentar novamente'));
     await tester.pumpAndSettle();
@@ -188,6 +193,9 @@ void main() {
     Movie? tapped;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('pt'),
         home: Scaffold(
           body: MovieCard(
             movie: dunaMovie,
@@ -203,5 +211,53 @@ void main() {
 
     await tester.tap(find.byType(MovieCard));
     expect(tapped, same(dunaMovie));
+  });
+
+  group('em inglês', () {
+    testWidgets('a home e os detalhes aparecem traduzidos e formatados',
+        (tester) async {
+      await tester.pumpWidget(
+        buildApp(buildRepository(), locale: const Locale('en')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Popular movies'), findsOneWidget);
+      expect(find.text('Movie title'), findsOneWidget);
+
+      await tester.tap(find.byType(MovieCard).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Synopsis'), findsOneWidget);
+      expect(find.text('8.2'), findsOneWidget);
+      expect(find.text('2h 46m'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Where to watch'), 200);
+      expect(find.text('Subscription'), findsOneWidget);
+    });
+
+    testWidgets('filme sem trailer mostra o aviso traduzido', (tester) async {
+      await tester.pumpWidget(
+        buildApp(buildRepository(), locale: const Locale('en')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey(matrixId)));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trailer not available'), findsOneWidget);
+    });
+
+    testWidgets('o erro aparece traduzido, com o botão de tentar de novo',
+        (tester) async {
+      await tester.pumpWidget(
+        buildApp(
+          FakeMoviesRepository(popularError: Exception('falha de rede')),
+          locale: const Locale('en'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text("Couldn't load the movies."), findsOneWidget);
+      expect(find.text('Try again'), findsOneWidget);
+    });
   });
 }

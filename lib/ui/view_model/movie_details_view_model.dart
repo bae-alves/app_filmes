@@ -57,6 +57,9 @@ class MovieDetailsViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   /// Erro que impediu a exibição dos detalhes, ou `null`.
+  ///
+  /// A view usa só a presença do erro: a mensagem exibida é traduzida por ela,
+  /// e o detalhe técnico vai para o log.
   Exception? get error => _error;
 
   /// Carrega detalhes, trailer e onde assistir o filme.
@@ -82,6 +85,9 @@ class MovieDetailsViewModel extends ChangeNotifier {
       case Error<MovieDetails>(:final error):
         _details = null;
         _error = error;
+        if (kDebugMode) {
+          debugPrint('Não foi possível carregar o filme $movieId: $error');
+        }
     }
 
     switch (await trailerRequest) {

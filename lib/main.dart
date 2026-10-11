@@ -10,7 +10,7 @@ import 'ui/view/home_page.dart';
 import 'ui/view_model/home_view_model.dart';
 import 'ui/view_model/movie_details_view_model.dart';
 import 'utils/env.dart';
-import 'utils/watch_region.dart';
+import 'utils/user_locale.dart';
 
 Future<void> main() async {
   // `ensureInitialized` é necessário porque carregamos o .env (um asset) antes
@@ -44,6 +44,8 @@ class _AppFilmesState extends State<AppFilmes> {
     final dio = createTmdbDio(readAccessToken: Env.tmdbReadToken);
     _moviesRepository = MoviesRepositoryRemote(
       restClient: TmdbRestClient(dio),
+      // Mesmo idioma que o MaterialApp vai escolher para a interface.
+      language: currentTmdbLanguage(),
     );
     _homeViewModel = HomeViewModel(moviesRepository: _moviesRepository);
   }

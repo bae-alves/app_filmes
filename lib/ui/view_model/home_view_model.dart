@@ -40,6 +40,9 @@ class HomeViewModel extends ChangeNotifier {
   bool get isLoadingGenres => _isLoadingGenres;
 
   /// Erro do último carregamento, ou `null` se deu tudo certo.
+  ///
+  /// Serve para a view decidir *que* houve erro; a mensagem exibida é
+  /// traduzida pela view, e não tirada daqui.
   Exception? get error => _error;
 
   /// Erro relacionado ao carregamento dos gêneros.
@@ -75,8 +78,7 @@ class HomeViewModel extends ChangeNotifier {
       case Ok<List<Movie>>(:final value):
         _movies = value;
       case Error<List<Movie>>(:final error):
-        _movies = const [];
-        _error = error;
+        _fail(error);
     }
 
     _isLoading = false;
@@ -105,8 +107,7 @@ class HomeViewModel extends ChangeNotifier {
       case Ok<List<Movie>>(:final value):
         _movies = value;
       case Error<List<Movie>>(:final error):
-        _movies = const [];
-        _error = error;
+        _fail(error);
     }
 
     _isLoading = false;
@@ -142,8 +143,7 @@ class HomeViewModel extends ChangeNotifier {
       case Ok<List<Movie>>(:final value):
         _movies = value;
       case Error<List<Movie>>(:final error):
-        _movies = const [];
-        _error = error;
+        _fail(error);
     }
 
     _isLoading = false;
@@ -174,6 +174,16 @@ class HomeViewModel extends ChangeNotifier {
     _isLoadingGenres = false;
     notifyListeners();
     return result;
+  }
+
+  /// Registra a falha de um carregamento da lista.
+  ///
+  /// A view mostra uma mensagem traduzida, sem o detalhe técnico; por isso o
+  /// detalhe vai para o log, onde o desenvolvedor ainda o encontra.
+  void _fail(Exception error) {
+    _movies = const [];
+    _error = error;
+    if (kDebugMode) debugPrint('Falha ao carregar a lista de filmes: $error');
   }
 
   /// Limpa todos os filtros e volta para os filmes populares.

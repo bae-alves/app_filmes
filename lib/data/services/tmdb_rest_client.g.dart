@@ -24,7 +24,7 @@ class _TmdbRestClient implements TmdbRestClient {
   @override
   Future<HttpResponse<MoviePageResponse>> getPopularMovies({
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -58,7 +58,7 @@ class _TmdbRestClient implements TmdbRestClient {
   @override
   Future<HttpResponse<MovieDetails>> getMovieDetails(
     int movieId, {
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'language': language};
@@ -122,7 +122,7 @@ class _TmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> searchMovies({
     required String query,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     bool includeAdult = false,
   }) async {
     final _extra = <String, dynamic>{};
@@ -160,7 +160,7 @@ class _TmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> discoverMovies({
     String? withGenres,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     String sortBy = 'popularity.desc',
   }) async {
     final _extra = <String, dynamic>{};
@@ -197,7 +197,7 @@ class _TmdbRestClient implements TmdbRestClient {
 
   @override
   Future<HttpResponse<MovieGenresResponse>> getMovieGenres({
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'language': language};

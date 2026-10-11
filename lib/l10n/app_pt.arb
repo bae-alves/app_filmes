@@ -1,6 +1,116 @@
 {
   "@@locale": "pt",
 
+  "retry": "Tentar novamente",
+  "@retry": {
+    "description": "Botão das telas de erro que repete o carregamento."
+  },
+
+  "untitled": "Sem título",
+  "@untitled": {
+    "description": "Substitui o título de um filme que o TMDB devolve sem nome."
+  },
+
+  "synopsisUnavailable": "Sinopse não disponível.",
+  "@synopsisUnavailable": {
+    "description": "Substitui a sinopse de um filme que o TMDB devolve sem texto (cartão da home e tela de detalhes)."
+  },
+
+  "runtimeHoursMinutes": "{hours}h {minutes}min",
+  "@runtimeHoursMinutes": {
+    "description": "Duração do filme com horas e minutos (ex.: 2h 46min). Mantenha curto: aparece numa linha de metadados.",
+    "placeholders": {
+      "hours": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+
+  "runtimeHours": "{hours}h",
+  "@runtimeHours": {
+    "description": "Duração do filme exata em horas (ex.: 2h).",
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+
+  "runtimeMinutes": "{minutes}min",
+  "@runtimeMinutes": {
+    "description": "Duração de um filme com menos de uma hora (ex.: 45min).",
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+
+  "homeTitle": "Filmes populares",
+  "@homeTitle": {
+    "description": "Título da tela inicial, que lista os filmes populares do momento."
+  },
+
+  "homeEmpty": "Nenhum filme encontrado no momento.",
+  "@homeEmpty": {
+    "description": "Aviso da tela inicial quando a lista (populares, pesquisa ou filtro) volta vazia."
+  },
+
+  "homeLoadError": "Não foi possível carregar os filmes.",
+  "@homeLoadError": {
+    "description": "Erro da tela inicial quando a lista de filmes não carrega. O detalhe técnico vai só para o log."
+  },
+
+  "searchLabel": "Nome do filme",
+  "@searchLabel": {
+    "description": "Rótulo do campo de pesquisa da tela inicial."
+  },
+
+  "searchHint": "Digite o nome do filme",
+  "@searchHint": {
+    "description": "Texto de exemplo dentro do campo de pesquisa vazio."
+  },
+
+  "searchTooltip": "Pesquisar",
+  "@searchTooltip": {
+    "description": "Dica e rótulo de acessibilidade do botão de lupa que dispara a pesquisa."
+  },
+
+  "advancedFilter": "Filtro avançado",
+  "@advancedFilter": {
+    "description": "Botão da tela inicial e título da folha que filtra os filmes por gênero."
+  },
+
+  "applyFilters": "Aplicar filtros",
+  "@applyFilters": {
+    "description": "Botão da folha de filtro avançado que aplica os gêneros marcados."
+  },
+
+  "genresLoadError": "Não foi possível carregar os gêneros.",
+  "@genresLoadError": {
+    "description": "Erro da folha de filtro avançado quando a lista de gêneros não carrega."
+  },
+
+  "detailsFallbackTitle": "Detalhes",
+  "@detailsFallbackTitle": {
+    "description": "Título da barra superior da tela de detalhes enquanto o nome do filme não é conhecido."
+  },
+
+  "detailsLoadError": "Não foi possível carregar este filme.",
+  "@detailsLoadError": {
+    "description": "Erro da tela de detalhes quando as informações do filme não carregam. O detalhe técnico vai só para o log."
+  },
+
+  "detailsNotFound": "Não encontramos informações sobre este filme.",
+  "@detailsNotFound": {
+    "description": "Aviso da tela de detalhes quando o carregamento termina sem erro, mas sem dados."
+  },
+
+  "synopsisTitle": "Sinopse",
+  "@synopsisTitle": {
+    "description": "Título da seção da tela de detalhes com o resumo do filme."
+  },
+
+  "trailerUnavailable": "Trailer não disponível",
+  "@trailerUnavailable": {
+    "description": "Aviso no lugar do player quando o filme não tem trailer publicado."
+  },
+
   "watchProvidersTitle": "Onde assistir",
   "@watchProvidersTitle": {
     "description": "Título da seção da tela de detalhes que lista os serviços de streaming do filme."

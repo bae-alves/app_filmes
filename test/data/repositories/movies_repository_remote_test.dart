@@ -13,13 +13,19 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../fakes/fake_tmdb_rest_client.dart';
 import '../../fakes/movie_fixtures.dart';
 
+/// Idioma do conteúdo usado pelo repositório na maior parte dos testes.
+const appLanguage = 'pt-BR';
+
 void main() {
   late FakeTmdbRestClient restClient;
   late MoviesRepositoryRemote repository;
 
   setUp(() {
     restClient = FakeTmdbRestClient();
-    repository = MoviesRepositoryRemote(restClient: restClient);
+    repository = MoviesRepositoryRemote(
+      restClient: restClient,
+      language: appLanguage,
+    );
   });
 
   group('getPopularMovies', () {
@@ -93,7 +99,7 @@ void main() {
   group('getMovieTrailer', () {
     test('prefere o trailer oficial do YouTube', () async {
       restClient.videosByLanguage = {
-        tmdbDefaultLanguage: const VideosResponse(
+        appLanguage: const VideosResponse(
           results: [
             Video(key: 'clipe', site: 'YouTube', type: 'Clip', official: true),
             Video(key: 'teaser', site: 'YouTube', type: 'Teaser', official: true),
@@ -110,7 +116,7 @@ void main() {
 
     test('ignora vídeos que não são do YouTube ou estão sem chave', () async {
       restClient.videosByLanguage = {
-        tmdbDefaultLanguage: const VideosResponse(
+        appLanguage: const VideosResponse(
           results: [
             Video(key: 'vimeo', site: 'Vimeo', type: 'Trailer', official: true),
             Video(key: '', site: 'YouTube', type: 'Trailer', official: true),
@@ -132,19 +138,19 @@ void main() {
 
       expect(
         restClient.requestedVideoLanguages,
-        [tmdbDefaultLanguage, tmdbFallbackLanguage],
+        [appLanguage, tmdbFallbackLanguage],
       );
       expect((result as Ok<Video?>).value?.key, dunaTrailer.key);
     });
 
     test('não busca o idioma alternativo quando pt-BR já tem vídeo', () async {
       restClient.videosByLanguage = {
-        tmdbDefaultLanguage: const VideosResponse(results: [dunaTrailer]),
+        appLanguage: const VideosResponse(results: [dunaTrailer]),
       };
 
       await repository.getMovieTrailer(dunaId);
 
-      expect(restClient.requestedVideoLanguages, [tmdbDefaultLanguage]);
+      expect(restClient.requestedVideoLanguages, [appLanguage]);
     });
 
     test('devolve Ok com null quando o filme não tem nenhum vídeo', () async {
@@ -231,6 +237,36 @@ void main() {
 
       expect((retried as Ok<WatchProviderRegion?>).value, isNotNull);
       expect(restClient.watchProvidersCallCount, 2);
+    });
+  });
+
+  group('idioma do conteúdo', () {
+    test('envia o idioma do repositório a todos os endpoints', () async {
+      final english = MoviesRepositoryRemote(
+        restClient: restClient,
+        language: 'en-US',
+      );
+
+      await english.getPopularMovies();
+      await english.getMovieDetails(dunaId);
+      await english.searchMovies(query: 'duna');
+      await english.discoverMovies(genreIds: const [878]);
+      await english.getMovieGenres();
+
+      expect(restClient.requestedLanguages, List.filled(5, 'en-US'));
+    });
+
+    test('em en-US, não repete a busca de trailer no idioma alternativo',
+        () async {
+      final english = MoviesRepositoryRemote(
+        restClient: restClient,
+        language: tmdbFallbackLanguage,
+      );
+
+      final result = await english.getMovieTrailer(matrixId);
+
+      expect(restClient.requestedVideoLanguages, [tmdbFallbackLanguage]);
+      expect((result as Ok<Video?>).value, isNull);
     });
   });
 }

@@ -9,6 +9,72 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get retry => 'Tentar novamente';
+
+  @override
+  String get untitled => 'Sem título';
+
+  @override
+  String get synopsisUnavailable => 'Sinopse não disponível.';
+
+  @override
+  String runtimeHoursMinutes(int hours, int minutes) {
+    return '${hours}h ${minutes}min';
+  }
+
+  @override
+  String runtimeHours(int hours) {
+    return '${hours}h';
+  }
+
+  @override
+  String runtimeMinutes(int minutes) {
+    return '${minutes}min';
+  }
+
+  @override
+  String get homeTitle => 'Filmes populares';
+
+  @override
+  String get homeEmpty => 'Nenhum filme encontrado no momento.';
+
+  @override
+  String get homeLoadError => 'Não foi possível carregar os filmes.';
+
+  @override
+  String get searchLabel => 'Nome do filme';
+
+  @override
+  String get searchHint => 'Digite o nome do filme';
+
+  @override
+  String get searchTooltip => 'Pesquisar';
+
+  @override
+  String get advancedFilter => 'Filtro avançado';
+
+  @override
+  String get applyFilters => 'Aplicar filtros';
+
+  @override
+  String get genresLoadError => 'Não foi possível carregar os gêneros.';
+
+  @override
+  String get detailsFallbackTitle => 'Detalhes';
+
+  @override
+  String get detailsLoadError => 'Não foi possível carregar este filme.';
+
+  @override
+  String get detailsNotFound => 'Não encontramos informações sobre este filme.';
+
+  @override
+  String get synopsisTitle => 'Sinopse';
+
+  @override
+  String get trailerUnavailable => 'Trailer não disponível';
+
+  @override
   String get watchProvidersTitle => 'Onde assistir';
 
   @override

@@ -15,11 +15,24 @@ import '../api_models/movie_genre.dart';
 /// requisições) nem à view model (que só cuida do estado da tela):
 /// cache em memória, tradução de falhas em [Result] e a escolha de qual vídeo
 /// é, de fato, "o trailer" do filme.
+///
+/// As mensagens das exceções devolvidas em [Result.error] são para o log do
+/// desenvolvedor, em português. A interface não as exibe: cada tela mostra a
+/// sua própria mensagem traduzida (veja `AppLocalizations`).
 class MoviesRepositoryRemote implements MoviesRepository {
-  MoviesRepositoryRemote({required TmdbRestClient restClient})
-      : _restClient = restClient;
+  MoviesRepositoryRemote({
+    required TmdbRestClient restClient,
+    required String language,
+  })  : _restClient = restClient,
+        _language = language;
 
   final TmdbRestClient _restClient;
+
+  /// Idioma do conteúdo pedido ao TMDB (ex.: `pt-BR`), o mesmo da interface.
+  ///
+  /// É fixo durante a vida do repositório, e por isso os caches não precisam
+  /// separar entradas por idioma. Em produção vem de `currentTmdbLanguage`.
+  final String _language;
 
   /// Páginas de populares já carregadas, indexadas pelo número da página.
   final Map<int, List<Movie>> _popularCache = {};
@@ -44,7 +57,10 @@ class MoviesRepositoryRemote implements MoviesRepository {
     if (cached != null && !forceRefresh) return Result.ok(cached);
 
     try {
-      final response = await _restClient.getPopularMovies(page: page);
+      final response = await _restClient.getPopularMovies(
+        page: page,
+        language: _language,
+      );
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(
           _httpException('Falha ao carregar os filmes populares', response.response),
@@ -67,7 +83,10 @@ class MoviesRepositoryRemote implements MoviesRepository {
     if (cached != null) return Result.ok(cached);
 
     try {
-      final response = await _restClient.getMovieDetails(movieId);
+      final response = await _restClient.getMovieDetails(
+        movieId,
+        language: _language,
+      );
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(
           _httpException('Falha ao carregar os detalhes do filme', response.response),
@@ -87,10 +106,11 @@ class MoviesRepositoryRemote implements MoviesRepository {
   @override
   Future<Result<Video?>> getMovieTrailer(int movieId) async {
     try {
-      // Boa parte dos filmes não tem vídeo cadastrado em pt-BR. Antes de dizer
-      // que não há trailer, tentamos o catálogo original (en-US).
-      var videos = await _fetchVideos(movieId, language: tmdbDefaultLanguage);
-      if (videos.isEmpty) {
+      // Boa parte dos filmes não tem vídeo cadastrado fora do inglês. Antes de
+      // dizer que não há trailer, tentamos o catálogo em en-US — a não ser que
+      // ele já tenha sido o primeiro pedido.
+      var videos = await _fetchVideos(movieId, language: _language);
+      if (videos.isEmpty && _language != tmdbFallbackLanguage) {
         videos = await _fetchVideos(movieId, language: tmdbFallbackLanguage);
       }
       return Result.ok(_pickBestTrailer(videos));
@@ -108,6 +128,7 @@ class MoviesRepositoryRemote implements MoviesRepository {
       final response = await _restClient.searchMovies(
         query: query,
         page: page,
+        language: _language,
       );
 
       if (!_isSuccess(response.response.statusCode)) {
@@ -141,6 +162,7 @@ class MoviesRepositoryRemote implements MoviesRepository {
       final response = await _restClient.discoverMovies(
         withGenres: withGenres,
         page: page,
+        language: _language,
       );
 
       if (!_isSuccess(response.response.statusCode)) {
@@ -164,7 +186,7 @@ class MoviesRepositoryRemote implements MoviesRepository {
   @override
   Future<Result<List<MovieGenre>>> getMovieGenres() async {
     try {
-      final response = await _restClient.getMovieGenres();
+      final response = await _restClient.getMovieGenres(language: _language);
 
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(

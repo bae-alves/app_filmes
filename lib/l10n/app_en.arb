@@ -1,6 +1,29 @@
 {
   "@@locale": "en",
 
+  "retry": "Try again",
+  "untitled": "Untitled",
+  "synopsisUnavailable": "Synopsis not available.",
+  "runtimeHoursMinutes": "{hours}h {minutes}m",
+  "runtimeHours": "{hours}h",
+  "runtimeMinutes": "{minutes}m",
+
+  "homeTitle": "Popular movies",
+  "homeEmpty": "No movies found right now.",
+  "homeLoadError": "Couldn't load the movies.",
+  "searchLabel": "Movie title",
+  "searchHint": "Type a movie title",
+  "searchTooltip": "Search",
+  "advancedFilter": "Advanced filter",
+  "applyFilters": "Apply filters",
+  "genresLoadError": "Couldn't load the genres.",
+
+  "detailsFallbackTitle": "Details",
+  "detailsLoadError": "Couldn't load this movie.",
+  "detailsNotFound": "We couldn't find any information about this movie.",
+  "synopsisTitle": "Synopsis",
+  "trailerUnavailable": "Trailer not available",
+
   "watchProvidersTitle": "Where to watch",
   "watchProvidersSubscription": "Subscription",
   "watchProvidersFree": "Free",
