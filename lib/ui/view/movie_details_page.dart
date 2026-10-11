@@ -121,7 +121,9 @@ class _DetailsContent extends StatelessWidget {
     const castPreview = 10;
 
     return ListView(
-      padding: const EdgeInsets.only(bottom: 24),
+      // Padding explícito desliga o recuo automático do sistema: sem somá-lo, o
+      // fim da tela fica sob a barra de navegação.
+      padding: const EdgeInsets.only(bottom: 24) + MediaQuery.paddingOf(context),
       children: [
         _TrailerSection(
           youtubeKey: viewModel.trailerYoutubeKey,

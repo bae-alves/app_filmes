@@ -314,6 +314,57 @@ void main() {
     expect(find.byKey(WatchProvidersSection.unavailableKey), findsNothing);
   });
 
+  group('com a barra de navegação do sistema por cima do app', () {
+    /// Altura da barra de navegação do Android (edge-to-edge) na tela de teste.
+    const navigationBar = 48.0;
+
+    /// Tela de 800x600 com a barra no rodapé. É a área que o conteúdo, ao fim
+    /// da rolagem, não pode invadir.
+    void useNavigationBar(WidgetTester tester) {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.padding = const FakeViewPadding(bottom: navigationBar);
+      tester.view.viewPadding = const FakeViewPadding(bottom: navigationBar);
+      addTearDown(tester.view.reset);
+    }
+
+    testWidgets('o último filme da lista termina acima da barra',
+        (tester) async {
+      useNavigationBar(tester);
+      final movies = [
+        for (var id = 1; id <= 12; id++) Movie(id: id, title: 'Filme $id'),
+      ];
+      await tester.pumpWidget(buildApp(FakeMoviesRepository(popularMovies: movies)));
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(ListView), const Offset(0, -10000));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getBottomLeft(find.byKey(const ValueKey(12))).dy,
+        lessThanOrEqualTo(600 - navigationBar),
+      );
+    });
+
+    testWidgets('o fim da tela de detalhes termina acima da barra',
+        (tester) async {
+      useNavigationBar(tester);
+      await tester.pumpWidget(buildApp(buildRepository()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(MovieCard).first);
+      await tester.pumpAndSettle();
+
+      await tester.drag(detailsScrollable, const Offset(0, -10000));
+      await tester.pumpAndSettle();
+
+      // "Fonte: JustWatch" é a última linha da tela.
+      expect(
+        tester.getBottomLeft(find.text('Fonte: JustWatch')).dy,
+        lessThanOrEqualTo(600 - navigationBar),
+      );
+    });
+  });
+
   group('em inglês', () {
     testWidgets('a home e os detalhes aparecem traduzidos e formatados',
         (tester) async {

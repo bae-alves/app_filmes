@@ -192,7 +192,10 @@ Future<void> _openAdvancedFilter() async {
                 child: RefreshIndicator(
                   onRefresh: () => viewModel.load(forceRefresh: true),
                   child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    // Padding explícito desliga o recuo automático do sistema:
+                    // sem somá-lo, o fim da lista fica sob a barra de navegação.
+                    padding: const EdgeInsets.symmetric(vertical: 8) +
+                        MediaQuery.paddingOf(context),
                     itemCount: viewModel.movies.length,
                     itemBuilder: (context, index) {
                       final movie = viewModel.movies[index];
