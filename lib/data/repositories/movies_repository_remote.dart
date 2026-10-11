@@ -4,6 +4,7 @@ import '../../utils/result.dart';
 import '../api_models/movie.dart';
 import '../api_models/movie_details.dart';
 import '../api_models/video.dart';
+import '../api_models/watch_providers.dart';
 import '../services/tmdb_rest_client.dart';
 import 'movies_repository.dart';
 import '../api_models/movie_genre.dart';
@@ -26,6 +27,13 @@ class MoviesRepositoryRemote implements MoviesRepository {
   /// Detalhes já carregados, indexados pelo id do filme. Evita nova chamada de
   /// rede quando o usuário volta para a home e reabre o mesmo filme.
   final Map<int, MovieDetails> _detailsCache = {};
+
+  /// Disponibilidade em streaming já carregada, indexada pelo id do filme.
+  ///
+  /// Guarda o mapa de **todos os países** devolvido pelo TMDB, e não só o da
+  /// região pedida: se a região do usuário mudar, a resposta sai do cache sem
+  /// nova chamada de rede.
+  final Map<int, Map<String, WatchProviderRegion>> _watchProvidersCache = {};
 
   @override
   Future<Result<List<Movie>>> getPopularMovies({
@@ -174,6 +182,36 @@ class MoviesRepositoryRemote implements MoviesRepository {
         _asException('Falha ao carregar os gêneros', error),
       );
     }
+  }
+
+  @override
+  Future<Result<WatchProviderRegion?>> getWatchProviders(
+    int movieId, {
+    required String region,
+  }) async {
+    var byRegion = _watchProvidersCache[movieId];
+    if (byRegion == null) {
+      try {
+        final response = await _restClient.getWatchProviders(movieId);
+        if (!_isSuccess(response.response.statusCode)) {
+          return Result.error(
+            _httpException('Falha ao carregar onde assistir', response.response),
+          );
+        }
+
+        byRegion = response.data.results ?? const {};
+        _watchProvidersCache[movieId] = byRegion;
+      } on Object catch (error) {
+        return Result.error(
+          _asException('Falha ao carregar onde assistir', error),
+        );
+      }
+    }
+
+    // País ausente e país presente mas sem nenhum serviço significam a mesma
+    // coisa para quem consome: o filme não está disponível ali.
+    final providers = byRegion[region.toUpperCase()];
+    return Result.ok(providers == null || providers.isEmpty ? null : providers);
   }
 
   Future<List<Video>> _fetchVideos(int movieId, {required String language}) async {

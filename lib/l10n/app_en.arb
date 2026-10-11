@@ -1,0 +1,10 @@
+{
+  "@@locale": "en",
+
+  "watchProvidersSubscription": "Subscription",
+  "watchProvidersFree": "Free",
+  "watchProvidersRent": "Rent",
+  "watchProvidersBuy": "Buy",
+  "watchProvidersUnavailable": "Not available for streaming in your region",
+  "watchProvidersAttribution": "Source: JustWatch"
+}

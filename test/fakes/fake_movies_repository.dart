@@ -1,6 +1,7 @@
 import 'package:app_filmes/data/api_models/movie.dart';
 import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/video.dart';
+import 'package:app_filmes/data/api_models/watch_providers.dart';
 import 'package:app_filmes/data/repositories/movies_repository.dart';
 import 'package:app_filmes/utils/result.dart';
 import 'package:app_filmes/data/api_models/movie_genre.dart';
@@ -18,12 +19,14 @@ class FakeMoviesRepository implements MoviesRepository {
     this.movieGenres = const [],
     this.detailsById = const {},
     this.trailersById = const {},
+    this.watchProvidersById = const {},
     this.popularError,
     this.searchError,
     this.discoverError,
     this.genresError,
     this.detailsError,
     this.trailerError,
+    this.watchProvidersError,
   });
 
   /// Filmes devolvidos por [getPopularMovies].
@@ -35,6 +38,17 @@ class FakeMoviesRepository implements MoviesRepository {
   /// Trailers disponíveis, indexados pelo id do filme. Ids ausentes
   /// representam filmes sem trailer publicado.
   final Map<int, Video> trailersById;
+
+  /// Disponibilidade em streaming por filme e, dentro dele, por país — o
+  /// mesmo formato de `WatchProvidersResponse.results`. Filmes ou países
+  /// ausentes representam "indisponível".
+  final Map<int, Map<String, WatchProviderRegion>> watchProvidersById;
+
+  /// Quando definido, [getWatchProviders] falha com esta exceção.
+  final Exception? watchProvidersError;
+
+  /// Regiões passadas para [getWatchProviders], na ordem em que chegaram.
+  final List<String> requestedWatchRegions = [];
 
   /// Quando definido, [getPopularMovies] falha com esta exceção.
   final Exception? popularError;
@@ -132,5 +146,16 @@ class FakeMoviesRepository implements MoviesRepository {
     final error = trailerError;
     if (error != null) return Result.error(error);
     return Result.ok(trailersById[movieId]);
+  }
+
+  @override
+  Future<Result<WatchProviderRegion?>> getWatchProviders(
+    int movieId, {
+    required String region,
+  }) async {
+    requestedWatchRegions.add(region);
+    final error = watchProvidersError;
+    if (error != null) return Result.error(error);
+    return Result.ok(watchProvidersById[movieId]?[region]);
   }
 }

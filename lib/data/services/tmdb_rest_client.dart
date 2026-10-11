@@ -5,6 +5,7 @@ import '../api_models/movie_details.dart';
 import '../api_models/movie_page_response.dart';
 import '../api_models/videos_response.dart';
 import '../api_models/movie_genres_response.dart';
+import '../api_models/watch_providers.dart';
 
 part 'tmdb_rest_client.g.dart';
 
@@ -73,6 +74,15 @@ abstract class TmdbRestClient {
   Future<HttpResponse<MovieGenresResponse>> getMovieGenres({
     @Query('language') String language = tmdbDefaultLanguage,
   });
+
+  /// Serviços de streaming, aluguel e compra onde o filme está disponível.
+  ///
+  /// A resposta traz **todos os países** de uma vez — não há parâmetro de
+  /// região nem de idioma. Escolher o país do usuário é papel do repositório.
+  @GET('/movie/{movie_id}/watch/providers')
+  Future<HttpResponse<WatchProvidersResponse>> getWatchProviders(
+    @Path('movie_id') int movieId,
+  );
 }
 
 /// URL base da API v3 do TMDB.
@@ -84,3 +94,11 @@ const String tmdbDefaultLanguage = 'pt-BR';
 
 /// Idioma usado como alternativa quando não há conteúdo em [tmdbDefaultLanguage].
 const String tmdbFallbackLanguage = 'en-US';
+
+/// País usado para consultar onde assistir quando o dispositivo não informa
+/// uma região (ex.: navegador configurado só com `en`, sem país).
+///
+/// Código ISO 3166-1 de duas letras, o mesmo formato das chaves de
+/// [WatchProvidersResponse.results]. A região do usuário é obtida em
+/// `currentWatchRegion` (lib/utils/watch_region.dart).
+const String tmdbFallbackWatchRegion = 'BR';

@@ -41,6 +41,14 @@ dependencies:
   flutter_dotenv: ^6.0.1
   youtube_player_flutter: ^10.0.1
   url_launcher: ^6.3.2
+  # Ícones da interface (https://lucide.dev). Logos de serviços de streaming
+  # não fazem parte do Lucide: vêm como imagem do TMDB.
+  lucide_icons_flutter: ^3.1.24
+  # Internacionalização (EN / PT-BR). A versão do intl é fixada pelo
+  # flutter_localizations do SDK, por isso não usamos `^` aqui.
+  intl: 0.20.2
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +74,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Gera `AppLocalizations` a partir dos arquivos .arb de lib/l10n
+  # (configuração em l10n.yaml). Veja a seção "Internacionalização" do README.
+  generate: true
 
   # O arquivo .env guarda as credenciais do TMDB e é carregado em tempo de
   # execução pelo flutter_dotenv. Ele está no .gitignore: cada desenvolvedor

@@ -2,6 +2,7 @@ import 'package:app_filmes/data/api_models/genre.dart';
 import 'package:app_filmes/data/api_models/movie.dart';
 import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/video.dart';
+import 'package:app_filmes/data/api_models/watch_providers.dart';
 
 /// Massa de dados compartilhada entre os testes.
 ///
@@ -73,4 +74,51 @@ const dunaTrailer = Video(
   type: 'Trailer',
   official: true,
   publishedAt: '2024-01-10T13:00:00.000Z',
+);
+
+const netflix = WatchProvider(
+  providerId: 8,
+  providerName: 'Netflix',
+  logoPath: '/netflix.jpg',
+  displayPriority: 5,
+);
+
+const maxStreaming = WatchProvider(
+  providerId: 1899,
+  providerName: 'Max',
+  logoPath: '/max.jpg',
+  displayPriority: 1,
+);
+
+const appleTv = WatchProvider(
+  providerId: 2,
+  providerName: 'Apple TV',
+  logoPath: '/apple.jpg',
+  displayPriority: 3,
+);
+
+/// Onde assistir Duna no Brasil: duas assinaturas (fora de ordem de
+/// prioridade, de propósito) e o mesmo serviço para alugar e comprar.
+const dunaProvidersBr = WatchProviderRegion(
+  link: 'https://www.themoviedb.org/movie/693134/watch?locale=BR',
+  flatrate: [netflix, maxStreaming],
+  rent: [appleTv],
+  buy: [appleTv],
+);
+
+/// Onde assistir Duna nos EUA: só uma assinatura.
+const dunaProvidersUs = WatchProviderRegion(
+  link: 'https://www.themoviedb.org/movie/693134/watch?locale=US',
+  flatrate: [maxStreaming],
+);
+
+/// Resposta do TMDB para Duna: BR e US com serviços, e PT presente mas vazio
+/// (o TMDB às vezes devolve o país só com o link).
+const dunaProvidersResponse = WatchProvidersResponse(
+  id: dunaId,
+  results: {
+    'BR': dunaProvidersBr,
+    'US': dunaProvidersUs,
+    'PT': WatchProviderRegion(link: 'https://www.themoviedb.org/movie/693134/watch?locale=PT'),
+  },
 );

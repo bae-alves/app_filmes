@@ -1,0 +1,33 @@
+{
+  "@@locale": "pt",
+
+  "watchProvidersSubscription": "Assinatura",
+  "@watchProvidersSubscription": {
+    "description": "Grupo de serviços em que o filme está incluído na assinatura (ex.: Netflix, Max)."
+  },
+
+  "watchProvidersFree": "Grátis",
+  "@watchProvidersFree": {
+    "description": "Grupo de serviços em que o filme é gratuito, com ou sem anúncios."
+  },
+
+  "watchProvidersRent": "Alugar",
+  "@watchProvidersRent": {
+    "description": "Grupo de serviços em que o filme pode ser alugado."
+  },
+
+  "watchProvidersBuy": "Comprar",
+  "@watchProvidersBuy": {
+    "description": "Grupo de serviços em que o filme pode ser comprado."
+  },
+
+  "watchProvidersUnavailable": "Indisponível em streaming na sua região",
+  "@watchProvidersUnavailable": {
+    "description": "Aviso exibido quando o filme não está em nenhum serviço de streaming na região do usuário."
+  },
+
+  "watchProvidersAttribution": "Fonte: JustWatch",
+  "@watchProvidersAttribution": {
+    "description": "Crédito obrigatório pelos termos do TMDB: os dados de streaming vêm da JustWatch. Não traduza o nome JustWatch."
+  }
+}

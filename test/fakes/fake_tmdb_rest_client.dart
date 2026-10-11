@@ -1,6 +1,7 @@
 import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/movie_page_response.dart';
 import 'package:app_filmes/data/api_models/videos_response.dart';
+import 'package:app_filmes/data/api_models/watch_providers.dart';
 import 'package:app_filmes/data/services/tmdb_rest_client.dart';
 import 'package:app_filmes/data/api_models/movie_genres_response.dart';
 import 'package:dio/dio.dart';
@@ -15,6 +16,7 @@ class FakeTmdbRestClient implements TmdbRestClient {
     this.popularPage = const MoviePageResponse(),
     this.details,
     this.videosByLanguage = const {},
+    this.watchProviders = const WatchProvidersResponse(),
   });
 
   /// Resposta devolvida por [getPopularMovies].
@@ -26,6 +28,12 @@ class FakeTmdbRestClient implements TmdbRestClient {
   /// Vídeos por idioma solicitado. Idiomas ausentes devolvem lista vazia,
   /// exatamente como o TMDB faz quando não há tradução cadastrada.
   Map<String?, VideosResponse> videosByLanguage;
+
+  /// Resposta devolvida por [getWatchProviders].
+  WatchProvidersResponse watchProviders;
+
+  /// Quantidade de chamadas a [getWatchProviders].
+  int watchProvidersCallCount = 0;
 
   /// Status HTTP devolvido em todas as respostas.
   int statusCode = 200;
@@ -102,6 +110,15 @@ class FakeTmdbRestClient implements TmdbRestClient {
     return _wrap(
       videosByLanguage[language] ?? const VideosResponse(results: []),
     );
+  }
+
+  @override
+  Future<HttpResponse<WatchProvidersResponse>> getWatchProviders(
+    int movieId,
+  ) async {
+    watchProvidersCallCount++;
+    _maybeThrow();
+    return _wrap(watchProviders);
   }
 
   void _maybeThrow() {

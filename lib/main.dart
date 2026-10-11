@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'l10n/app_localizations.dart';
+
 import 'data/repositories/movies_repository.dart';
 import 'data/repositories/movies_repository_remote.dart';
 import 'data/services/tmdb_dio.dart';
@@ -58,6 +60,11 @@ class _AppFilmesState extends State<AppFilmes> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
       ),
+      // Idiomas suportados (EN e PT) e os textos traduzidos de lib/l10n. O
+      // Flutter escolhe o idioma pela localidade do dispositivo, caindo para o
+      // primeiro da lista quando ela não é suportada.
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: HomePage(
         viewModel: _homeViewModel,
         detailsViewModelFactory: (movieId) => MovieDetailsViewModel(

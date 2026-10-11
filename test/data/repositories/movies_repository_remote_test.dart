@@ -3,6 +3,7 @@ import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/movie_page_response.dart';
 import 'package:app_filmes/data/api_models/video.dart';
 import 'package:app_filmes/data/api_models/videos_response.dart';
+import 'package:app_filmes/data/api_models/watch_providers.dart';
 import 'package:app_filmes/data/repositories/movies_repository_remote.dart';
 import 'package:app_filmes/data/services/tmdb_rest_client.dart';
 import 'package:app_filmes/utils/result.dart';
@@ -151,6 +152,85 @@ void main() {
 
       expect(result, isA<Ok<Video?>>());
       expect((result as Ok<Video?>).value, isNull);
+    });
+  });
+
+  group('getWatchProviders', () {
+    test('devolve os serviços da região pedida', () async {
+      restClient.watchProviders = dunaProvidersResponse;
+
+      final result = await repository.getWatchProviders(dunaId, region: 'BR');
+
+      expect(result, isA<Ok<WatchProviderRegion?>>());
+      final region = (result as Ok<WatchProviderRegion?>).value;
+      expect(region?.flatrate, [netflix, maxStreaming]);
+      expect(region?.link, contains('locale=BR'));
+    });
+
+    test('aceita a região em minúsculas', () async {
+      restClient.watchProviders = dunaProvidersResponse;
+
+      final result = await repository.getWatchProviders(dunaId, region: 'us');
+
+      expect((result as Ok<WatchProviderRegion?>).value?.flatrate,
+          [maxStreaming]);
+    });
+
+    test('devolve Ok com null quando a região não aparece na resposta',
+        () async {
+      restClient.watchProviders = dunaProvidersResponse;
+
+      final result = await repository.getWatchProviders(dunaId, region: 'JP');
+
+      expect(result, isA<Ok<WatchProviderRegion?>>());
+      expect((result as Ok<WatchProviderRegion?>).value, isNull);
+    });
+
+    test('devolve Ok com null quando a região vem só com o link', () async {
+      restClient.watchProviders = dunaProvidersResponse;
+
+      final result = await repository.getWatchProviders(dunaId, region: 'PT');
+
+      expect((result as Ok<WatchProviderRegion?>).value, isNull);
+    });
+
+    test('guarda todos os países em cache: trocar de região não refaz a '
+        'requisição', () async {
+      restClient.watchProviders = dunaProvidersResponse;
+
+      await repository.getWatchProviders(dunaId, region: 'BR');
+      final us = await repository.getWatchProviders(dunaId, region: 'US');
+
+      expect(restClient.watchProvidersCallCount, 1);
+      expect((us as Ok<WatchProviderRegion?>).value?.flatrate, [maxStreaming]);
+    });
+
+    test('devolve Error quando o status HTTP não é de sucesso', () async {
+      restClient.statusCode = 500;
+
+      final result = await repository.getWatchProviders(dunaId, region: 'BR');
+
+      expect(result, isA<Error<WatchProviderRegion?>>());
+      expect((result as Error<WatchProviderRegion?>).error.toString(),
+          contains('500'));
+    });
+
+    test('não guarda a falha em cache: a próxima chamada tenta de novo',
+        () async {
+      restClient.errorToThrow = DioException.connectionError(
+        requestOptions: RequestOptions(path: '/movie/watch/providers'),
+        reason: 'offline',
+      );
+      final failed = await repository.getWatchProviders(dunaId, region: 'BR');
+      expect(failed, isA<Error<WatchProviderRegion?>>());
+
+      restClient
+        ..errorToThrow = null
+        ..watchProviders = dunaProvidersResponse;
+      final retried = await repository.getWatchProviders(dunaId, region: 'BR');
+
+      expect((retried as Ok<WatchProviderRegion?>).value, isNotNull);
+      expect(restClient.watchProvidersCallCount, 2);
     });
   });
 }
