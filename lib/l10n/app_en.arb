@@ -34,6 +34,7 @@
   "watchProvidersAttribution": "Source: JustWatch",
   "watchProvidersLoadError": "Couldn't load where to watch",
   "castTitle": "Cast",
+  "castSeeAll": "See all",
   "directedBy": "Directed by {names}",
   "certificationLabel": "Age rating: {certification}"
 }

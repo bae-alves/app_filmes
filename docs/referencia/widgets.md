@@ -15,6 +15,8 @@ Todos exigem os delegates de `AppLocalizations` no `MaterialApp`.
 ## `MovieDetailsPage`
 
 `lib/ui/view/movie_details_page.dart`. Trailer, informações e onde assistir.
+A fileira do elenco mostra os 10 primeiros. Com mais gente, o botão "Ver todos"
+abre a lista completa.
 
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |

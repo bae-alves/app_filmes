@@ -107,6 +107,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get castTitle => 'Cast';
 
   @override
+  String get castSeeAll => 'See all';
+
+  @override
   String directedBy(String names) {
     return 'Directed by $names';
   }

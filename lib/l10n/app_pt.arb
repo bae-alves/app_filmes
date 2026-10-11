@@ -161,6 +161,11 @@
     "description": "Título da seção da tela de detalhes com os atores principais."
   },
 
+  "castSeeAll": "Ver todos",
+  "@castSeeAll": {
+    "description": "Botão ao lado do título \"Elenco\" que abre a lista completa do elenco."
+  },
+
   "directedBy": "Direção: {names}",
   "@directedBy": {
     "description": "Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.",

@@ -278,6 +278,12 @@ abstract class AppLocalizations {
   /// **'Elenco'**
   String get castTitle;
 
+  /// Botão ao lado do título "Elenco" que abre a lista completa do elenco.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver todos'**
+  String get castSeeAll;
+
   /// Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.
   ///
   /// In pt, this message translates to:

@@ -15,7 +15,7 @@ flutter analyze   # análise estática
 | `test/data/repositories/movies_repository_remote_test.dart` | 26 | Cache (inclusive o salvo no aparelho e o seu limite), erros HTTP e de rede, escolha do trailer, onde assistir por região, idioma enviado ao TMDB. |
 | `test/ui/view_model/home_view_model_test.dart` | 5 | Estados de carregamento e erro da home. |
 | `test/ui/view_model/movie_details_view_model_test.dart` | 8 | Detalhes, trailer e onde assistir; falhas toleradas e a de onde assistir sinalizada. |
-| `test/ui/view/home_to_details_navigation_test.dart` | 13 | Navegação da home aos detalhes, em pt e en, o elenco com fonte grande e a falha em onde assistir. |
+| `test/ui/view/home_to_details_navigation_test.dart` | 14 | Navegação da home aos detalhes, em pt e en, o elenco com fonte grande e o "Ver todos", e a falha em onde assistir. |
 | `test/ui/view/watch_providers_section_test.dart` | 5 | Grupos, ordem, indisponível, modo compacto, pt e en. |
 
 ## Fakes

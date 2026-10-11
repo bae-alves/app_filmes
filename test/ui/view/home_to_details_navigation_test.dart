@@ -1,4 +1,5 @@
 import 'package:app_filmes/data/api_models/movie.dart';
+import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/l10n/app_localizations.dart';
 import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view/movie_details_page.dart';
@@ -258,6 +259,39 @@ void main() {
 
     await tester.tap(find.byType(MovieCard));
     expect(tapped, same(dunaMovie));
+  });
+
+  testWidgets('com mais de 10 no elenco, "Ver todos" abre o elenco completo',
+      (tester) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [matrixMovie],
+      detailsById: {
+        matrixId: MovieDetails(
+          id: matrixId,
+          title: 'Matrix',
+          credits: Credits(cast: [
+            for (var i = 1; i <= 11; i++) CastMember(name: 'Ator $i', order: i),
+          ]),
+        ),
+      },
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard));
+    await tester.pumpAndSettle();
+
+    // O botão já existe fora da tela (dentro do cacheExtent da lista), então
+    // basta rolar até ele.
+    await tester.ensureVisible(find.text('Ver todos'));
+    await tester.pumpAndSettle();
+    expect(find.text('Ator 11'), findsNothing);
+
+    await tester.tap(find.text('Ver todos'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Elenco'), findsOneWidget, reason: 'título da página');
+    await tester.scrollUntilVisible(find.text('Ator 11'), 200);
+    expect(find.text('Ator 11'), findsOneWidget);
   });
 
   testWidgets('falha em onde assistir não aparece como "indisponível"',

@@ -115,9 +115,10 @@ class _DetailsContent extends StatelessWidget {
       for (final director in details.directors)
         if (director.name?.isNotEmpty == true) director.name!,
     ];
-    // ponytail: só os 10 primeiros; criar uma tela de elenco completo se pedirem.
     final cast = [...?details.credits?.cast]
       ..sort((a, b) => (a.order ?? 999).compareTo(b.order ?? 999));
+    // A fileira mostra só o elenco principal; o resto fica em "Ver todos".
+    const castPreview = 10;
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
@@ -182,9 +183,27 @@ class _DetailsContent extends StatelessWidget {
               ),
               if (cast.isNotEmpty) ...[
                 const SizedBox(height: 20),
-                Text(l10n.castTitle, style: theme.textTheme.titleMedium),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.castTitle,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ),
+                    if (cast.length > castPreview)
+                      TextButton(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => _FullCastPage(cast: cast),
+                          ),
+                        ),
+                        child: Text(l10n.castSeeAll),
+                      ),
+                  ],
+                ),
                 const SizedBox(height: 8),
-                _CastList(cast: cast.take(10).toList()),
+                _CastList(cast: cast.take(castPreview).toList()),
               ],
               const SizedBox(height: 20),
               Text(
@@ -359,19 +378,11 @@ class _CastMemberTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final photoUrl = TmdbImages.profile(member.profilePath);
     return SizedBox(
       width: 88,
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 36,
-            foregroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-            // Foto que não carrega fica no ícone, sem erro no log.
-            onForegroundImageError:
-                photoUrl != null ? (error, stackTrace) {} : null,
-            child: const Icon(Icons.person_outline),
-          ),
+          _CastAvatar(member: member, radius: 36),
           const SizedBox(height: 6),
           Text(
             member.name ?? '—',
@@ -391,6 +402,54 @@ class _CastMemberTile extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// Foto de uma pessoa do elenco, com um ícone no lugar quando não há foto.
+class _CastAvatar extends StatelessWidget {
+  const _CastAvatar({required this.member, required this.radius});
+
+  final CastMember member;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final photoUrl = TmdbImages.profile(member.profilePath);
+    return CircleAvatar(
+      radius: radius,
+      foregroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+      // Foto que não carrega fica no ícone, sem erro no log.
+      onForegroundImageError: photoUrl != null ? (error, stackTrace) {} : null,
+      child: const Icon(Icons.person_outline),
+    );
+  }
+}
+
+/// Elenco completo do filme, aberto pelo botão "Ver todos" da tela de detalhes.
+class _FullCastPage extends StatelessWidget {
+  const _FullCastPage({required this.cast});
+
+  /// Elenco já ordenado por destaque.
+  final List<CastMember> cast;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(AppLocalizations.of(context).castTitle)),
+      body: ListView.builder(
+        itemCount: cast.length,
+        itemBuilder: (context, index) {
+          final member = cast[index];
+          return ListTile(
+            leading: _CastAvatar(member: member, radius: 20),
+            title: Text(member.name ?? '—'),
+            subtitle: member.character?.isNotEmpty == true
+                ? Text(member.character!)
+                : null,
+          );
+        },
       ),
     );
   }
