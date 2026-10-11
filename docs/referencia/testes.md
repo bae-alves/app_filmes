@@ -11,10 +11,11 @@ flutter analyze   # análise estática
 | --- | --- | --- |
 | `test/utils/formatters_test.dart` | 10 | Ano, duração e nota, em pt e en. |
 | `test/utils/user_locale_test.dart` | 4 | Idioma do TMDB a partir dos idiomas do dispositivo. |
-| `test/data/repositories/movies_repository_remote_test.dart` | 20 | Cache, erros HTTP e de rede, escolha do trailer, onde assistir por região, idioma enviado ao TMDB. |
+| `test/data/api_models/movie_details_test.dart` | 5 | Diretores, classificação indicativa por país e ida e volta do JSON do cache. |
+| `test/data/repositories/movies_repository_remote_test.dart` | 25 | Cache (inclusive o salvo no aparelho), erros HTTP e de rede, escolha do trailer, onde assistir por região, idioma enviado ao TMDB. |
 | `test/ui/view_model/home_view_model_test.dart` | 5 | Estados de carregamento e erro da home. |
 | `test/ui/view_model/movie_details_view_model_test.dart` | 8 | Detalhes, trailer e onde assistir; falhas toleradas. |
-| `test/ui/view/home_to_details_navigation_test.dart` | 11 | Navegação da home aos detalhes, em pt e en. |
+| `test/ui/view/home_to_details_navigation_test.dart` | 12 | Navegação da home aos detalhes, em pt e en, e o elenco com fonte grande. |
 | `test/ui/view/watch_providers_section_test.dart` | 5 | Grupos, ordem, indisponível, modo compacto, pt e en. |
 
 ## Fakes
@@ -23,7 +24,8 @@ Em `test/fakes/`. Substituem a rede; os testes rodam offline.
 
 ### `FakeTmdbRestClient`
 
-Substitui o service nos testes do repositório.
+Substitui o service nos testes do repositório. O armazenamento do cache de
+detalhes vem de `SharedPreferences.setMockInitialValues`, em memória.
 
 | Membro | Descrição |
 | --- | --- |
@@ -53,8 +55,8 @@ Substitui o repositório nos testes de view model e de widget.
 
 | Fixture | Conteúdo |
 | --- | --- |
-| `dunaId`, `dunaMovie`, `dunaDetails`, `dunaTrailer` | Filme completo, com trailer. |
-| `matrixId`, `matrixMovie`, `matrixDetails` | Filme sem trailer e sem campos opcionais. |
+| `dunaId`, `dunaMovie`, `dunaDetails`, `dunaTrailer` | Filme completo, com trailer, elenco, direção e classificação em BR e US. |
+| `matrixId`, `matrixMovie`, `matrixDetails` | Filme sem trailer, sem créditos e sem campos opcionais. |
 | `netflix`, `maxStreaming`, `appleTv` | Serviços de streaming. |
 | `dunaProvidersBr`, `dunaProvidersUs` | Onde assistir Duna em BR e US. |
 | `dunaProvidersResponse` | Resposta do TMDB com BR, US e PT (PT sem serviços). |

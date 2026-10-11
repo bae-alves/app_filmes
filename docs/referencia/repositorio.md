@@ -11,6 +11,7 @@ fonte de dados de filmes da UI. A implementação de produção é
 | --- | --- | --- |
 | `restClient` | `TmdbRestClient` | Service do TMDB. |
 | `language` | `String` | Idioma do conteúdo (`pt-BR`, `en-US`). Fixo durante a vida do repositório. |
+| `preferences` | `SharedPreferences` | Onde o cache de detalhes é salvo. Ao criar o repositório, as entradas vencidas são apagadas. |
 
 ## Métodos
 
@@ -23,7 +24,7 @@ Nenhum lança exceção.
 | `searchMovies({required query, page = 1})` | `List<Movie>` | `/search/movie` | Não |
 | `discoverMovies({genreIds, page = 1})` | `List<Movie>` | `/discover/movie` | Não |
 | `getMovieGenres()` | `List<MovieGenre>` | `/genre/movie/list` | Não (a `HomeViewModel` guarda a lista) |
-| `getMovieDetails(movieId)` | `MovieDetails` | `/movie/{id}` | Por filme |
+| `getMovieDetails(movieId)` | `MovieDetails` | `/movie/{id}?append_to_response=credits,release_dates` | Por filme e idioma, salvo no aparelho (`shared_preferences`) por 24h. Sobrevive ao reinício do app. |
 | `getMovieTrailer(movieId)` | `Video?` | `/movie/{id}/videos` | Não |
 | `getWatchProviders(movieId, {required region})` | `WatchProviderRegion?` | `/movie/{id}/watch/providers` | Por filme, com todos os países |
 

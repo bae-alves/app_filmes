@@ -1,7 +1,7 @@
 # Como adicionar um endpoint do TMDB
 
 O caminho de um dado novo, da API até a view model. Exemplo:
-`/movie/{movie_id}/credits` (elenco).
+`/movie/{movie_id}/reviews` (avaliações).
 
 ## 1. Modele a resposta
 
@@ -10,22 +10,22 @@ Crie `lib/data/api_models/<nome>.dart` no estilo de `video.dart`:
 ```dart
 import 'package:json_annotation/json_annotation.dart';
 
-part 'movie_credits.g.dart';
+part 'movie_reviews.g.dart';
 
-/// Envelope devolvido por `/movie/{movie_id}/credits`.
+/// Envelope devolvido por `/movie/{movie_id}/reviews`.
 ///
-/// Referência: https://developer.themoviedb.org/reference/movie-credits
+/// Referência: https://developer.themoviedb.org/reference/movie-reviews
 @JsonSerializable(fieldRename: FieldRename.snake)
-class MovieCredits {
-  const MovieCredits({this.id, this.cast});
+class MovieReviews {
+  const MovieReviews({this.id, this.results});
 
-  factory MovieCredits.fromJson(Map<String, dynamic> json) =>
-      _$MovieCreditsFromJson(json);
+  factory MovieReviews.fromJson(Map<String, dynamic> json) =>
+      _$MovieReviewsFromJson(json);
 
   final int? id;
-  final List<CastMember>? cast;
+  final List<Review>? results;
 
-  Map<String, dynamic> toJson() => _$MovieCreditsToJson(this);
+  Map<String, dynamic> toJson() => _$MovieReviewsToJson(this);
 }
 ```
 
@@ -36,8 +36,8 @@ Deixe todos os campos anuláveis: o TMDB omite campos sem aviso.
 Em `lib/data/services/tmdb_rest_client.dart`:
 
 ```dart
-  @GET('/movie/{movie_id}/credits')
-  Future<HttpResponse<MovieCredits>> getMovieCredits(
+  @GET('/movie/{movie_id}/reviews')
+  Future<HttpResponse<MovieReviews>> getMovieReviews(
     @Path('movie_id') int movieId, {
     @Query('language') required String language,
   });
@@ -58,11 +58,11 @@ dart run build_runner build --delete-conflicting-outputs
 No contrato `lib/data/repositories/movies_repository.dart`:
 
 ```dart
-  /// Elenco do filme [movieId].
-  Future<Result<MovieCredits>> getMovieCredits(int movieId);
+  /// Avaliações do filme [movieId].
+  Future<Result<MovieReviews>> getMovieReviews(int movieId);
 ```
 
-Em `movies_repository_remote.dart`, copie a forma de `getMovieDetails`:
+Em `movies_repository_remote.dart`, copie a forma de `getPopularMovies`:
 
 - chame o service com `language: _language`;
 - confira `_isSuccess(response.response.statusCode)`;
