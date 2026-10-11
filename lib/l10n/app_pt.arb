@@ -1,6 +1,11 @@
 {
   "@@locale": "pt",
 
+  "watchProvidersTitle": "Onde assistir",
+  "@watchProvidersTitle": {
+    "description": "Título da seção da tela de detalhes que lista os serviços de streaming do filme."
+  },
+
   "watchProvidersSubscription": "Assinatura",
   "@watchProvidersSubscription": {
     "description": "Grupo de serviços em que o filme está incluído na assinatura (ex.: Netflix, Max)."
@@ -24,6 +29,11 @@
   "watchProvidersUnavailable": "Indisponível em streaming na sua região",
   "@watchProvidersUnavailable": {
     "description": "Aviso exibido quando o filme não está em nenhum serviço de streaming na região do usuário."
+  },
+
+  "watchProvidersSeeWhere": "Ver onde assistir",
+  "@watchProvidersSeeWhere": {
+    "description": "Botão que abre, fora do app, a página do TMDB com os links para cada serviço de streaming."
   },
 
   "watchProvidersAttribution": "Fonte: JustWatch",

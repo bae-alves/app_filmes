@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../../data/api_models/genre.dart';
+import '../../l10n/app_localizations.dart';
 import '../../utils/formatters.dart';
 import '../../utils/tmdb_images.dart';
 import '../view_model/movie_details_view_model.dart';
 import 'widgets/trailer_player.dart';
+import 'widgets/watch_providers_section.dart';
 
-/// Tela de detalhes: mostra o trailer e as informações completas do filme.
+/// Tela de detalhes: mostra o trailer, as informações completas do filme e
+/// onde ele pode ser assistido.
 ///
 /// É alcançada ao tocar em um cartão da tela inicial.
 class MovieDetailsPage extends StatefulWidget {
@@ -149,6 +152,13 @@ class _DetailsContent extends StatelessWidget {
                     : 'Sinopse não disponível.',
                 style: theme.textTheme.bodyMedium,
               ),
+              const SizedBox(height: 20),
+              Text(
+                AppLocalizations.of(context).watchProvidersTitle,
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              WatchProvidersSection(region: viewModel.watchProviders),
             ],
           ),
         ),

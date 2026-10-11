@@ -98,6 +98,12 @@ abstract class AppLocalizations {
     Locale('pt'),
   ];
 
+  /// Título da seção da tela de detalhes que lista os serviços de streaming do filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Onde assistir'**
+  String get watchProvidersTitle;
+
   /// Grupo de serviços em que o filme está incluído na assinatura (ex.: Netflix, Max).
   ///
   /// In pt, this message translates to:
@@ -127,6 +133,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Indisponível em streaming na sua região'**
   String get watchProvidersUnavailable;
+
+  /// Botão que abre, fora do app, a página do TMDB com os links para cada serviço de streaming.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver onde assistir'**
+  String get watchProvidersSeeWhere;
 
   /// Crédito obrigatório pelos termos do TMDB: os dados de streaming vêm da JustWatch. Não traduza o nome JustWatch.
   ///

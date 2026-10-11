@@ -1,7 +1,9 @@
 import 'package:app_filmes/data/api_models/movie.dart';
+import 'package:app_filmes/l10n/app_localizations.dart';
 import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view/movie_details_page.dart';
 import 'package:app_filmes/ui/view/widgets/movie_card.dart';
+import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
 import 'package:app_filmes/ui/view_model/home_view_model.dart';
 import 'package:app_filmes/ui/view_model/movie_details_view_model.dart';
 import 'package:flutter/material.dart';
@@ -22,11 +24,16 @@ void main() {
   /// trailer certo chegou à tela.
   Widget buildApp(FakeMoviesRepository repository) {
     return MaterialApp(
+      // A tela de detalhes usa textos traduzidos (seção "Onde assistir").
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
       home: HomePage(
         viewModel: HomeViewModel(moviesRepository: repository),
         detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
           moviesRepository: repository,
           movieId: movieId,
+          watchRegion: 'BR',
         ),
         trailerPlayerBuilder: (context, youtubeKey) =>
             Text('trailer-fake:$youtubeKey'),
@@ -38,6 +45,9 @@ void main() {
         popularMovies: const [dunaMovie, matrixMovie],
         detailsById: const {dunaId: dunaDetails, matrixId: matrixDetails},
         trailersById: const {dunaId: dunaTrailer},
+        watchProvidersById: const {
+          dunaId: {'BR': dunaProvidersBr},
+        },
       );
 
   testWidgets('a tela inicial lista os filmes populares em cartões',
@@ -82,6 +92,11 @@ void main() {
       expect(find.text('8,2'), findsOneWidget);
       expect(find.text('Ficção científica'), findsOneWidget);
       expect(find.text('Aventura'), findsOneWidget);
+
+      // E onde assisti-lo, na região informada à view model.
+      expect(repository.requestedWatchRegions, ['BR']);
+      await tester.scrollUntilVisible(find.text('Onde assistir'), 200);
+      expect(find.byTooltip('Netflix'), findsOneWidget);
     },
   );
 
@@ -112,6 +127,16 @@ void main() {
       expect(find.byKey(MovieDetailsPage.emptyTrailerKey), findsOneWidget);
       expect(find.text('Trailer não disponível'), findsOneWidget);
       expect(find.text(matrixDetails.overview!), findsOneWidget);
+
+      // Matrix não tem serviços cadastrados no fake: a tela avisa.
+      await tester.scrollUntilVisible(
+        find.byKey(WatchProvidersSection.unavailableKey),
+        200,
+      );
+      expect(
+        find.text('Indisponível em streaming na sua região'),
+        findsOneWidget,
+      );
     },
   );
 
@@ -124,7 +149,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(MovieDetailsPage), findsOneWidget);
 
-    await tester.pageBack();
+    // `pageBack()` procura o botão pelo tooltip em inglês ("Back"); com o app
+    // em português o tooltip é "Voltar", então tocamos no widget diretamente.
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
     expect(find.byType(MovieDetailsPage), findsNothing);

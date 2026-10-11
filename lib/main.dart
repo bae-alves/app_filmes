@@ -10,6 +10,7 @@ import 'ui/view/home_page.dart';
 import 'ui/view_model/home_view_model.dart';
 import 'ui/view_model/movie_details_view_model.dart';
 import 'utils/env.dart';
+import 'utils/watch_region.dart';
 
 Future<void> main() async {
   // `ensureInitialized` é necessário porque carregamos o .env (um asset) antes
@@ -70,6 +71,9 @@ class _AppFilmesState extends State<AppFilmes> {
         detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
           moviesRepository: _moviesRepository,
           movieId: movieId,
+          // Lida a cada abertura: se o usuário trocar a região do aparelho,
+          // a próxima tela de detalhes já reflete a mudança.
+          watchRegion: currentWatchRegion(),
         ),
       ),
     );

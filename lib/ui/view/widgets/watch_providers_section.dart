@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/api_models/watch_providers.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/tmdb_images.dart';
 
 /// Mostra onde um filme pode ser assistido: logos dos serviços agrupados por
-/// forma de acesso e o crédito da JustWatch.
+/// forma de acesso, link para a página do TMDB e o crédito da JustWatch.
 ///
 /// É um widget "burro", como o `MovieCard`: recebe a [region] já escolhida e
 /// não conhece repositório nem view model. Por isso serve tanto à tela de
@@ -25,12 +26,15 @@ class WatchProvidersSection extends StatelessWidget {
   /// Chave do aviso exibido quando o filme não está em nenhum serviço.
   static const unavailableKey = Key('watch-providers-unavailable');
 
+  /// Chave do botão que abre a página "onde assistir" do TMDB.
+  static const linkKey = Key('watch-providers-link');
+
   /// Disponibilidade no país do usuário. `null` significa que o filme não está
   /// em nenhum serviço ali — e é exibido como tal, não como erro.
   final WatchProviderRegion? region;
 
   /// Versão reduzida para cards: uma única fileira de logos menores, sem
-  /// títulos de grupo e sem crédito (o crédito fica a cargo da
+  /// títulos de grupo, sem botão e sem crédito (o crédito fica a cargo da
   /// tela que hospeda os cards).
   final bool compact;
 
@@ -56,6 +60,7 @@ class WatchProvidersSection extends StatelessWidget {
     }
 
     final theme = Theme.of(context);
+    final link = region.link == null ? null : Uri.tryParse(region.link!);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,6 +71,16 @@ class WatchProvidersSection extends StatelessWidget {
           _LogoWrap(providers: providers, size: 40),
           const SizedBox(height: 12),
         ],
+        if (link != null)
+          TextButton.icon(
+            key: linkKey,
+            // A API não fornece deep link por serviço: a página do TMDB lista
+            // os links para cada um deles no país do usuário.
+            onPressed: () =>
+                launchUrl(link, mode: LaunchMode.externalApplication),
+            icon: const Icon(LucideIcons.externalLink, size: 18),
+            label: Text(l10n.watchProvidersSeeWhere),
+          ),
         // Exigência dos termos de uso do TMDB para os dados de streaming.
         Text(
           l10n.watchProvidersAttribution,

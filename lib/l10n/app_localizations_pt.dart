@@ -9,6 +9,9 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get watchProvidersTitle => 'Onde assistir';
+
+  @override
   String get watchProvidersSubscription => 'Assinatura';
 
   @override
@@ -23,6 +26,9 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get watchProvidersUnavailable =>
       'Indisponível em streaming na sua região';
+
+  @override
+  String get watchProvidersSeeWhere => 'Ver onde assistir';
 
   @override
   String get watchProvidersAttribution => 'Fonte: JustWatch';

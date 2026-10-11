@@ -27,7 +27,7 @@ void main() {
     );
   }
 
-  testWidgets('agrupa os serviços por forma de acesso, com o crédito',
+  testWidgets('agrupa os serviços por forma de acesso, com link e crédito',
       (tester) async {
     await tester.pumpWidget(buildSection(dunaProvidersBr));
 
@@ -41,6 +41,7 @@ void main() {
     // Apple TV está em "Alugar" e em "Comprar": um logo em cada grupo.
     expect(find.byTooltip('Apple TV'), findsNWidgets(2));
 
+    expect(find.byKey(WatchProvidersSection.linkKey), findsOneWidget);
     expect(find.text('Fonte: JustWatch'), findsOneWidget);
   });
 
@@ -62,6 +63,7 @@ void main() {
       find.text('Indisponível em streaming na sua região'),
       findsOneWidget,
     );
+    expect(find.byKey(WatchProvidersSection.linkKey), findsNothing);
   });
 
   testWidgets('exibe os textos em inglês quando o app está em inglês',
@@ -70,6 +72,7 @@ void main() {
       buildSection(dunaProvidersBr, locale: const Locale('en')),
     );
     expect(find.text('Subscription'), findsOneWidget);
+    expect(find.text('See where to watch'), findsOneWidget);
     expect(find.text('Source: JustWatch'), findsOneWidget);
 
     await tester.pumpWidget(buildSection(null, locale: const Locale('en')));
@@ -84,6 +87,7 @@ void main() {
     await tester.pumpWidget(buildSection(dunaProvidersBr, compact: true));
 
     expect(find.text('Assinatura'), findsNothing);
+    expect(find.byKey(WatchProvidersSection.linkKey), findsNothing);
     expect(find.text('Fonte: JustWatch'), findsNothing);
     expect(find.byTooltip('Apple TV'), findsOneWidget);
     expect(find.byTooltip('Netflix'), findsOneWidget);

@@ -1,10 +1,12 @@
 {
   "@@locale": "en",
 
+  "watchProvidersTitle": "Where to watch",
   "watchProvidersSubscription": "Subscription",
   "watchProvidersFree": "Free",
   "watchProvidersRent": "Rent",
   "watchProvidersBuy": "Buy",
   "watchProvidersUnavailable": "Not available for streaming in your region",
+  "watchProvidersSeeWhere": "See where to watch",
   "watchProvidersAttribution": "Source: JustWatch"
 }
