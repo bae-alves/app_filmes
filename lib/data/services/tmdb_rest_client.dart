@@ -43,10 +43,15 @@ abstract class TmdbRestClient {
   });
 
   /// Detalhes de um filme específico.
+  ///
+  /// [appendToResponse] traz elenco, equipe e classificação indicativa na
+  /// mesma requisição, em vez de três chamadas.
   @GET('/movie/{movie_id}')
   Future<HttpResponse<MovieDetails>> getMovieDetails(
     @Path('movie_id') int movieId, {
     @Query('language') required String language,
+    @Query('append_to_response')
+    String appendToResponse = 'credits,release_dates',
   });
 
   /// Vídeos (trailers, teasers, clipes) de um filme.

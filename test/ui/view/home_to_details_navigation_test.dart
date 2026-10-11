@@ -17,6 +17,10 @@ import '../../fakes/movie_fixtures.dart';
 /// > Dado que estou na tela inicial, quando toco em um cartão de filme, sou
 /// > direcionado para uma página com o trailer e as informações do filme.
 void main() {
+  /// Lista vertical da tela de detalhes. A fileira do elenco também é rolável,
+  /// por isso `scrollUntilVisible` precisa saber qual das duas rolar.
+  final detailsScrollable = find.byType(Scrollable).first;
+
   /// Monta o app com o repositório falso e um player de trailer de mentira.
   ///
   /// O player real depende de uma WebView, que não existe no ambiente de
@@ -95,10 +99,31 @@ void main() {
       expect(find.text('8,2'), findsOneWidget);
       expect(find.text('Ficção científica'), findsOneWidget);
       expect(find.text('Aventura'), findsOneWidget);
+      expect(find.text('Direção: Denis Villeneuve'), findsOneWidget);
+      // Classificação da região do usuário (BR), não a dos EUA.
+      expect(find.text('14'), findsOneWidget);
+      expect(find.text('PG-13'), findsNothing);
+      expect(find.byTooltip('Classificação indicativa: 14'), findsOneWidget);
+
+      // Elenco principal, na ordem dos créditos.
+      await tester.scrollUntilVisible(
+        find.text('Elenco'),
+        200,
+        scrollable: detailsScrollable,
+      );
+      expect(
+        tester.getTopLeft(find.text('Timothée Chalamet')).dx,
+        lessThan(tester.getTopLeft(find.text('Zendaya')).dx),
+      );
+      expect(find.text('Paul Atreides'), findsOneWidget);
 
       // E onde assisti-lo, na região informada à view model.
       expect(repository.requestedWatchRegions, ['BR']);
-      await tester.scrollUntilVisible(find.text('Onde assistir'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Onde assistir'),
+        200,
+        scrollable: detailsScrollable,
+      );
       expect(find.byTooltip('Netflix'), findsOneWidget);
     },
   );
@@ -114,6 +139,28 @@ void main() {
     expect(repository.requestedDetailIds, [matrixId]);
     expect(find.text('Matrix'), findsWidgets);
     expect(find.text('2h 16min'), findsOneWidget);
+    // Sem créditos nem classificação: as seções somem.
+    expect(find.text('Elenco'), findsNothing);
+    expect(find.textContaining('Direção'), findsNothing);
+  });
+
+  testWidgets('o elenco não estoura com a fonte do sistema no dobro',
+      (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(buildApp(buildRepository()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(MovieCard).first);
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Paul Atreides'),
+      200,
+      scrollable: detailsScrollable,
+    );
+
+    // Um overflow de layout aparece aqui como exceção.
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets(
@@ -230,7 +277,11 @@ void main() {
       expect(find.text('Synopsis'), findsOneWidget);
       expect(find.text('8.2'), findsOneWidget);
       expect(find.text('2h 46m'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Where to watch'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Where to watch'),
+        200,
+        scrollable: detailsScrollable,
+      );
       expect(find.text('Subscription'), findsOneWidget);
     });
 

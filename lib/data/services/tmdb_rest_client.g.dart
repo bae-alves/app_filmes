@@ -59,9 +59,13 @@ class _TmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MovieDetails>> getMovieDetails(
     int movieId, {
     required String language,
+    String appendToResponse = 'credits,release_dates',
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'language': language};
+    final queryParameters = <String, dynamic>{
+      r'language': language,
+      r'append_to_response': appendToResponse,
+    };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<MovieDetails>>(

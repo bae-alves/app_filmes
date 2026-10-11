@@ -99,4 +99,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get watchProvidersAttribution => 'Source: JustWatch';
+
+  @override
+  String get castTitle => 'Cast';
+
+  @override
+  String directedBy(String names) {
+    return 'Directed by $names';
+  }
+
+  @override
+  String certificationLabel(String certification) {
+    return 'Age rating: $certification';
+  }
 }

@@ -265,6 +265,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Fonte: JustWatch'**
   String get watchProvidersAttribution;
+
+  /// Título da seção da tela de detalhes com os atores principais.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco'**
+  String get castTitle;
+
+  /// Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.
+  ///
+  /// In pt, this message translates to:
+  /// **'Direção: {names}'**
+  String directedBy(String names);
+
+  /// Dica e rótulo de acessibilidade do selo com a classificação indicativa do país do usuário (ex.: 14, L, PG-13).
+  ///
+  /// In pt, this message translates to:
+  /// **'Classificação indicativa: {certification}'**
+  String certificationLabel(String certification);
 }
 
 class _AppLocalizationsDelegate

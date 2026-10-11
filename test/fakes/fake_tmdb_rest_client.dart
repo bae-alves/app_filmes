@@ -102,6 +102,7 @@ class FakeTmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MovieDetails>> getMovieDetails(
     int movieId, {
     required String language,
+    String appendToResponse = 'credits,release_dates',
   }) async {
     detailsCallCount++;
     requestedLanguages.add(language);

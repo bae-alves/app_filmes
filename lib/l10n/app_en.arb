@@ -31,5 +31,8 @@
   "watchProvidersBuy": "Buy",
   "watchProvidersUnavailable": "Not available for streaming in your region",
   "watchProvidersSeeWhere": "See where to watch",
-  "watchProvidersAttribution": "Source: JustWatch"
+  "watchProvidersAttribution": "Source: JustWatch",
+  "castTitle": "Cast",
+  "directedBy": "Directed by {names}",
+  "certificationLabel": "Age rating: {certification}"
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:app_filmes/data/api_models/movie.dart';
 import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/movie_page_response.dart';
@@ -9,6 +11,7 @@ import 'package:app_filmes/data/services/tmdb_rest_client.dart';
 import 'package:app_filmes/utils/result.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../fakes/fake_tmdb_rest_client.dart';
 import '../../fakes/movie_fixtures.dart';
@@ -18,13 +21,17 @@ const appLanguage = 'pt-BR';
 
 void main() {
   late FakeTmdbRestClient restClient;
+  late SharedPreferences preferences;
   late MoviesRepositoryRemote repository;
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    preferences = await SharedPreferences.getInstance();
     restClient = FakeTmdbRestClient();
     repository = MoviesRepositoryRemote(
       restClient: restClient,
       language: appLanguage,
+      preferences: preferences,
     );
   });
 
@@ -84,6 +91,90 @@ void main() {
 
       expect(first, isA<Ok<MovieDetails>>());
       expect((second as Ok<MovieDetails>).value.title, 'Duna: Parte Dois');
+      expect(restClient.detailsCallCount, 1);
+    });
+
+    test('o cache sobrevive a uma nova instância (reinício do app)', () async {
+      restClient.details = dunaDetails;
+      await repository.getMovieDetails(dunaId);
+
+      final restarted = MoviesRepositoryRemote(
+        restClient: restClient,
+        language: appLanguage,
+        preferences: preferences,
+      );
+      final result = await restarted.getMovieDetails(dunaId);
+
+      final details = (result as Ok<MovieDetails>).value;
+      expect(restClient.detailsCallCount, 1);
+      expect(details.directors.single.name, 'Denis Villeneuve');
+      expect(details.certificationFor('BR'), '14');
+    });
+
+    test('busca de novo quando o cache passou de 24h', () async {
+      final expired = DateTime.now()
+          .subtract(MoviesRepositoryRemote.detailsCacheTtl)
+          .subtract(const Duration(minutes: 1));
+      SharedPreferences.setMockInitialValues({
+        'movie_details:$appLanguage:$dunaId': jsonEncode({
+          'savedAt': expired.millisecondsSinceEpoch,
+          'details': matrixDetails.toJson(),
+        }),
+      });
+      final stale = MoviesRepositoryRemote(
+        restClient: restClient..details = dunaDetails,
+        language: appLanguage,
+        preferences: await SharedPreferences.getInstance(),
+      );
+
+      final result = await stale.getMovieDetails(dunaId);
+
+      expect(restClient.detailsCallCount, 1);
+      expect((result as Ok<MovieDetails>).value.title, 'Duna: Parte Dois');
+    });
+
+    test('apaga do aparelho as entradas vencidas ao ser criado', () async {
+      final expired = DateTime.now().subtract(const Duration(days: 2));
+      SharedPreferences.setMockInitialValues({
+        // De outro filme e outro idioma: some mesmo sem ser pedida de novo.
+        'movie_details:en-US:$matrixId': jsonEncode({
+          'savedAt': expired.millisecondsSinceEpoch,
+          'details': matrixDetails.toJson(),
+        }),
+        'outra_preferencia': 'fica',
+      });
+      final storage = await SharedPreferences.getInstance();
+
+      MoviesRepositoryRemote(
+        restClient: restClient,
+        language: appLanguage,
+        preferences: storage,
+      );
+
+      expect(storage.getKeys(), {'outra_preferencia'});
+    });
+
+    test('separa o cache por idioma', () async {
+      restClient.details = dunaDetails;
+      await repository.getMovieDetails(dunaId);
+
+      final english = MoviesRepositoryRemote(
+        restClient: restClient,
+        language: 'en-US',
+        preferences: preferences,
+      );
+      await english.getMovieDetails(dunaId);
+
+      expect(restClient.detailsCallCount, 2);
+    });
+
+    test('ignora uma entrada corrompida no cache', () async {
+      await preferences.setString('movie_details:$appLanguage:$dunaId', '{');
+      restClient.details = dunaDetails;
+
+      final result = await repository.getMovieDetails(dunaId);
+
+      expect(result, isA<Ok<MovieDetails>>());
       expect(restClient.detailsCallCount, 1);
     });
 
@@ -245,6 +336,7 @@ void main() {
       final english = MoviesRepositoryRemote(
         restClient: restClient,
         language: 'en-US',
+        preferences: preferences,
       );
 
       await english.getPopularMovies();
@@ -261,6 +353,7 @@ void main() {
       final english = MoviesRepositoryRemote(
         restClient: restClient,
         language: tmdbFallbackLanguage,
+        preferences: preferences,
       );
 
       final result = await english.getMovieTrailer(matrixId);

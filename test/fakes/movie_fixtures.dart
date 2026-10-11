@@ -51,6 +51,38 @@ const dunaDetails = MovieDetails(
     Genre(id: 878, name: 'Ficção científica'),
     Genre(id: 12, name: 'Aventura'),
   ],
+  credits: Credits(
+    // Fora de ordem de propósito: a tela deve ordenar por `order`.
+    cast: [
+      CastMember(name: 'Zendaya', character: 'Chani', order: 1),
+      CastMember(
+        name: 'Timothée Chalamet',
+        character: 'Paul Atreides',
+        profilePath: '/timothee.jpg',
+        order: 0,
+      ),
+    ],
+    crew: [
+      CrewMember(name: 'Hans Zimmer', job: 'Original Music Composer'),
+      CrewMember(name: 'Denis Villeneuve', job: 'Director'),
+    ],
+  ),
+  releaseDates: ReleaseDatesResponse(
+    results: [
+      CountryReleaseDates(
+        iso31661: 'BR',
+        // O TMDB costuma devolver lançamentos sem classificação.
+        releaseDates: [
+          ReleaseDate(certification: ''),
+          ReleaseDate(certification: '14'),
+        ],
+      ),
+      CountryReleaseDates(
+        iso31661: 'US',
+        releaseDates: [ReleaseDate(certification: 'PG-13')],
+      ),
+    ],
+  ),
 );
 
 /// Filme sem trailer e sem alguns campos opcionais.

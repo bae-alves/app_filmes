@@ -98,4 +98,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get watchProvidersAttribution => 'Fonte: JustWatch';
+
+  @override
+  String get castTitle => 'Elenco';
+
+  @override
+  String directedBy(String names) {
+    return 'Direção: $names';
+  }
+
+  @override
+  String certificationLabel(String certification) {
+    return 'Classificação indicativa: $certification';
+  }
 }

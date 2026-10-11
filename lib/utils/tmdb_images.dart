@@ -24,6 +24,10 @@ abstract final class TmdbImages {
   static String? logo(String? path, {String size = 'w92'}) =>
       _build(path, size);
 
+  /// URL da foto de uma pessoa do elenco no tamanho [size].
+  static String? profile(String? path, {String size = 'w185'}) =>
+      _build(path, size);
+
   static String? _build(String? path, String size) {
     if (path == null || path.isEmpty) return null;
     // A API já devolve o caminho com "/" inicial, mas normalizamos para não

@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/result.dart';
 import '../api_models/movie.dart';
@@ -13,7 +17,7 @@ import '../api_models/movie_genre.dart';
 ///
 /// Concentra a lógica que não pertence nem ao service (que só sabe fazer
 /// requisições) nem à view model (que só cuida do estado da tela):
-/// cache em memória, tradução de falhas em [Result] e a escolha de qual vídeo
+/// cache, tradução de falhas em [Result] e a escolha de qual vídeo
 /// é, de fato, "o trailer" do filme.
 ///
 /// As mensagens das exceções devolvidas em [Result.error] são para o log do
@@ -23,23 +27,35 @@ class MoviesRepositoryRemote implements MoviesRepository {
   MoviesRepositoryRemote({
     required TmdbRestClient restClient,
     required String language,
+    required SharedPreferences preferences,
   })  : _restClient = restClient,
-        _language = language;
+        _language = language,
+        _preferences = preferences {
+    _removeExpiredDetails();
+  }
 
   final TmdbRestClient _restClient;
 
+  /// Armazenamento local (localStorage na web) do cache de detalhes, que
+  /// sobrevive ao fechamento do app — veja [getMovieDetails]. As entradas
+  /// vencidas são apagadas quando o repositório é criado.
+  final SharedPreferences _preferences;
+
+  /// Por quanto tempo os detalhes de um filme salvos localmente valem.
+  static const detailsCacheTtl = Duration(hours: 24);
+
+  /// Prefixo das chaves do cache de detalhes (`movie_details:<idioma>:<id>`).
+  static const _detailsKeyPrefix = 'movie_details:';
+
   /// Idioma do conteúdo pedido ao TMDB (ex.: `pt-BR`), o mesmo da interface.
   ///
-  /// É fixo durante a vida do repositório, e por isso os caches não precisam
-  /// separar entradas por idioma. Em produção vem de `currentTmdbLanguage`.
+  /// É fixo durante a vida do repositório, e por isso os caches em memória não
+  /// separam entradas por idioma. O de detalhes, que é persistido e sobrevive a
+  /// uma troca de idioma, separa. Em produção vem de `currentTmdbLanguage`.
   final String _language;
 
   /// Páginas de populares já carregadas, indexadas pelo número da página.
   final Map<int, List<Movie>> _popularCache = {};
-
-  /// Detalhes já carregados, indexados pelo id do filme. Evita nova chamada de
-  /// rede quando o usuário volta para a home e reabre o mesmo filme.
-  final Map<int, MovieDetails> _detailsCache = {};
 
   /// Disponibilidade em streaming já carregada, indexada pelo id do filme.
   ///
@@ -77,11 +93,15 @@ class MoviesRepositoryRemote implements MoviesRepository {
     }
   }
 
+  /// Os detalhes ficam salvos localmente por [detailsCacheTtl]: reabrir o
+  /// filme, inclusive depois de reiniciar o app, não depende da API.
   @override
   Future<Result<MovieDetails>> getMovieDetails(int movieId) async {
-    final cached = _detailsCache[movieId];
+    final cacheKey = '$_detailsKeyPrefix$_language:$movieId';
+    final cached = _readCachedDetails(cacheKey);
     if (cached != null) return Result.ok(cached);
 
+    final MovieDetails details;
     try {
       final response = await _restClient.getMovieDetails(
         movieId,
@@ -92,15 +112,30 @@ class MoviesRepositoryRemote implements MoviesRepository {
           _httpException('Falha ao carregar os detalhes do filme', response.response),
         );
       }
-
-      final details = response.data;
-      _detailsCache[movieId] = details;
-      return Result.ok(details);
+      details = response.data;
     } on Object catch (error) {
       return Result.error(
         _asException('Falha ao carregar os detalhes do filme', error),
       );
     }
+
+    // Salvar é só um extra: se falhar (ex.: localStorage cheio na web), a tela
+    // abre do mesmo jeito.
+    // ponytail: sem limite de entradas; se o localStorage encher dentro das
+    // 24h, os filmes seguintes só deixam de ser salvos. Limitar a quantidade se
+    // isso acontecer.
+    try {
+      await _preferences.setString(
+        cacheKey,
+        jsonEncode({
+          'savedAt': DateTime.now().millisecondsSinceEpoch,
+          'details': details.toJson(),
+        }),
+      );
+    } on Object catch (error) {
+      if (kDebugMode) debugPrint('Não foi possível salvar o filme $movieId: $error');
+    }
+    return Result.ok(details);
   }
 
   @override
@@ -234,6 +269,35 @@ class MoviesRepositoryRemote implements MoviesRepository {
     // coisa para quem consome: o filme não está disponível ali.
     final providers = byRegion[region.toUpperCase()];
     return Result.ok(providers == null || providers.isEmpty ? null : providers);
+  }
+
+  /// Detalhes salvos em [key], ou `null` se não houver, se tiverem vencido ou
+  /// se a entrada estiver corrompida (ex.: formato de uma versão anterior).
+  MovieDetails? _readCachedDetails(String key) {
+    final raw = _preferences.getString(key);
+    if (raw == null) return null;
+    try {
+      final entry = jsonDecode(raw) as Map<String, dynamic>;
+      final savedAt =
+          DateTime.fromMillisecondsSinceEpoch(entry['savedAt'] as int);
+      final age = DateTime.now().difference(savedAt);
+      // Idade negativa: o relógio do aparelho voltou no tempo. Sem essa
+      // checagem a entrada valeria até o relógio alcançar a data salva.
+      if (age.isNegative || age > detailsCacheTtl) return null;
+      return MovieDetails.fromJson(entry['details'] as Map<String, dynamic>);
+    } on Object {
+      return null;
+    }
+  }
+
+  /// Apaga os detalhes salvos que venceram ou estão corrompidos. Sem isso o
+  /// armazenamento só cresce, e na web o localStorage tem poucos MB.
+  void _removeExpiredDetails() {
+    for (final key in _preferences.getKeys()) {
+      if (key.startsWith(_detailsKeyPrefix) && _readCachedDetails(key) == null) {
+        _preferences.remove(key);
+      }
+    }
   }
 
   Future<List<Video>> _fetchVideos(int movieId, {required String language}) async {

@@ -149,5 +149,26 @@
   "watchProvidersAttribution": "Fonte: JustWatch",
   "@watchProvidersAttribution": {
     "description": "Crédito obrigatório pelos termos do TMDB: os dados de streaming vêm da JustWatch. Não traduza o nome JustWatch."
+  },
+
+  "castTitle": "Elenco",
+  "@castTitle": {
+    "description": "Título da seção da tela de detalhes com os atores principais."
+  },
+
+  "directedBy": "Direção: {names}",
+  "@directedBy": {
+    "description": "Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.",
+    "placeholders": {
+      "names": {"type": "String"}
+    }
+  },
+
+  "certificationLabel": "Classificação indicativa: {certification}",
+  "@certificationLabel": {
+    "description": "Dica e rótulo de acessibilidade do selo com a classificação indicativa do país do usuário (ex.: 14, L, PG-13).",
+    "placeholders": {
+      "certification": {"type": "String"}
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/api_models/genre.dart';
+import '../../data/api_models/movie_details.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/formatters.dart';
 import '../../utils/tmdb_images.dart';
@@ -110,6 +111,13 @@ class _DetailsContent extends StatelessWidget {
     final runtime = formatRuntime(details.runtime, l10n);
     final rating = formatRating(details.voteAverage, locale);
     final genres = details.genres ?? const <Genre>[];
+    final directors = [
+      for (final director in details.directors)
+        if (director.name?.isNotEmpty == true) director.name!,
+    ];
+    // ponytail: só os 10 primeiros; criar uma tela de elenco completo se pedirem.
+    final cast = [...?details.credits?.cast]
+      ..sort((a, b) => (a.order ?? 999).compareTo(b.order ?? 999));
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
@@ -138,8 +146,20 @@ class _DetailsContent extends StatelessWidget {
                   ),
                 ),
               ],
+              if (directors.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  l10n.directedBy(directors.join(', ')),
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
               const SizedBox(height: 12),
-              _MetadataRow(year: year, runtime: runtime, rating: rating),
+              _MetadataRow(
+                year: year,
+                runtime: runtime,
+                rating: rating,
+                certification: details.certificationFor(viewModel.watchRegion),
+              ),
               if (genres.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Wrap(
@@ -160,6 +180,12 @@ class _DetailsContent extends StatelessWidget {
                     : l10n.synopsisUnavailable,
                 style: theme.textTheme.bodyMedium,
               ),
+              if (cast.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Text(l10n.castTitle, style: theme.textTheme.titleMedium),
+                const SizedBox(height: 8),
+                _CastList(cast: cast.take(10).toList()),
+              ],
               const SizedBox(height: 20),
               Text(
                 l10n.watchProvidersTitle,
@@ -236,17 +262,26 @@ class _TrailerSection extends StatelessWidget {
   }
 }
 
-/// Linha com nota, ano e duração do filme.
+/// Linha com nota, ano, duração e classificação indicativa do filme.
 class _MetadataRow extends StatelessWidget {
-  const _MetadataRow({this.year, this.runtime, this.rating});
+  const _MetadataRow({
+    this.year,
+    this.runtime,
+    this.rating,
+    this.certification,
+  });
 
   final String? year;
   final String? runtime;
   final String? rating;
+  final String? certification;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final certificationLabel = certification == null
+        ? null
+        : AppLocalizations.of(context).certificationLabel(certification!);
     return Wrap(
       spacing: 16,
       runSpacing: 4,
@@ -264,7 +299,92 @@ class _MetadataRow extends StatelessWidget {
           ),
         if (year != null) Text(year!, style: theme.textTheme.labelLarge),
         if (runtime != null) Text(runtime!, style: theme.textTheme.labelLarge),
+        if (certificationLabel != null)
+          Tooltip(
+            message: certificationLabel,
+            excludeFromSemantics: true,
+            child: Semantics(
+              label: certificationLabel,
+              excludeSemantics: true,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.colorScheme.outline),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(certification!, style: theme.textTheme.labelLarge),
+              ),
+            ),
+          ),
       ],
+    );
+  }
+}
+
+/// Fileira horizontal com foto, nome e personagem do elenco principal.
+///
+/// A altura acompanha o texto, e não é fixa: com a fonte do sistema grande, uma
+/// altura fixa cortaria os nomes.
+class _CastList extends StatelessWidget {
+  const _CastList({required this.cast});
+
+  final List<CastMember> cast;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 12,
+        children: [for (final member in cast) _CastMemberTile(member: member)],
+      ),
+    );
+  }
+}
+
+/// Foto, nome e personagem de uma pessoa do elenco.
+class _CastMemberTile extends StatelessWidget {
+  const _CastMemberTile({required this.member});
+
+  final CastMember member;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final photoUrl = TmdbImages.profile(member.profilePath);
+    return SizedBox(
+      width: 88,
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 36,
+            foregroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+            // Foto que não carrega fica no ícone, sem erro no log.
+            onForegroundImageError:
+                photoUrl != null ? (error, stackTrace) {} : null,
+            child: const Icon(Icons.person_outline),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            member.name ?? '—',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.labelMedium,
+          ),
+          if (member.character?.isNotEmpty == true)
+            Text(
+              member.character!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
