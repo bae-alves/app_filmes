@@ -22,10 +22,12 @@ class HomePage extends StatefulWidget {
     required this.viewModel,
     required this.detailsViewModelFactory,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
+    required this.onOpenChat,
   });
 
   /// Estado e comandos da tela.
   final HomeViewModel viewModel;
+  final VoidCallback onOpenChat;
 
   /// Fábrica da view model usada ao abrir a tela de detalhes.
   final MovieDetailsViewModelFactory detailsViewModelFactory;
@@ -155,7 +157,16 @@ Future<void> _openAdvancedFilter() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Filmes populares')),
+            appBar: AppBar(
+        title: const Text('Filmes populares'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            tooltip: 'Assistente de recomendações',
+            onPressed: widget.onOpenChat,
+          ),
+        ],
+      ),
       body: ListenableBuilder(
         listenable: widget.viewModel,
         builder: (context, _) {

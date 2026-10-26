@@ -8,6 +8,9 @@ import 'ui/view/home_page.dart';
 import 'ui/view_model/home_view_model.dart';
 import 'ui/view_model/movie_details_view_model.dart';
 import 'utils/env.dart';
+import 'data/services/gemini_service.dart';
+import 'ui/view/chat_page.dart';
+import 'ui/view_model/chat_view_model.dart';
 
 Future<void> main() async {
   // `ensureInitialized` é necessário porque carregamos o .env (um asset) antes
@@ -33,7 +36,8 @@ class AppFilmes extends StatefulWidget {
 class _AppFilmesState extends State<AppFilmes> {
   late final MoviesRepository _moviesRepository;
   late final HomeViewModel _homeViewModel;
-
+  late final GeminiService _geminiService;
+  late final ChatViewModel _chatViewModel;
   @override
   void initState() {
     super.initState();
@@ -43,11 +47,20 @@ class _AppFilmesState extends State<AppFilmes> {
       restClient: TmdbRestClient(dio),
     );
     _homeViewModel = HomeViewModel(moviesRepository: _moviesRepository);
+
+    _geminiService = GeminiService(
+      apiKey: Env.geminiApiKey,
+    );
+
+    _chatViewModel = ChatViewModel(
+      geminiService: _geminiService,
+    );
   }
 
   @override
   void dispose() {
     _homeViewModel.dispose();
+    _chatViewModel.dispose();
     super.dispose();
   }
 
@@ -64,7 +77,17 @@ class _AppFilmesState extends State<AppFilmes> {
           moviesRepository: _moviesRepository,
           movieId: movieId,
         ),
+        onOpenChat: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ChatPage(
+                viewModel: _chatViewModel,
+              ),
+            ),
+          );
+        },
       ),
+
     );
   }
 }
