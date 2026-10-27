@@ -24,7 +24,7 @@ class _TmdbRestClient implements TmdbRestClient {
   @override
   Future<HttpResponse<MoviePageResponse>> getPopularMovies({
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -58,10 +58,14 @@ class _TmdbRestClient implements TmdbRestClient {
   @override
   Future<HttpResponse<MovieDetails>> getMovieDetails(
     int movieId, {
-    String language = tmdbDefaultLanguage,
+    required String language,
+    String appendToResponse = 'credits,release_dates',
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'language': language};
+    final queryParameters = <String, dynamic>{
+      r'language': language,
+      r'append_to_response': appendToResponse,
+    };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<MovieDetails>>(
@@ -122,7 +126,7 @@ class _TmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> searchMovies({
     required String query,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     bool includeAdult = false,
   }) async {
     final _extra = <String, dynamic>{};
@@ -160,7 +164,7 @@ class _TmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> discoverMovies({
     String? withGenres,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     String sortBy = 'popularity.desc',
   }) async {
     final _extra = <String, dynamic>{};
@@ -197,7 +201,7 @@ class _TmdbRestClient implements TmdbRestClient {
 
   @override
   Future<HttpResponse<MovieGenresResponse>> getMovieGenres({
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'language': language};
@@ -217,6 +221,36 @@ class _TmdbRestClient implements TmdbRestClient {
     late MovieGenresResponse _value;
     try {
       _value = MovieGenresResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<WatchProvidersResponse>> getWatchProviders(
+    int movieId,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<WatchProvidersResponse>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/movie/${movieId}/watch/providers',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late WatchProvidersResponse _value;
+    try {
+      _value = WatchProvidersResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

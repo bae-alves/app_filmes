@@ -1,0 +1,184 @@
+{
+  "@@locale": "pt",
+
+  "retry": "Tentar novamente",
+  "@retry": {
+    "description": "Botão das telas de erro que repete o carregamento."
+  },
+
+  "untitled": "Sem título",
+  "@untitled": {
+    "description": "Substitui o título de um filme que o TMDB devolve sem nome."
+  },
+
+  "synopsisUnavailable": "Sinopse não disponível.",
+  "@synopsisUnavailable": {
+    "description": "Substitui a sinopse de um filme que o TMDB devolve sem texto (cartão da home e tela de detalhes)."
+  },
+
+  "runtimeHoursMinutes": "{hours}h {minutes}min",
+  "@runtimeHoursMinutes": {
+    "description": "Duração do filme com horas e minutos (ex.: 2h 46min). Mantenha curto: aparece numa linha de metadados.",
+    "placeholders": {
+      "hours": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+
+  "runtimeHours": "{hours}h",
+  "@runtimeHours": {
+    "description": "Duração do filme exata em horas (ex.: 2h).",
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+
+  "runtimeMinutes": "{minutes}min",
+  "@runtimeMinutes": {
+    "description": "Duração de um filme com menos de uma hora (ex.: 45min).",
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+
+  "homeTitle": "Filmes populares",
+  "@homeTitle": {
+    "description": "Título da tela inicial, que lista os filmes populares do momento."
+  },
+
+  "homeEmpty": "Nenhum filme encontrado no momento.",
+  "@homeEmpty": {
+    "description": "Aviso da tela inicial quando a lista (populares, pesquisa ou filtro) volta vazia."
+  },
+
+  "homeLoadError": "Não foi possível carregar os filmes.",
+  "@homeLoadError": {
+    "description": "Erro da tela inicial quando a lista de filmes não carrega. O detalhe técnico vai só para o log."
+  },
+
+  "searchLabel": "Nome do filme",
+  "@searchLabel": {
+    "description": "Rótulo do campo de pesquisa da tela inicial."
+  },
+
+  "searchHint": "Digite o nome do filme",
+  "@searchHint": {
+    "description": "Texto de exemplo dentro do campo de pesquisa vazio."
+  },
+
+  "searchTooltip": "Pesquisar",
+  "@searchTooltip": {
+    "description": "Dica e rótulo de acessibilidade do botão de lupa que dispara a pesquisa."
+  },
+
+  "advancedFilter": "Filtro avançado",
+  "@advancedFilter": {
+    "description": "Botão da tela inicial e título da folha que filtra os filmes por gênero."
+  },
+
+  "applyFilters": "Aplicar filtros",
+  "@applyFilters": {
+    "description": "Botão da folha de filtro avançado que aplica os gêneros marcados."
+  },
+
+  "genresLoadError": "Não foi possível carregar os gêneros.",
+  "@genresLoadError": {
+    "description": "Erro da folha de filtro avançado quando a lista de gêneros não carrega."
+  },
+
+  "detailsFallbackTitle": "Detalhes",
+  "@detailsFallbackTitle": {
+    "description": "Título da barra superior da tela de detalhes enquanto o nome do filme não é conhecido."
+  },
+
+  "detailsLoadError": "Não foi possível carregar este filme.",
+  "@detailsLoadError": {
+    "description": "Erro da tela de detalhes quando as informações do filme não carregam. O detalhe técnico vai só para o log."
+  },
+
+  "detailsNotFound": "Não encontramos informações sobre este filme.",
+  "@detailsNotFound": {
+    "description": "Aviso da tela de detalhes quando o carregamento termina sem erro, mas sem dados."
+  },
+
+  "synopsisTitle": "Sinopse",
+  "@synopsisTitle": {
+    "description": "Título da seção da tela de detalhes com o resumo do filme."
+  },
+
+  "trailerUnavailable": "Trailer não disponível",
+  "@trailerUnavailable": {
+    "description": "Aviso no lugar do player quando o filme não tem trailer publicado."
+  },
+
+  "watchProvidersTitle": "Onde assistir",
+  "@watchProvidersTitle": {
+    "description": "Título da seção da tela de detalhes que lista os serviços de streaming do filme."
+  },
+
+  "watchProvidersSubscription": "Assinatura",
+  "@watchProvidersSubscription": {
+    "description": "Grupo de serviços em que o filme está incluído na assinatura (ex.: Netflix, Max)."
+  },
+
+  "watchProvidersFree": "Grátis",
+  "@watchProvidersFree": {
+    "description": "Grupo de serviços em que o filme é gratuito, com ou sem anúncios."
+  },
+
+  "watchProvidersRent": "Alugar",
+  "@watchProvidersRent": {
+    "description": "Grupo de serviços em que o filme pode ser alugado."
+  },
+
+  "watchProvidersBuy": "Comprar",
+  "@watchProvidersBuy": {
+    "description": "Grupo de serviços em que o filme pode ser comprado."
+  },
+
+  "watchProvidersUnavailable": "Indisponível em streaming na sua região",
+  "@watchProvidersUnavailable": {
+    "description": "Aviso exibido quando o filme não está em nenhum serviço de streaming na região do usuário."
+  },
+
+  "watchProvidersSeeWhere": "Ver onde assistir",
+  "@watchProvidersSeeWhere": {
+    "description": "Botão que abre, fora do app, a página do TMDB com os links para cada serviço de streaming."
+  },
+
+  "watchProvidersAttribution": "Fonte: JustWatch",
+  "@watchProvidersAttribution": {
+    "description": "Crédito obrigatório pelos termos do TMDB: os dados de streaming vêm da JustWatch. Não traduza o nome JustWatch."
+  },
+
+  "watchProvidersLoadError": "Não foi possível carregar onde assistir",
+  "@watchProvidersLoadError": {
+    "description": "Aviso na seção \"Onde assistir\" quando a consulta falha. Diferente de watchProvidersUnavailable: aqui não se sabe se o filme está em algum serviço."
+  },
+
+  "castTitle": "Elenco",
+  "@castTitle": {
+    "description": "Título da seção da tela de detalhes com os atores principais."
+  },
+
+  "castSeeAll": "Ver todos",
+  "@castSeeAll": {
+    "description": "Botão ao lado do título \"Elenco\" que abre a lista completa do elenco."
+  },
+
+  "directedBy": "Direção: {names}",
+  "@directedBy": {
+    "description": "Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.",
+    "placeholders": {
+      "names": {"type": "String"}
+    }
+  },
+
+  "certificationLabel": "Classificação indicativa: {certification}",
+  "@certificationLabel": {
+    "description": "Dica e rótulo de acessibilidade do selo com a classificação indicativa do país do usuário (ex.: 14, L, PG-13).",
+    "placeholders": {
+      "certification": {"type": "String"}
+    }
+  }
+}

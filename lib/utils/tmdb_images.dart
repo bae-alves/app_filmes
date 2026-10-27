@@ -17,6 +17,17 @@ abstract final class TmdbImages {
   static String? backdrop(String? path, {String size = 'w780'}) =>
       _build(path, size);
 
+  /// URL do logo de um serviço de streaming no tamanho [size].
+  ///
+  /// Os logos do TMDB são quadrados; `w92` basta para exibi-los em até ~46px
+  /// com boa nitidez em telas de alta densidade.
+  static String? logo(String? path, {String size = 'w92'}) =>
+      _build(path, size);
+
+  /// URL da foto de uma pessoa do elenco no tamanho [size].
+  static String? profile(String? path, {String size = 'w185'}) =>
+      _build(path, size);
+
   static String? _build(String? path, String size) {
     if (path == null || path.isEmpty) return null;
     // A API já devolve o caminho com "/" inicial, mas normalizamos para não

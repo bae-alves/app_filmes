@@ -1,6 +1,7 @@
 import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/data/api_models/movie_page_response.dart';
 import 'package:app_filmes/data/api_models/videos_response.dart';
+import 'package:app_filmes/data/api_models/watch_providers.dart';
 import 'package:app_filmes/data/services/tmdb_rest_client.dart';
 import 'package:app_filmes/data/api_models/movie_genres_response.dart';
 import 'package:dio/dio.dart';
@@ -15,6 +16,7 @@ class FakeTmdbRestClient implements TmdbRestClient {
     this.popularPage = const MoviePageResponse(),
     this.details,
     this.videosByLanguage = const {},
+    this.watchProviders = const WatchProvidersResponse(),
   });
 
   /// Resposta devolvida por [getPopularMovies].
@@ -26,6 +28,12 @@ class FakeTmdbRestClient implements TmdbRestClient {
   /// Vídeos por idioma solicitado. Idiomas ausentes devolvem lista vazia,
   /// exatamente como o TMDB faz quando não há tradução cadastrada.
   Map<String?, VideosResponse> videosByLanguage;
+
+  /// Resposta devolvida por [getWatchProviders].
+  WatchProvidersResponse watchProviders;
+
+  /// Quantidade de chamadas a [getWatchProviders].
+  int watchProvidersCallCount = 0;
 
   /// Status HTTP devolvido em todas as respostas.
   int statusCode = 200;
@@ -39,15 +47,20 @@ class FakeTmdbRestClient implements TmdbRestClient {
   /// Quantidade de chamadas a [getMovieDetails].
   int detailsCallCount = 0;
 
+  /// Idiomas recebidos pelos endpoints com `language` obrigatório (todos,
+  /// menos [getMovieVideos]), na ordem das chamadas.
+  final List<String> requestedLanguages = [];
+
   /// Idiomas pedidos a [getMovieVideos], na ordem das chamadas.
   final List<String?> requestedVideoLanguages = [];
 
   @override
   Future<HttpResponse<MoviePageResponse>> getPopularMovies({
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
     popularCallCount++;
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(popularPage);
   }
@@ -56,9 +69,10 @@ class FakeTmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> searchMovies({
     required String query,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     bool includeAdult = false,
   }) async {
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(popularPage);
   }
@@ -67,17 +81,19 @@ class FakeTmdbRestClient implements TmdbRestClient {
   Future<HttpResponse<MoviePageResponse>> discoverMovies({
     String? withGenres,
     int page = 1,
-    String language = tmdbDefaultLanguage,
+    required String language,
     String sortBy = 'popularity.desc',
   }) async {
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(popularPage);
   }
 
   @override
   Future<HttpResponse<MovieGenresResponse>> getMovieGenres({
-    String language = tmdbDefaultLanguage,
+    required String language,
   }) async {
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(const MovieGenresResponse());
   }
@@ -85,9 +101,11 @@ class FakeTmdbRestClient implements TmdbRestClient {
   @override
   Future<HttpResponse<MovieDetails>> getMovieDetails(
     int movieId, {
-    String language = tmdbDefaultLanguage,
+    required String language,
+    String appendToResponse = 'credits,release_dates',
   }) async {
     detailsCallCount++;
+    requestedLanguages.add(language);
     _maybeThrow();
     return _wrap(details ?? MovieDetails(id: movieId));
   }
@@ -102,6 +120,15 @@ class FakeTmdbRestClient implements TmdbRestClient {
     return _wrap(
       videosByLanguage[language] ?? const VideosResponse(results: []),
     );
+  }
+
+  @override
+  Future<HttpResponse<WatchProvidersResponse>> getWatchProviders(
+    int movieId,
+  ) async {
+    watchProvidersCallCount++;
+    _maybeThrow();
+    return _wrap(watchProviders);
   }
 
   void _maybeThrow() {

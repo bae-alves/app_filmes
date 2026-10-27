@@ -13,6 +13,7 @@ void main() {
     final viewModel = MovieDetailsViewModel(
       moviesRepository: repository,
       movieId: dunaId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -31,6 +32,7 @@ void main() {
         detailsById: const {matrixId: matrixDetails},
       ),
       movieId: matrixId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -47,6 +49,7 @@ void main() {
         trailerError: Exception('vídeos indisponíveis'),
       ),
       movieId: dunaId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -61,6 +64,7 @@ void main() {
     final viewModel = MovieDetailsViewModel(
       moviesRepository: FakeMoviesRepository(detailsError: failure),
       movieId: dunaId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -75,6 +79,7 @@ void main() {
         detailsById: const {dunaId: dunaDetails},
       ),
       movieId: dunaId,
+      watchRegion: 'BR',
     );
     var notifications = 0;
     viewModel.addListener(() => notifications++);
@@ -82,5 +87,59 @@ void main() {
     await viewModel.load();
 
     expect(notifications, 2);
+  });
+
+  test('load busca onde assistir na região informada', () async {
+    final repository = FakeMoviesRepository(
+      detailsById: const {dunaId: dunaDetails},
+      watchProvidersById: const {
+        dunaId: {'BR': dunaProvidersBr, 'US': dunaProvidersUs},
+      },
+    );
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: repository,
+      movieId: dunaId,
+      watchRegion: 'US',
+    );
+
+    await viewModel.load();
+
+    expect(repository.requestedWatchRegions, ['US']);
+    expect(viewModel.watchProviders, same(dunaProvidersUs));
+    expect(viewModel.watchProvidersFailed, isFalse);
+  });
+
+  test('watchProviders é null quando o filme não está em nenhum serviço',
+      () async {
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {matrixId: matrixDetails},
+      ),
+      movieId: matrixId,
+      watchRegion: 'BR',
+    );
+
+    await viewModel.load();
+
+    expect(viewModel.watchProviders, isNull);
+  });
+
+  test('falha em onde assistir não impede a exibição das informações',
+      () async {
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {dunaId: dunaDetails},
+        watchProvidersError: Exception('provedores indisponíveis'),
+      ),
+      movieId: dunaId,
+      watchRegion: 'BR',
+    );
+
+    await viewModel.load();
+
+    expect(viewModel.details?.title, 'Duna: Parte Dois');
+    expect(viewModel.watchProviders, isNull);
+    expect(viewModel.watchProvidersFailed, isTrue);
+    expect(viewModel.error, isNull, reason: 'a tela ainda é utilizável');
   });
 }
