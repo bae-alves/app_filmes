@@ -18,6 +18,7 @@ class MovieRatingViewModel extends ChangeNotifier {
   final int movieId;
 
   Rating? _rating;
+  bool _disposed = false;
 
   /// Nota de 1 a 5, ou `null` sem nota.
   int? get stars => _rating?.stars;
@@ -72,5 +73,18 @@ class MovieRatingViewModel extends ChangeNotifier {
       notifyListeners();
       if (kDebugMode) debugPrint('Não foi possível salvar a avaliação: $error');
     }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  /// A tela pode fechar antes de uma leitura ou gravação terminar; aí não há
+  /// mais quem avisar.
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
   }
 }

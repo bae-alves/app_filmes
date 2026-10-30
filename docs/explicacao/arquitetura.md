@@ -29,10 +29,26 @@ salvo no aparelho por 24h para a tela abrir mesmo com a API instável.
 
 **View model** (`ChangeNotifier`) guarda o estado de uma tela e expõe
 comandos (`load`, `search`). Não conhece widgets nem `Navigator`. Avisa a view
-com `notifyListeners`.
+com `notifyListeners`. Também deriva o que a tela mostra, como os diretores e o
+elenco em ordem, para que isso se teste sem widgets. As view models dos
+detalhes e da avaliação nascem a cada abertura da tela, e a tela as descarta
+ao fechar. As da home e dos favoritos vivem com o app.
 
 **View** desenha o estado (`UI = f(state)`) e repassa os eventos à view model.
 Navegação simples também fica na view.
+
+## Por que não há modelos de domínio
+
+A arquitetura do Flutter sugere que o repositório converta os modelos da API
+em modelos de domínio, só da aplicação. Aqui, por ora, os modelos da API
+(`lib/data/api_models/`) são os modelos de domínio: o repositório os devolve
+como vieram, e a UI os usa direto. Os favoritos guardam os campos do `Movie`
+em colunas do SQLite.
+
+O que se calcula a partir de um modelo fica nele, como `MovieDetails.directors`
+e `WatchProviderRegion.groups`. O custo é que uma mudança no JSON do TMDB
+chega às telas. Separar as duas camadas é uma refatoração grande, a ser feita
+em ticket próprio.
 
 ## Por que erros viram valores
 

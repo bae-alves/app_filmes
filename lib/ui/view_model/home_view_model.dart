@@ -26,6 +26,10 @@ class HomeViewModel extends ChangeNotifier {
 
   String _searchQuery = '';
   List<int> _selectedGenreIds = const [];
+
+  /// Número da busca mais recente da lista. Veja [_fetchMovies].
+  int _lastRequest = 0;
+
   /// Filmes exibidos na lista. Vazio enquanto o primeiro carregamento não
   /// termina ou quando ocorre erro.
   List<Movie> get movies => List.unmodifiable(_movies);
@@ -66,53 +70,25 @@ class HomeViewModel extends ChangeNotifier {
   /// Devolve o [Result] para quem quiser reagir ao desfecho — por exemplo, um
   /// `RefreshIndicator` que precisa mostrar uma mensagem em caso de falha.
   Future<Result<List<Movie>>> load({bool forceRefresh = false}) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    final result = await _moviesRepository.getPopularMovies(
-      forceRefresh: forceRefresh,
+    return _fetchMovies(
+      () => _moviesRepository.getPopularMovies(forceRefresh: forceRefresh),
     );
-
-    switch (result) {
-      case Ok<List<Movie>>(:final value):
-        _movies = value;
-      case Error<List<Movie>>(:final error):
-        _fail(error);
-    }
-
-    _isLoading = false;
-    notifyListeners();
-    return result;
   }
   /// Pesquisa filmes pelo nome.
+  ///
+  /// O TMDB não pesquisa por nome e por gênero na mesma chamada, por isso a
+  /// pesquisa desmarca os gêneros: nenhum filtro fica ativo sem valer. Uma
+  /// pesquisa vazia limpa tudo e volta aos populares.
   Future<Result<List<Movie>>> search(String query) async {
     final normalizedQuery = query.trim();
 
-    if (normalizedQuery.isEmpty) {
-      _searchQuery = '';
-      return load();
-    }
+    if (normalizedQuery.isEmpty) return clearFilters();
 
     _searchQuery = normalizedQuery;
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    final result = await _moviesRepository.searchMovies(
-      query: normalizedQuery,
+    _selectedGenreIds = const [];
+    return _fetchMovies(
+      () => _moviesRepository.searchMovies(query: normalizedQuery),
     );
-
-    switch (result) {
-      case Ok<List<Movie>>(:final value):
-        _movies = value;
-      case Error<List<Movie>>(:final error):
-        _fail(error);
-    }
-
-    _isLoading = false;
-    notifyListeners();
-    return result;
   }
 
   /// Seleciona ou remove um gênero do filtro.
@@ -129,26 +105,13 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Aplica os gêneros selecionados.
+  /// Aplica os gêneros selecionados. Apaga a pesquisa, pelo mesmo motivo de
+  /// [search].
   Future<Result<List<Movie>>> applyGenreFilter() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    final result = await _moviesRepository.discoverMovies(
-      genreIds: _selectedGenreIds,
+    _searchQuery = '';
+    return _fetchMovies(
+      () => _moviesRepository.discoverMovies(genreIds: _selectedGenreIds),
     );
-
-    switch (result) {
-      case Ok<List<Movie>>(:final value):
-        _movies = value;
-      case Error<List<Movie>>(:final error):
-        _fail(error);
-    }
-
-    _isLoading = false;
-    notifyListeners();
-    return result;
   }
 
   /// Carrega a lista de gêneros fornecida pelo TMDB.
@@ -172,6 +135,34 @@ class HomeViewModel extends ChangeNotifier {
     }
 
     _isLoadingGenres = false;
+    notifyListeners();
+    return result;
+  }
+
+  /// Busca a lista com [fetch] e a publica.
+  ///
+  /// Só a busca mais recente publica: se o usuário pesquisa e logo puxa para
+  /// atualizar, a resposta da pesquisa que chegar depois é descartada, e o
+  /// carregamento só termina quando a última busca termina.
+  Future<Result<List<Movie>>> _fetchMovies(
+    Future<Result<List<Movie>>> Function() fetch,
+  ) async {
+    final request = ++_lastRequest;
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    final result = await fetch();
+    if (request != _lastRequest) return result;
+
+    switch (result) {
+      case Ok<List<Movie>>(:final value):
+        _movies = value;
+      case Error<List<Movie>>(:final error):
+        _fail(error);
+    }
+
+    _isLoading = false;
     notifyListeners();
     return result;
   }

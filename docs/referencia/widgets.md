@@ -87,17 +87,18 @@ A `HomePage` dá a cada cartão a chave `ValueKey(movie.id)`. Na
 | --- | --- | --- | --- |
 | `region` | `WatchProviderRegion?` | — | Serviços no país do usuário. `null` mostra o aviso de indisponível. |
 | `compact` | `bool` | `false` | Só os logos (28 px), cada serviço uma vez, sem rótulos, botão e crédito. Para cards. |
+| `onOpenLink` | `ValueChanged<Uri>?` | `null` | Recebe o `link` quando o usuário toca num logo ou no botão. A tela decide como abrir; a de detalhes usa `launchUrl`, fora do app. `null` deixa os logos sem toque e esconde o botão. |
 
 | Membro estático | Valor |
 | --- | --- |
 | `unavailableKey` | `Key('watch-providers-unavailable')` |
 | `linkKey` | `Key('watch-providers-link')` |
 
-Modo completo, em ordem: grupos Assinatura (`flatrate`), Grátis (`free` +
-`ads`), Alugar (`rent`) e Comprar (`buy`), cada um ordenado por
-`displayPriority` e omitido se vazio; botão "Ver onde assistir" (se houver
-`link`); crédito "Fonte: JustWatch". Logos de 40 px com o nome no tooltip;
-tocar num logo abre o mesmo `link` do botão. No modo `compact`, os logos não
+Modo completo, em ordem: os grupos de `WatchProviderRegion.groups`
+(Assinatura, Grátis, Alugar e Comprar, cada um ordenado por
+`displayPriority` e omitido se vazio); botão "Ver onde assistir" (se houver
+`link` e `onOpenLink`); crédito "Fonte: JustWatch". Logos de 40 px com o nome
+no tooltip; tocar num logo entrega a `onOpenLink` o mesmo `link` do botão. No modo `compact`, os logos não
 respondem ao toque.
 
 ## `TrailerPlayer` e `TrailerPlayerBuilder`

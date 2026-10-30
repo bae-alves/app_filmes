@@ -57,6 +57,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get applyFilters => 'Apply filters';
 
   @override
+  String get clearFilters => 'Clear filters';
+
+  @override
   String get genresLoadError => 'Couldn\'t load the genres.';
 
   @override

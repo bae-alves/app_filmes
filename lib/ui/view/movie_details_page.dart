@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/api_models/genre.dart';
 import '../../data/api_models/movie.dart';
@@ -87,6 +88,14 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
     // pode ser chamado várias vezes e dispararia requisições em cascata.
     widget.viewModel.load();
     widget.ratingViewModel.load();
+  }
+
+  @override
+  void dispose() {
+    // As duas são da tela, criadas a cada abertura; a de favoritos é do app.
+    widget.viewModel.dispose();
+    widget.ratingViewModel.dispose();
+    super.dispose();
   }
 
   @override
@@ -184,12 +193,8 @@ class _DetailsContent extends StatelessWidget {
     final runtime = formatRuntime(details.runtime, l10n);
     final rating = formatRating(details.voteAverage, locale);
     final genres = details.genres ?? const <Genre>[];
-    final directors = [
-      for (final director in details.directors)
-        if (director.name?.isNotEmpty == true) director.name!,
-    ];
-    final cast = [...?details.credits?.cast]
-      ..sort((a, b) => (a.order ?? 999).compareTo(b.order ?? 999));
+    final directors = viewModel.directorNames;
+    final cast = viewModel.cast;
     // A fileira mostra só o elenco principal; o resto fica em "Ver todos".
     const castPreview = 10;
 
@@ -295,7 +300,11 @@ class _DetailsContent extends StatelessWidget {
                       ?.copyWith(color: theme.colorScheme.outline),
                 )
               else
-                WatchProvidersSection(region: viewModel.watchProviders),
+                WatchProvidersSection(
+                  region: viewModel.watchProviders,
+                  onOpenLink: (link) =>
+                      launchUrl(link, mode: LaunchMode.externalApplication),
+                ),
             ],
           ),
         ),

@@ -182,6 +182,12 @@ abstract class AppLocalizations {
   /// **'Aplicar filtros'**
   String get applyFilters;
 
+  /// Dica e rótulo de acessibilidade do botão de X no campo de pesquisa, que apaga a pesquisa e os gêneros marcados.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar filtros'**
+  String get clearFilters;
+
   /// Erro da folha de filtro avançado quando a lista de gêneros não carrega.
   ///
   /// In pt, this message translates to:

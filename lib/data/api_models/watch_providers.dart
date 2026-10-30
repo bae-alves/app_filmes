@@ -71,7 +71,66 @@ class WatchProviderRegion {
   bool get isEmpty => [flatrate, free, ads, rent, buy]
       .every((providers) => providers == null || providers.isEmpty);
 
+  /// Serviços por forma de acesso, da mais acessível à menos acessível para o
+  /// usuário, cada grupo ordenado pela prioridade do TMDB e sem repetir
+  /// serviço. Formas de acesso sem serviço ficam de fora.
+  ///
+  /// "Grátis" junta [free] e [ads]: o mesmo serviço pode estar nas duas.
+  List<({WatchProviderAccess access, List<WatchProvider> providers})>
+  get groups => [
+    (
+      access: WatchProviderAccess.subscription,
+      providers: _sortedUnique([...?flatrate]),
+    ),
+    (
+      access: WatchProviderAccess.free,
+      providers: _sortedUnique([...?free, ...?ads]),
+    ),
+    (access: WatchProviderAccess.rent, providers: _sortedUnique([...?rent])),
+    (access: WatchProviderAccess.buy, providers: _sortedUnique([...?buy])),
+  ].where((group) => group.providers.isNotEmpty).toList();
+
+  /// Todos os serviços na ordem de [groups], cada um uma vez só (ex.: Apple TV
+  /// costuma estar em "Alugar" e em "Comprar").
+  List<WatchProvider> get uniqueProviders =>
+      _uniqueById([for (final group in groups) ...group.providers]);
+
   Map<String, dynamic> toJson() => _$WatchProviderRegionToJson(this);
+
+  static List<WatchProvider> _sortedUnique(List<WatchProvider> providers) =>
+      _uniqueById(providers)..sort(
+        (a, b) => (a.displayPriority ?? _lastPriority).compareTo(
+          b.displayPriority ?? _lastPriority,
+        ),
+      );
+
+  /// Remove serviços repetidos (mesmo `providerId`) preservando a ordem.
+  static List<WatchProvider> _uniqueById(List<WatchProvider> providers) {
+    final seen = <int?>{};
+    return [
+      for (final provider in providers)
+        if (seen.add(provider.providerId)) provider,
+    ];
+  }
+
+  /// Serviços sem prioridade informada vão para o fim da lista.
+  static const _lastPriority = 1 << 30;
+}
+
+/// Forma de acesso a um filme num serviço, como o TMDB as separa.
+enum WatchProviderAccess {
+  /// Incluído na assinatura ([WatchProviderRegion.flatrate]).
+  subscription,
+
+  /// Gratuito, com ou sem anúncios ([WatchProviderRegion.free] e
+  /// [WatchProviderRegion.ads]).
+  free,
+
+  /// Aluguel ([WatchProviderRegion.rent]).
+  rent,
+
+  /// Compra ([WatchProviderRegion.buy]).
+  buy,
 }
 
 /// Um serviço de streaming, aluguel ou compra de filmes.

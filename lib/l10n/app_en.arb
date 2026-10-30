@@ -16,6 +16,7 @@
   "searchTooltip": "Search",
   "advancedFilter": "Advanced filter",
   "applyFilters": "Apply filters",
+  "clearFilters": "Clear filters",
   "genresLoadError": "Couldn't load the genres.",
 
   "detailsFallbackTitle": "Details",

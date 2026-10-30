@@ -162,6 +162,7 @@ Future<void> _openAdvancedFilter() async {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: () async {
+                        _searchController.clear();
                         await viewModel.applyGenreFilter();
 
                         if (!context.mounted) return;
@@ -276,6 +277,12 @@ Future<void> _openAdvancedFilter() async {
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (widget.viewModel.hasFilters)
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: l10n.clearFilters,
+                  onPressed: _clearFilters,
+                ),
               IconButton(
                 icon: const Icon(Icons.search),
                 tooltip: l10n.searchTooltip,
@@ -296,6 +303,11 @@ Future<void> _openAdvancedFilter() async {
 
   void _search() {
     widget.viewModel.search(_searchController.text);
+  }
+
+  void _clearFilters() {
+    _searchController.clear();
+    widget.viewModel.clearFilters();
   }
 }
 

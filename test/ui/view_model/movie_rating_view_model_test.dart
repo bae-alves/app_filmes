@@ -99,4 +99,17 @@ void main() {
     // Mostra a mudança na hora e depois a desfaz.
     expect(notified, 2);
   });
+
+  test('load e setStars que terminam depois do dispose não falham', () async {
+    final loading = build(FakeRatingsRepository());
+    final load = loading.load();
+    loading.dispose();
+    await expectLater(load, completes);
+
+    final saving = build(FakeRatingsRepository());
+    await saving.load();
+    final save = saving.setStars(3);
+    saving.dispose();
+    await expectLater(save, completes);
+  });
 }

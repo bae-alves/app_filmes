@@ -81,6 +81,11 @@
     "description": "Botão da folha de filtro avançado que aplica os gêneros marcados."
   },
 
+  "clearFilters": "Limpar filtros",
+  "@clearFilters": {
+    "description": "Dica e rótulo de acessibilidade do botão de X no campo de pesquisa, que apaga a pesquisa e os gêneros marcados."
+  },
+
   "genresLoadError": "Não foi possível carregar os gêneros.",
   "@genresLoadError": {
     "description": "Erro da folha de filtro avançado quando a lista de gêneros não carrega."
