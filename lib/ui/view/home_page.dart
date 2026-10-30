@@ -210,7 +210,7 @@ Future<void> _openAdvancedFilter() async {
           if (viewModel.error != null) {
             return _ErrorState(
               message: l10n.homeLoadError,
-              onRetry: () => viewModel.load(forceRefresh: true),
+              onRetry: viewModel.refresh,
             );
           }
 
@@ -228,7 +228,7 @@ Future<void> _openAdvancedFilter() async {
               _buildSearchField(l10n),
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: () => viewModel.load(forceRefresh: true),
+                  onRefresh: viewModel.refresh,
                   child: ListView.builder(
                     // Padding explícito desliga o recuo automático do sistema:
                     // sem somá-lo, o fim da lista fica sob a barra de navegação.

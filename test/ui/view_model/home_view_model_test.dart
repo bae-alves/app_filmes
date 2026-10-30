@@ -141,6 +141,62 @@ void main() {
     });
   });
 
+  group('refresh refaz a busca ativa', () {
+    FakeMoviesRepository buildRepository({Exception? searchError}) =>
+        FakeMoviesRepository(
+          popularMovies: const [dunaMovie],
+          searchMoviesResult: const [matrixMovie],
+          discoverMoviesResult: const [dunaMovie, matrixMovie],
+          searchError: searchError,
+        );
+
+    test('com pesquisa, pesquisa de novo', () async {
+      final repository = buildRepository();
+      final viewModel = HomeViewModel(moviesRepository: repository);
+      await viewModel.search('matrix');
+
+      await viewModel.refresh();
+
+      expect(viewModel.searchQuery, 'matrix');
+      expect(viewModel.movies.map((movie) => movie.id), [matrixId]);
+      expect(repository.forcedRefreshCount, 0);
+    });
+
+    test('com gêneros, filtra de novo', () async {
+      final viewModel = HomeViewModel(moviesRepository: buildRepository());
+      viewModel.toggleGenre(28);
+      await viewModel.applyGenreFilter();
+
+      await viewModel.refresh();
+
+      expect(viewModel.selectedGenreIds, [28]);
+      expect(viewModel.movies.map((movie) => movie.id), [dunaId, matrixId]);
+    });
+
+    test('sem filtro, recarrega os populares ignorando o cache', () async {
+      final repository = buildRepository();
+      final viewModel = HomeViewModel(moviesRepository: repository);
+      await viewModel.load();
+
+      await viewModel.refresh();
+
+      expect(repository.forcedRefreshCount, 1);
+      expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
+    });
+
+    test('depois de uma pesquisa que falhou, tenta a pesquisa de novo',
+        () async {
+      final repository = buildRepository(searchError: Exception('sem rede'));
+      final viewModel = HomeViewModel(moviesRepository: repository);
+      await viewModel.search('matrix');
+
+      await viewModel.refresh();
+
+      expect(viewModel.error, isNotNull);
+      expect(repository.forcedRefreshCount, 0);
+    });
+  });
+
   group('com duas buscas ao mesmo tempo', () {
     test('a resposta antiga que chega depois não troca a lista', () async {
       final repository = _SlowMoviesRepository(

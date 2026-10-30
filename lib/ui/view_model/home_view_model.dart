@@ -74,6 +74,15 @@ class HomeViewModel extends ChangeNotifier {
       () => _moviesRepository.getPopularMovies(forceRefresh: forceRefresh),
     );
   }
+  /// Refaz a busca ativa: a pesquisa, os gêneros ou, sem filtro, os populares
+  /// sem cache. É o que "puxar para atualizar" e "Tentar novamente" chamam,
+  /// para que a lista continue de acordo com o filtro na tela.
+  Future<Result<List<Movie>>> refresh() {
+    if (_searchQuery.isNotEmpty) return search(_searchQuery);
+    if (_selectedGenreIds.isNotEmpty) return applyGenreFilter();
+    return load(forceRefresh: true);
+  }
+
   /// Pesquisa filmes pelo nome.
   ///
   /// O TMDB não pesquisa por nome e por gênero na mesma chamada, por isso a

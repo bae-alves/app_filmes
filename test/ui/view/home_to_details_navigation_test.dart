@@ -314,6 +314,25 @@ void main() {
     expect(find.byKey(const ValueKey(dunaId)), findsOneWidget);
   });
 
+  testWidgets('puxar para atualizar mantém a pesquisa', (tester) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie, matrixMovie],
+      searchMoviesResult: const [matrixMovie],
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'matrix');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    await tester.fling(find.byType(MovieCard), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+
+    expect(repository.forcedRefreshCount, 0);
+    expect(find.byType(MovieCard), findsOneWidget);
+    expect(find.byKey(const ValueKey(matrixId)), findsOneWidget);
+  });
+
   testWidgets('a tela inicial informa quando não há filmes para exibir',
       (tester) async {
     await tester.pumpWidget(buildApp(FakeMoviesRepository()));
