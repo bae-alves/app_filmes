@@ -118,4 +118,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String certificationLabel(String certification) {
     return 'Classificação indicativa: $certification';
   }
+
+  @override
+  String get favoritesTitle => 'Favoritos';
+
+  @override
+  String get favoritesEmpty =>
+      'Nenhum filme nos favoritos ainda. Toque no coração na tela de um filme para salvá-lo aqui.';
+
+  @override
+  String get favoritesLoadError => 'Não foi possível carregar os favoritos.';
+
+  @override
+  String get favoriteAdd => 'Adicionar aos favoritos';
+
+  @override
+  String get favoriteRemove => 'Remover dos favoritos';
 }

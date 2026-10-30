@@ -35,6 +35,7 @@ texto, cada um para uma necessidade diferente.
 - [Plataformas](explicacao/plataformas.md)
 - [Internacionalização](explicacao/internacionalizacao.md)
 - [Onde assistir](explicacao/onde-assistir.md)
+- [Favoritos](explicacao/favoritos.md): por que SQLite local, e o que muda com login
 
 ## Onde colocar um texto novo
 

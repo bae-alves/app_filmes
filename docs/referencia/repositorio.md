@@ -56,3 +56,36 @@ não exibe essa mensagem.
 | Status fora de 2xx | Resposta do TMDB |
 | `DioException` | Rede, timeout, status ≥ 400 |
 | `TypeError` e outros | JSON fora do formato esperado |
+
+## `FavoritesRepository`
+
+`lib/data/repositories/favorites_repository.dart`. Lista de favoritos
+(watchlist). A implementação de produção é `FavoritesRepositoryLocal`, em
+SQLite no aparelho. A de teste é `FakeFavoritesRepository` (`test/fakes/`).
+Por que local, e o que muda com login:
+[Favoritos](../explicacao/favoritos.md).
+
+| Método | `T` | Comportamento |
+| --- | --- | --- |
+| `getFavorites()` | `List<Movie>` | Do adicionado mais recentemente ao mais antigo. |
+| `addFavorite(movie)` | `void` | Grava o resumo do filme. Se ele já está na lista, atualiza o resumo e o leva ao topo. |
+| `removeFavorite(movieId)` | `void` | Remove. Remover um filme ausente não é erro. |
+
+Assim como em `MoviesRepository`, nada lança: falhas do banco viram
+`Error`, com mensagem em português para o log.
+
+### Construtor de `FavoritesRepositoryLocal`
+
+| Parâmetro | Tipo | Descrição |
+| --- | --- | --- |
+| `database` | `Database` (sqflite) | Banco aberto por `AppDatabase.open()`. |
+| `now` | `DateTime Function()?` | Relógio de `added_at`. Padrão: `DateTime.now`. |
+
+### `AppDatabase`
+
+`lib/data/services/app_database.dart`. Abre o banco `app_filmes.db`
+(esquema versão 1), com a tabela `favorites`: `movie_id` (chave), `title`,
+`original_title`, `overview`, `poster_path`, `backdrop_path`,
+`release_date`, `vote_average`, `vote_count` e `added_at` (milissegundos
+desde 1970). `open({factory, path})` aceita uma fábrica e um caminho para os
+testes abrirem um banco em memória.

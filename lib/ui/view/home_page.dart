@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../data/api_models/movie.dart';
 import '../../l10n/app_localizations.dart';
+import '../view_model/favorites_view_model.dart';
 import '../view_model/home_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
+import 'favorites_page.dart';
 import 'movie_details_page.dart';
 import 'widgets/movie_card.dart';
 import 'widgets/trailer_player.dart';
@@ -22,11 +24,15 @@ class HomePage extends StatefulWidget {
     super.key,
     required this.viewModel,
     required this.detailsViewModelFactory,
+    required this.favoritesViewModel,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
   });
 
   /// Estado e comandos da tela.
   final HomeViewModel viewModel;
+
+  /// Lista de favoritos, aberta pelo botão da AppBar.
+  final FavoritesViewModel favoritesViewModel;
 
   /// Fábrica da view model usada ao abrir a tela de detalhes.
   final MovieDetailsViewModelFactory detailsViewModelFactory;
@@ -54,11 +60,21 @@ class _HomePageState extends State<HomePage> {
   /// arquitetura em camadas: a view model continua sem depender do Navigator.
   void _openDetails(Movie movie) {
     Navigator.of(context).push(
+      MovieDetailsPage.route(
+        viewModel: widget.detailsViewModelFactory(movie.id),
+        favoritesViewModel: widget.favoritesViewModel,
+        fallbackTitle: movie.title,
+        trailerPlayerBuilder: widget.trailerPlayerBuilder,
+      ),
+    );
+  }
+
+  void _openFavorites() {
+    Navigator.of(context).push(
       MaterialPageRoute<void>(
-        settings: const RouteSettings(name: MovieDetailsPage.routeName),
-        builder: (_) => MovieDetailsPage(
-          viewModel: widget.detailsViewModelFactory(movie.id),
-          fallbackTitle: movie.title,
+        builder: (_) => FavoritesPage(
+          viewModel: widget.favoritesViewModel,
+          detailsViewModelFactory: widget.detailsViewModelFactory,
           trailerPlayerBuilder: widget.trailerPlayerBuilder,
         ),
       ),
@@ -157,7 +173,16 @@ Future<void> _openAdvancedFilter() async {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.homeTitle)),
+      appBar: AppBar(
+        title: Text(l10n.homeTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite_border),
+            tooltip: l10n.favoritesTitle,
+            onPressed: _openFavorites,
+          ),
+        ],
+      ),
       body: ListenableBuilder(
         listenable: widget.viewModel,
         builder: (context, _) {

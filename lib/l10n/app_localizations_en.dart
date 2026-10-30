@@ -118,4 +118,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String certificationLabel(String certification) {
     return 'Age rating: $certification';
   }
+
+  @override
+  String get favoritesTitle => 'Favorites';
+
+  @override
+  String get favoritesEmpty =>
+      'No favorites yet. Tap the heart on a movie\'s page to save it here.';
+
+  @override
+  String get favoritesLoadError => 'Couldn\'t load your favorites.';
+
+  @override
+  String get favoriteAdd => 'Add to favorites';
+
+  @override
+  String get favoriteRemove => 'Remove from favorites';
 }

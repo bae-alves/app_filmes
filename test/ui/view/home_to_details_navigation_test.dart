@@ -5,11 +5,13 @@ import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view/movie_details_page.dart';
 import 'package:app_filmes/ui/view/widgets/movie_card.dart';
 import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
+import 'package:app_filmes/ui/view_model/favorites_view_model.dart';
 import 'package:app_filmes/ui/view_model/home_view_model.dart';
 import 'package:app_filmes/ui/view_model/movie_details_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../fakes/fake_favorites_repository.dart';
 import '../../fakes/fake_movies_repository.dart';
 import '../../fakes/movie_fixtures.dart';
 
@@ -38,6 +40,9 @@ void main() {
       locale: locale,
       home: HomePage(
         viewModel: HomeViewModel(moviesRepository: repository),
+        favoritesViewModel: FavoritesViewModel(
+          favoritesRepository: FakeFavoritesRepository(),
+        ),
         detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
           moviesRepository: repository,
           movieId: movieId,

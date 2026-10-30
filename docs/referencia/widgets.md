@@ -9,6 +9,7 @@ Todos exigem os delegates de `AppLocalizations` no `MaterialApp`.
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `viewModel` | `HomeViewModel` | — | Estado e comandos. |
+| `favoritesViewModel` | `FavoritesViewModel` | — | Lista de favoritos. O coração da barra abre a `FavoritesPage`. |
 | `detailsViewModelFactory` | `MovieDetailsViewModel Function(int movieId)` | — | Cria a view model da tela de detalhes. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Repassado à tela de detalhes. |
 
@@ -21,6 +22,7 @@ abre a lista completa.
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `viewModel` | `MovieDetailsViewModel` | — | Estado e comandos. Chama `load()` no `initState`. |
+| `favoritesViewModel` | `FavoritesViewModel` | — | Liga e desliga o coração da barra, que aparece quando os detalhes carregam. |
 | `fallbackTitle` | `String?` | `null` | Título da barra enquanto os detalhes carregam. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Constrói o player. |
 
@@ -29,6 +31,23 @@ abre a lista completa.
 | `routeName` | `/movie-details` |
 | `trailerKey` | `Key('movie-details-trailer')`: bloco do player. |
 | `emptyTrailerKey` | `Key('movie-details-trailer-empty')`: aviso de filme sem trailer. |
+| `favoriteButtonKey` | `Key('movie-details-favorite')`: coração da barra. |
+| `route({viewModel, favoritesViewModel, fallbackTitle, trailerPlayerBuilder})` | `Route` até a tela, usada pela home e pelos favoritos. |
+
+## `FavoritesPage`
+
+`lib/ui/view/favorites_page.dart`. Lista de favoritos, do mais recente ao
+mais antigo, em `MovieCard`s. Tocar num cartão abre os detalhes. Para tirar
+um filme da lista, o usuário desfavorita na tela de detalhes; ao voltar, a
+lista já está atualizada. Chama `load()` no `initState`. Mostra um aviso
+quando a lista está vazia, e erro com "Tentar novamente" quando a leitura
+falha.
+
+| Parâmetro | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `viewModel` | `FavoritesViewModel` | — | A mesma instância da home e dos detalhes. |
+| `detailsViewModelFactory` | `MovieDetailsViewModel Function(int movieId)` | — | Cria a view model da tela de detalhes. |
+| `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Repassado à tela de detalhes. |
 
 ## `MovieCard`
 
@@ -39,7 +58,7 @@ abre a lista completa.
 | `movie` | `Movie` | Filme exibido. |
 | `onTap` | `VoidCallback` | Chamado no toque. |
 
-A `HomePage` dá a cada cartão a chave `ValueKey(movie.id)`.
+A `HomePage` e a `FavoritesPage` dão a cada cartão a chave `ValueKey(movie.id)`.
 
 ## `WatchProvidersSection`
 

@@ -23,6 +23,8 @@ Nele mora tudo que não é requisição nem estado de tela: cache, tradução de
 falhas em `Result`, a escolha de qual vídeo é "o trailer" e de qual país vale
 em "onde assistir". Os caches vivem em memória, menos o de detalhes, que fica
 salvo no aparelho por 24h para a tela abrir mesmo com a API instável.
+`FavoritesRepository` faz o mesmo papel para a lista de favoritos, guardada
+em SQLite no aparelho (veja [Favoritos](favoritos.md)).
 
 **View model** (`ChangeNotifier`) guarda o estado de uma tela e expõe
 comandos (`load`, `search`). Não conhece widgets nem `Navigator`. Avisa a view

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'l10n/app_localizations.dart';
 
+import 'data/repositories/favorites_repository_local.dart';
 import 'data/repositories/movies_repository.dart';
 import 'data/repositories/movies_repository_remote.dart';
+import 'data/services/app_database.dart';
 import 'data/services/tmdb_dio.dart';
 import 'data/services/tmdb_rest_client.dart';
 import 'ui/view/home_page.dart';
+import 'ui/view_model/favorites_view_model.dart';
 import 'ui/view_model/home_view_model.dart';
 import 'ui/view_model/movie_details_view_model.dart';
 import 'utils/env.dart';
@@ -19,8 +23,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Env.load();
   final preferences = await SharedPreferences.getInstance();
+  final database = await AppDatabase.open();
 
-  runApp(AppFilmes(preferences: preferences));
+  runApp(AppFilmes(preferences: preferences, database: database));
 }
 
 /// Raiz da aplicação e único ponto de composição das dependências.
@@ -29,10 +34,17 @@ Future<void> main() async {
 /// view. Nenhuma camada instancia a camada de baixo por conta própria, o que
 /// mantém todas elas substituíveis nos testes.
 class AppFilmes extends StatefulWidget {
-  const AppFilmes({super.key, required this.preferences});
+  const AppFilmes({
+    super.key,
+    required this.preferences,
+    required this.database,
+  });
 
   /// Armazenamento local, usado pelo cache de detalhes do repositório.
   final SharedPreferences preferences;
+
+  /// Banco SQLite do aparelho, onde ficam os favoritos.
+  final Database database;
 
   @override
   State<AppFilmes> createState() => _AppFilmesState();
@@ -41,6 +53,7 @@ class AppFilmes extends StatefulWidget {
 class _AppFilmesState extends State<AppFilmes> {
   late final MoviesRepository _moviesRepository;
   late final HomeViewModel _homeViewModel;
+  late final FavoritesViewModel _favoritesViewModel;
 
   @override
   void initState() {
@@ -54,11 +67,16 @@ class _AppFilmesState extends State<AppFilmes> {
       preferences: widget.preferences,
     );
     _homeViewModel = HomeViewModel(moviesRepository: _moviesRepository);
+    // Sem login, os favoritos ficam só no aparelho. Veja FavoritesRepository.
+    _favoritesViewModel = FavoritesViewModel(
+      favoritesRepository: FavoritesRepositoryLocal(database: widget.database),
+    )..load();
   }
 
   @override
   void dispose() {
     _homeViewModel.dispose();
+    _favoritesViewModel.dispose();
     super.dispose();
   }
 
@@ -76,6 +94,7 @@ class _AppFilmesState extends State<AppFilmes> {
       supportedLocales: AppLocalizations.supportedLocales,
       home: HomePage(
         viewModel: _homeViewModel,
+        favoritesViewModel: _favoritesViewModel,
         detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
           moviesRepository: _moviesRepository,
           movieId: movieId,

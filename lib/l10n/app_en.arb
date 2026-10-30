@@ -36,5 +36,10 @@
   "castTitle": "Cast",
   "castSeeAll": "See all",
   "directedBy": "Directed by {names}",
-  "certificationLabel": "Age rating: {certification}"
+  "certificationLabel": "Age rating: {certification}",
+  "favoritesTitle": "Favorites",
+  "favoritesEmpty": "No favorites yet. Tap the heart on a movie's page to save it here.",
+  "favoritesLoadError": "Couldn't load your favorites.",
+  "favoriteAdd": "Add to favorites",
+  "favoriteRemove": "Remove from favorites"
 }

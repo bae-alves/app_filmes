@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../data/api_models/genre.dart';
+import '../../data/api_models/movie.dart';
 import '../../data/api_models/movie_details.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/formatters.dart';
 import '../../utils/tmdb_images.dart';
+import '../view_model/favorites_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
 import 'widgets/trailer_player.dart';
 import 'widgets/watch_providers_section.dart';
@@ -12,17 +14,39 @@ import 'widgets/watch_providers_section.dart';
 /// Tela de detalhes: mostra o trailer, as informações completas do filme e
 /// onde ele pode ser assistido.
 ///
-/// É alcançada ao tocar em um cartão da tela inicial.
+/// É alcançada ao tocar em um cartão da tela inicial ou da tela de favoritos.
 class MovieDetailsPage extends StatefulWidget {
   const MovieDetailsPage({
     super.key,
     required this.viewModel,
+    required this.favoritesViewModel,
     this.fallbackTitle,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
   });
 
   /// Identificador da rota, útil em testes e em navegação nomeada.
   static const routeName = '/movie-details';
+
+  /// Chave do botão de coração, que liga e desliga o favorito.
+  static const favoriteButtonKey = Key('movie-details-favorite');
+
+  /// Rota até a tela de detalhes, usada por todas as telas que a abrem.
+  static Route<void> route({
+    required MovieDetailsViewModel viewModel,
+    required FavoritesViewModel favoritesViewModel,
+    String? fallbackTitle,
+    TrailerPlayerBuilder trailerPlayerBuilder = defaultTrailerPlayerBuilder,
+  }) {
+    return MaterialPageRoute<void>(
+      settings: const RouteSettings(name: routeName),
+      builder: (_) => MovieDetailsPage(
+        viewModel: viewModel,
+        favoritesViewModel: favoritesViewModel,
+        fallbackTitle: fallbackTitle,
+        trailerPlayerBuilder: trailerPlayerBuilder,
+      ),
+    );
+  }
 
   /// Chave do bloco que hospeda o player do trailer.
   static const trailerKey = Key('movie-details-trailer');
@@ -32,6 +56,9 @@ class MovieDetailsPage extends StatefulWidget {
 
   /// Estado e comandos da tela.
   final MovieDetailsViewModel viewModel;
+
+  /// Lista de favoritos, compartilhada com o resto do app.
+  final FavoritesViewModel favoritesViewModel;
 
   /// Título já conhecido pela tela anterior. Evita uma AppBar vazia enquanto os
   /// detalhes ainda estão sendo carregados.
@@ -68,6 +95,13 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                   widget.fallbackTitle ??
                   AppLocalizations.of(context).detailsFallbackTitle,
             ),
+            actions: [
+              if (viewModel.movieSummary case final movie?)
+                _FavoriteButton(
+                  movie: movie,
+                  favoritesViewModel: widget.favoritesViewModel,
+                ),
+            ],
           ),
           body: switch ((viewModel.isLoading, viewModel.error, details)) {
             (true, _, null) => const Center(child: CircularProgressIndicator()),
@@ -85,6 +119,33 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                 trailerPlayerBuilder: widget.trailerPlayerBuilder,
               ),
           },
+        );
+      },
+    );
+  }
+}
+
+/// Coração da AppBar: favorita ou desfavorita o filme.
+class _FavoriteButton extends StatelessWidget {
+  const _FavoriteButton({required this.movie, required this.favoritesViewModel});
+
+  final Movie movie;
+  final FavoritesViewModel favoritesViewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: favoritesViewModel,
+      builder: (context, _) {
+        final isFavorite = favoritesViewModel.isFavorite(movie.id);
+        return IconButton(
+          key: MovieDetailsPage.favoriteButtonKey,
+          isSelected: isFavorite,
+          icon: const Icon(Icons.favorite_border),
+          selectedIcon: const Icon(Icons.favorite),
+          tooltip: isFavorite ? l10n.favoriteRemove : l10n.favoriteAdd,
+          onPressed: () => favoritesViewModel.toggle(movie),
         );
       },
     );

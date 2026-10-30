@@ -180,5 +180,30 @@
     "placeholders": {
       "certification": {"type": "String"}
     }
+  },
+
+  "favoritesTitle": "Favoritos",
+  "@favoritesTitle": {
+    "description": "Título da tela com a lista de favoritos (watchlist) e dica do botão da tela inicial que a abre."
+  },
+
+  "favoritesEmpty": "Nenhum filme nos favoritos ainda. Toque no coração na tela de um filme para salvá-lo aqui.",
+  "@favoritesEmpty": {
+    "description": "Mensagem da tela de favoritos quando a lista está vazia. Explica como adicionar um filme."
+  },
+
+  "favoritesLoadError": "Não foi possível carregar os favoritos.",
+  "@favoritesLoadError": {
+    "description": "Mensagem da tela de favoritos quando a leitura da lista salva no aparelho falha."
+  },
+
+  "favoriteAdd": "Adicionar aos favoritos",
+  "@favoriteAdd": {
+    "description": "Dica do botão de coração (vazio) da tela de detalhes, que salva o filme nos favoritos."
+  },
+
+  "favoriteRemove": "Remover dos favoritos",
+  "@favoriteRemove": {
+    "description": "Dica do botão de coração (cheio) da tela de detalhes, que tira o filme dos favoritos."
   }
 }

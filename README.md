@@ -3,6 +3,7 @@
 Aplicativo Flutter que lista os filmes populares do
 [TMDB](https://developer.themoviedb.org/docs/getting-started) e abre uma tela
 de detalhes com o trailer, as informações de cada filme e onde assisti-lo.
+Os filmes podem ser salvos numa lista de favoritos, guardada no aparelho.
 Roda em Android e na web, em português e em inglês.
 
 ## Começo rápido
@@ -36,7 +37,7 @@ Toda a documentação está em [`docs/`](docs/README.md):
 - **Referência:** configuração, repositório, widgets, testes
 - **Explicação:** [arquitetura](docs/explicacao/arquitetura.md),
   plataformas, [internacionalização](docs/explicacao/internacionalizacao.md),
-  onde assistir
+  onde assistir, [favoritos](docs/explicacao/favoritos.md)
 
 ## Estrutura
 
@@ -44,8 +45,8 @@ Toda a documentação está em [`docs/`](docs/README.md):
 lib/
 ├── data/
 │   ├── api_models/     # modelos do JSON do TMDB (json_serializable)
-│   ├── repositories/   # MoviesRepository (contrato) + implementação remota
-│   └── services/       # TmdbRestClient (retrofit) + configuração do Dio
+│   ├── repositories/   # MoviesRepository e FavoritesRepository (contratos + implementações)
+│   └── services/       # TmdbRestClient (retrofit), Dio e o banco SQLite (AppDatabase)
 ├── l10n/               # textos traduzidos (.arb) e AppLocalizations gerado
 ├── ui/
 │   ├── view/           # telas e widgets

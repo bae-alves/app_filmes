@@ -295,6 +295,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Classificação indicativa: {certification}'**
   String certificationLabel(String certification);
+
+  /// Título da tela com a lista de favoritos (watchlist) e dica do botão da tela inicial que a abre.
+  ///
+  /// In pt, this message translates to:
+  /// **'Favoritos'**
+  String get favoritesTitle;
+
+  /// Mensagem da tela de favoritos quando a lista está vazia. Explica como adicionar um filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum filme nos favoritos ainda. Toque no coração na tela de um filme para salvá-lo aqui.'**
+  String get favoritesEmpty;
+
+  /// Mensagem da tela de favoritos quando a leitura da lista salva no aparelho falha.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os favoritos.'**
+  String get favoritesLoadError;
+
+  /// Dica do botão de coração (vazio) da tela de detalhes, que salva o filme nos favoritos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar aos favoritos'**
+  String get favoriteAdd;
+
+  /// Dica do botão de coração (cheio) da tela de detalhes, que tira o filme dos favoritos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover dos favoritos'**
+  String get favoriteRemove;
 }
 
 class _AppLocalizationsDelegate

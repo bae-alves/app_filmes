@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../data/api_models/movie.dart';
 import '../../data/api_models/movie_details.dart';
 import '../../data/api_models/video.dart';
 import '../../data/api_models/watch_providers.dart';
@@ -40,6 +41,24 @@ class MovieDetailsViewModel extends ChangeNotifier {
 
   /// Informações do filme, disponíveis após um [load] bem-sucedido.
   MovieDetails? get details => _details;
+
+  /// Resumo do filme no formato da listagem, que é o que os favoritos guardam.
+  /// `null` enquanto os detalhes não chegaram.
+  Movie? get movieSummary {
+    final details = _details;
+    if (details == null) return null;
+    return Movie(
+      id: details.id,
+      title: details.title,
+      originalTitle: details.originalTitle,
+      overview: details.overview,
+      posterPath: details.posterPath,
+      backdropPath: details.backdropPath,
+      releaseDate: details.releaseDate,
+      voteAverage: details.voteAverage,
+      voteCount: details.voteCount,
+    );
+  }
 
   /// Trailer escolhido pelo repositório, ou `null` quando o filme não tem um.
   Video? get trailer => _trailer;
