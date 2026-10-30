@@ -41,5 +41,7 @@
   "favoritesEmpty": "No favorites yet. Tap the heart on a movie's page to save it here.",
   "favoritesLoadError": "Couldn't load your favorites.",
   "favoriteAdd": "Add to favorites",
-  "favoriteRemove": "Remove from favorites"
+  "favoriteRemove": "Remove from favorites",
+  "favoriteRemoved": "Removed {title} from favorites",
+  "undo": "Undo"
 }

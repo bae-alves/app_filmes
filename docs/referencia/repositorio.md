@@ -67,8 +67,8 @@ Por que local, e o que muda com login:
 
 | Método | `T` | Comportamento |
 | --- | --- | --- |
-| `getFavorites()` | `List<Movie>` | Do adicionado mais recentemente ao mais antigo. |
-| `addFavorite(movie)` | `void` | Grava o resumo do filme. Se ele já está na lista, atualiza o resumo e o leva ao topo. |
+| `getFavorites()` | `List<Favorite>` | Do adicionado mais recentemente ao mais antigo. `Favorite` traz o `movie` e o `addedAt`. |
+| `addFavorite(movie, {addedAt})` | `void` | Grava o resumo do filme com `addedAt` (padrão: agora), que define a posição na lista. Se o filme já está lá, atualiza o resumo. "Desfazer" passa o `addedAt` original para o filme voltar ao mesmo lugar. |
 | `removeFavorite(movieId)` | `void` | Remove. Remover um filme ausente não é erro. |
 
 Assim como em `MoviesRepository`, nada lança: falhas do banco viram
@@ -79,7 +79,7 @@ Assim como em `MoviesRepository`, nada lança: falhas do banco viram
 | Parâmetro | Tipo | Descrição |
 | --- | --- | --- |
 | `database` | `Database` (sqflite) | Banco aberto por `AppDatabase.open()`. |
-| `now` | `DateTime Function()?` | Relógio de `added_at`. Padrão: `DateTime.now`. |
+| `now` | `DateTime Function()?` | Relógio de `added_at` quando `addFavorite` não recebe `addedAt`. Padrão: `DateTime.now`. |
 
 ### `AppDatabase`
 

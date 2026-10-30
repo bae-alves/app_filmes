@@ -1,4 +1,4 @@
-import 'package:app_filmes/data/api_models/movie.dart';
+import 'package:app_filmes/data/repositories/favorites_repository.dart';
 import 'package:app_filmes/data/repositories/favorites_repository_local.dart';
 import 'package:app_filmes/data/services/app_database.dart';
 import 'package:app_filmes/utils/result.dart';
@@ -29,7 +29,7 @@ void main() {
 
   tearDown(() => database.close());
 
-  Future<List<Movie>> favorites() async =>
+  Future<List<Favorite>> favorites() async =>
       switch (await repository.getFavorites()) {
         Ok(:final value) => value,
         Error(:final error) => throw error,
@@ -44,9 +44,10 @@ void main() {
     await repository.addFavorite(matrixMovie);
 
     final saved = await favorites();
-    expect(saved.map((m) => m.id), [matrixId, dunaId]);
+    expect(saved.map((f) => f.movie.id), [matrixId, dunaId]);
+    expect(saved.last.addedAt, DateTime.fromMillisecondsSinceEpoch(1));
 
-    final duna = saved.last;
+    final duna = saved.last.movie;
     expect(duna.title, dunaMovie.title);
     expect(duna.originalTitle, dunaMovie.originalTitle);
     expect(duna.overview, dunaMovie.overview);
@@ -62,7 +63,18 @@ void main() {
     await repository.addFavorite(matrixMovie);
     await repository.addFavorite(dunaMovie);
 
-    expect((await favorites()).map((m) => m.id), [dunaId, matrixId]);
+    expect((await favorites()).map((f) => f.movie.id), [dunaId, matrixId]);
+  });
+
+  test('addedAt informado devolve o filme à posição original', () async {
+    await repository.addFavorite(dunaMovie); // added_at 1
+    await repository.addFavorite(matrixMovie); // added_at 2
+    final dunaAddedAt = (await favorites()).last.addedAt;
+
+    await repository.removeFavorite(dunaId);
+    await repository.addFavorite(dunaMovie, addedAt: dunaAddedAt);
+
+    expect((await favorites()).map((f) => f.movie.id), [matrixId, dunaId]);
   });
 
   test('remove o filme, e remover um que não está lá não é erro', () async {
@@ -71,13 +83,13 @@ void main() {
 
     expect(await repository.removeFavorite(dunaId), isA<Ok<void>>());
     expect(await repository.removeFavorite(dunaId), isA<Ok<void>>());
-    expect((await favorites()).map((m) => m.id), [matrixId]);
+    expect((await favorites()).map((f) => f.movie.id), [matrixId]);
   });
 
   test('falha do banco vira Error, sem lançar', () async {
     await database.close();
 
-    expect(await repository.getFavorites(), isA<Error<List<Movie>>>());
+    expect(await repository.getFavorites(), isA<Error<List<Favorite>>>());
     expect(await repository.addFavorite(dunaMovie), isA<Error<void>>());
     expect(await repository.removeFavorite(dunaId), isA<Error<void>>());
   });

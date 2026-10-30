@@ -134,4 +134,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoriteRemove => 'Remove from favorites';
+
+  @override
+  String favoriteRemoved(String title) {
+    return 'Removed $title from favorites';
+  }
+
+  @override
+  String get undo => 'Undo';
 }

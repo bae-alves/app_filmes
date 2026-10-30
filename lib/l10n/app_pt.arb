@@ -205,5 +205,18 @@
   "favoriteRemove": "Remover dos favoritos",
   "@favoriteRemove": {
     "description": "Dica do botão de coração (cheio) da tela de detalhes, que tira o filme dos favoritos."
+  },
+
+  "favoriteRemoved": "{title} saiu dos favoritos",
+  "@favoriteRemoved": {
+    "description": "Aviso na parte de baixo da tela de favoritos depois de remover um filme, ao lado do botão \"Desfazer\".",
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+
+  "undo": "Desfazer",
+  "@undo": {
+    "description": "Ação do aviso de filme removido: devolve o filme à lista, no mesmo lugar."
   }
 }

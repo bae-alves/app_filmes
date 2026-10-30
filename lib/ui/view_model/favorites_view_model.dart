@@ -15,12 +15,16 @@ class FavoritesViewModel extends ChangeNotifier {
 
   final FavoritesRepository _favoritesRepository;
 
-  List<Movie> _favorites = const [];
+  List<Favorite> _favorites = const [];
   bool _isLoading = false;
   Exception? _error;
 
+  /// Último favorito tirado por [remove] e a posição em que estava, para
+  /// [undoRemove].
+  (Favorite, int)? _lastRemoved;
+
   /// Filmes favoritados, do mais recente ao mais antigo.
-  List<Movie> get favorites => _favorites;
+  List<Movie> get favorites => [for (final f in _favorites) f.movie];
 
   /// Indica que a lista está sendo lida.
   bool get isLoading => _isLoading;
@@ -29,7 +33,7 @@ class FavoritesViewModel extends ChangeNotifier {
   Exception? get error => _error;
 
   /// O filme [movieId] está nos favoritos.
-  bool isFavorite(int movieId) => _favorites.any((m) => m.id == movieId);
+  bool isFavorite(int movieId) => _favorites.any((f) => f.movie.id == movieId);
 
   /// Lê a lista salva.
   Future<void> load() async {
@@ -38,9 +42,9 @@ class FavoritesViewModel extends ChangeNotifier {
     notifyListeners();
 
     switch (await _favoritesRepository.getFavorites()) {
-      case Ok<List<Movie>>(:final value):
+      case Ok<List<Favorite>>(:final value):
         _favorites = value;
-      case Error<List<Movie>>(:final error):
+      case Error<List<Favorite>>(:final error):
         _error = error;
         if (kDebugMode) {
           debugPrint('Não foi possível carregar os favoritos: $error');
@@ -52,23 +56,51 @@ class FavoritesViewModel extends ChangeNotifier {
   }
 
   /// Adiciona [movie] aos favoritos, ou o remove se já estiver lá.
-  ///
-  /// O coração muda na hora; se a gravação falhar, a lista volta ao que era.
-  Future<void> toggle(Movie movie) async {
+  Future<void> toggle(Movie movie) => isFavorite(movie.id)
+      ? remove(movie.id)
+      : _insert(Favorite(movie: movie, addedAt: DateTime.now()), 0);
+
+  /// Tira o filme [movieId] da lista. [undoRemove] o devolve ao mesmo lugar.
+  Future<void> remove(int movieId) async {
+    final index = _favorites.indexWhere((f) => f.movie.id == movieId);
+    if (index < 0) return;
+    _lastRemoved = (_favorites[index], index);
+    await _update(
+      [..._favorites]..removeAt(index),
+      () => _favoritesRepository.removeFavorite(movieId),
+    );
+  }
+
+  /// Desfaz o último [remove]: o filme volta à posição em que estava, com a
+  /// mesma data de entrada, e por isso continua lá depois de reabrir o app.
+  Future<void> undoRemove() async {
+    final lastRemoved = _lastRemoved;
+    _lastRemoved = null;
+    if (lastRemoved == null) return;
+    final (favorite, index) = lastRemoved;
+    if (isFavorite(favorite.movie.id)) return;
+    await _insert(favorite, index);
+  }
+
+  Future<void> _insert(Favorite favorite, int index) => _update(
+    [..._favorites]..insert(index.clamp(0, _favorites.length), favorite),
+    () => _favoritesRepository.addFavorite(
+      favorite.movie,
+      addedAt: favorite.addedAt,
+    ),
+  );
+
+  /// Mostra [next] na hora e grava com [write]; se a gravação falhar, a lista
+  /// volta ao que era.
+  Future<void> _update(
+    List<Favorite> next,
+    Future<Result<void>> Function() write,
+  ) async {
     final previous = _favorites;
-    final remove = isFavorite(movie.id);
-    _favorites = remove
-        ? [
-            for (final m in previous)
-              if (m.id != movie.id) m,
-          ]
-        : [movie, ...previous];
+    _favorites = next;
     notifyListeners();
 
-    final result = remove
-        ? await _favoritesRepository.removeFavorite(movie.id)
-        : await _favoritesRepository.addFavorite(movie);
-    if (result case Error(:final error)) {
+    if (await write() case Error(:final error)) {
       _favorites = previous;
       notifyListeners();
       if (kDebugMode) debugPrint('Não foi possível salvar o favorito: $error');

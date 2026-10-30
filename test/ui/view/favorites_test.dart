@@ -80,7 +80,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byTooltip('Remover dos favoritos'), findsOneWidget);
-      expect(favorites.favorites.map((m) => m.id), [dunaId]);
+      expect(favorites.movieIds, [dunaId]);
 
       await back(tester);
       await openFavorites(tester);
@@ -94,7 +94,7 @@ void main() {
     'tocar num favorito abre os detalhes, e desfavoritar o tira da lista',
     (tester) async {
       final favorites = FakeFavoritesRepository(
-        favorites: [matrixMovie, dunaMovie],
+        movies: [matrixMovie, dunaMovie],
       );
       await tester.pumpWidget(buildApp(favorites));
       await tester.pumpAndSettle();
@@ -117,9 +117,94 @@ void main() {
       expect(find.byType(FavoritesPage), findsOneWidget);
       expect(find.byKey(const ValueKey(matrixId)), findsNothing);
       expect(find.byKey(const ValueKey(dunaId)), findsOneWidget);
-      expect(favorites.favorites.map((m) => m.id), [dunaId]);
+      expect(favorites.movieIds, [dunaId]);
     },
   );
+
+  group('remover da lista', () {
+    /// Cartões na tela, de cima para baixo. O SnackBar também usa um
+    /// Dismissible, com outra chave; por isso o filtro pelo tipo da chave.
+    List<int> cardIds(WidgetTester tester) => [
+          for (final d in tester.widgetList<Dismissible>(
+            find.byType(Dismissible),
+          ))
+            if (d.key case ValueKey<int>(:final value)) value,
+        ];
+
+    Future<FakeFavoritesRepository> openList(WidgetTester tester) async {
+      final favorites = FakeFavoritesRepository(
+        movies: [matrixMovie, dunaMovie],
+      );
+      await tester.pumpWidget(buildApp(favorites));
+      await tester.pumpAndSettle();
+      await openFavorites(tester);
+      return favorites;
+    }
+
+    testWidgets('o botão de lixeira remove e oferece desfazer', (tester) async {
+      final favorites = await openList(tester);
+
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(const ValueKey(matrixId)),
+          matching: find.byTooltip('Remover dos favoritos'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(cardIds(tester), [dunaId]);
+      expect(favorites.movieIds, [dunaId]);
+      expect(find.text('Matrix saiu dos favoritos'), findsOneWidget);
+
+      await tester.tap(find.text('Desfazer'));
+      await tester.pumpAndSettle();
+
+      // De volta ao mesmo lugar: no topo, como antes.
+      expect(cardIds(tester), [matrixId, dunaId]);
+      expect(favorites.movieIds, [matrixId, dunaId]);
+    });
+
+    testWidgets('arrastar o cartão para a esquerda remove o filme',
+        (tester) async {
+      final favorites = await openList(tester);
+
+      await tester.drag(
+        find.byKey(const ValueKey(dunaId)),
+        const Offset(-800, 0),
+      );
+      await tester.pumpAndSettle();
+
+      expect(cardIds(tester), [matrixId]);
+      expect(favorites.movieIds, [matrixId]);
+      expect(find.text('Duna: Parte Dois saiu dos favoritos'), findsOneWidget);
+    });
+
+    testWidgets('o aviso some sozinho e o filme continua removido',
+        (tester) async {
+      final favorites = await openList(tester);
+
+      await tester.tap(find.byTooltip('Remover dos favoritos').first);
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 9));
+      expect(find.text('Desfazer'), findsOneWidget, reason: 'ainda dá tempo');
+
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+      expect(find.text('Desfazer'), findsNothing);
+      expect(favorites.movieIds, [dunaId]);
+    });
+
+    testWidgets('remover o último mostra a lista vazia', (tester) async {
+      await openList(tester);
+
+      await tester.tap(find.byTooltip('Remover dos favoritos').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Remover dos favoritos').first);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Nenhum filme nos favoritos'), findsOneWidget);
+    });
+  });
 
   testWidgets('falha ao ler a lista mostra o erro e permite tentar de novo',
       (tester) async {
@@ -132,9 +217,8 @@ void main() {
 
     expect(find.text('Não foi possível carregar os favoritos.'), findsOneWidget);
 
-    favorites
-      ..readError = null
-      ..favorites.add(dunaMovie);
+    favorites.readError = null;
+    await favorites.addFavorite(dunaMovie);
     await tester.tap(find.text('Tentar novamente'));
     await tester.pumpAndSettle();
 
@@ -152,9 +236,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byTooltip('Add to favorites'), findsOneWidget);
 
+    await tester.tap(find.byTooltip('Add to favorites'));
+    await tester.pumpAndSettle();
     await back(tester);
     await tester.tap(find.byTooltip('Favorites'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Remove from favorites'));
+    await tester.pumpAndSettle();
+    expect(find.text('Removed Duna: Parte Dois from favorites'), findsOneWidget);
+    expect(find.text('Undo'), findsOneWidget);
     expect(find.textContaining('No favorites yet'), findsOneWidget);
   });
 }

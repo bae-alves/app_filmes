@@ -18,24 +18,25 @@ class FavoritesRepositoryLocal implements FavoritesRepository {
 
   final Database _database;
 
-  /// Relógio usado em `added_at`. Injetável para os testes controlarem a ordem.
+  /// Relógio usado em `added_at` quando `addFavorite` não recebe um. Injetável
+  /// para os testes controlarem a ordem.
   final DateTime Function() _now;
 
   @override
-  Future<Result<List<Movie>>> getFavorites() async {
+  Future<Result<List<Favorite>>> getFavorites() async {
     try {
       final rows = await _database.query(
         AppDatabase.favoritesTable,
         orderBy: 'added_at DESC',
       );
-      return Result.ok([for (final row in rows) _movieFromRow(row)]);
+      return Result.ok([for (final row in rows) _favoriteFromRow(row)]);
     } on Exception catch (error) {
       return Result.error(Exception('Falha ao ler os favoritos ($error).'));
     }
   }
 
   @override
-  Future<Result<void>> addFavorite(Movie movie) async {
+  Future<Result<void>> addFavorite(Movie movie, {DateTime? addedAt}) async {
     try {
       await _database.insert(AppDatabase.favoritesTable, {
         'movie_id': movie.id,
@@ -47,7 +48,7 @@ class FavoritesRepositoryLocal implements FavoritesRepository {
         'release_date': movie.releaseDate,
         'vote_average': movie.voteAverage,
         'vote_count': movie.voteCount,
-        'added_at': _now().millisecondsSinceEpoch,
+        'added_at': (addedAt ?? _now()).millisecondsSinceEpoch,
       }, conflictAlgorithm: ConflictAlgorithm.replace);
       return const Result.ok(null);
     } on Exception catch (error) {
@@ -73,15 +74,18 @@ class FavoritesRepositoryLocal implements FavoritesRepository {
     }
   }
 
-  static Movie _movieFromRow(Map<String, Object?> row) => Movie(
-    id: row['movie_id']! as int,
-    title: row['title'] as String?,
-    originalTitle: row['original_title'] as String?,
-    overview: row['overview'] as String?,
-    posterPath: row['poster_path'] as String?,
-    backdropPath: row['backdrop_path'] as String?,
-    releaseDate: row['release_date'] as String?,
-    voteAverage: (row['vote_average'] as num?)?.toDouble(),
-    voteCount: row['vote_count'] as int?,
+  static Favorite _favoriteFromRow(Map<String, Object?> row) => Favorite(
+    movie: Movie(
+      id: row['movie_id']! as int,
+      title: row['title'] as String?,
+      originalTitle: row['original_title'] as String?,
+      overview: row['overview'] as String?,
+      posterPath: row['poster_path'] as String?,
+      backdropPath: row['backdrop_path'] as String?,
+      releaseDate: row['release_date'] as String?,
+      voteAverage: (row['vote_average'] as num?)?.toDouble(),
+      voteCount: row['vote_count'] as int?,
+    ),
+    addedAt: DateTime.fromMillisecondsSinceEpoch(row['added_at']! as int),
   );
 }

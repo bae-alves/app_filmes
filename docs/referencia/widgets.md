@@ -37,9 +37,13 @@ abre a lista completa.
 ## `FavoritesPage`
 
 `lib/ui/view/favorites_page.dart`. Lista de favoritos, do mais recente ao
-mais antigo, em `MovieCard`s. Tocar num cartão abre os detalhes. Para tirar
-um filme da lista, o usuário desfavorita na tela de detalhes; ao voltar, a
-lista já está atualizada. Chama `load()` no `initState`. Mostra um aviso
+mais antigo, em `MovieCard`s. Tocar num cartão abre os detalhes. Um filme sai
+da lista de três jeitos: pela lixeira do cartão (tooltip "Remover dos
+favoritos"), arrastando o cartão para a esquerda (`Dismissible`) ou pelo
+coração da tela de detalhes. Os dois primeiros mostram um SnackBar
+"<título> saiu dos favoritos" com "Desfazer", que some sozinho depois de
+`FavoritesPage.undoDuration` (10s); desfazer devolve o filme ao mesmo
+lugar. Chama `load()` no `initState`. Mostra um aviso
 quando a lista está vazia, e erro com "Tentar novamente" quando a leitura
 falha.
 
@@ -57,8 +61,10 @@ falha.
 | --- | --- | --- |
 | `movie` | `Movie` | Filme exibido. |
 | `onTap` | `VoidCallback` | Chamado no toque. |
+| `trailing` | `Widget?` | Canto superior direito. A `FavoritesPage` põe ali a lixeira. |
 
-A `HomePage` e a `FavoritesPage` dão a cada cartão a chave `ValueKey(movie.id)`.
+A `HomePage` dá a cada cartão a chave `ValueKey(movie.id)`. Na
+`FavoritesPage`, a chave fica no `Dismissible` que envolve o cartão.
 
 ## `WatchProvidersSection`
 

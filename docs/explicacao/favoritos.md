@@ -2,8 +2,8 @@
 
 O usuário salva filmes numa lista de favoritos (watchlist) para ver depois.
 O coração na barra da tela de detalhes adiciona e remove o filme. O coração
-da tela inicial abre a lista. Esta página explica onde a lista é guardada e
-por quê.
+da tela inicial abre a lista, onde cada filme também sai pela lixeira ou
+arrastando o cartão. Esta página explica onde a lista é guardada e por quê.
 
 ## Por que SQLite no aparelho
 
@@ -26,6 +26,17 @@ pôster, nota, ano. Assim a tela de favoritos abre sem nenhuma requisição,
 mesmo sem internet, e usa o mesmo `MovieCard` da tela inicial. O preço é que
 o resumo pode ficar desatualizado (a nota muda). A tela de detalhes sempre
 busca os dados atuais, e favoritar de novo atualiza o resumo.
+
+## Por que "Desfazer" devolve ao mesmo lugar
+
+Remover pela lista é um toque ou um arraste, fácil de fazer sem querer. Por
+isso a remoção é imediata, mas vem com "Desfazer". A lista é ordenada pela
+data em que o filme entrou (`added_at`). Se desfazer gravasse o filme de novo
+com a data de agora, ele pularia para o topo. Por isso o repositório devolve
+o `addedAt` de cada favorito, e desfazer grava o filme com a data original.
+
+Não usamos uma caixa de confirmação: ela atrasa toda remoção para proteger
+contra o erro raro, e desfazer resolve o mesmo problema sem atrito.
 
 ## Quando houver login
 

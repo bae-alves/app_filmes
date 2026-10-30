@@ -325,6 +325,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Remover dos favoritos'**
   String get favoriteRemove;
+
+  /// Aviso na parte de baixo da tela de favoritos depois de remover um filme, ao lado do botão "Desfazer".
+  ///
+  /// In pt, this message translates to:
+  /// **'{title} saiu dos favoritos'**
+  String favoriteRemoved(String title);
+
+  /// Ação do aviso de filme removido: devolve o filme à lista, no mesmo lugar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desfazer'**
+  String get undo;
 }
 
 class _AppLocalizationsDelegate
