@@ -30,7 +30,8 @@ conexão e de leitura de 15 s; log das requisições só em modo debug.
 
 ## Localidade do usuário
 
-Em `lib/utils/user_locale.dart`. Lidas uma vez, no `main.dart`.
+Em `lib/utils/user_locale.dart`, chamadas no `main.dart`. O idioma é lido uma
+vez, ao criar o repositório; a região, a cada tela de detalhes aberta.
 
 | Função | Devolve | Origem |
 | --- | --- | --- |
@@ -80,6 +81,7 @@ dispositivo em outro idioma recebe o primeiro da lista, `en`.
 | `intl: 0.20.2` | Fixado pelo `flutter_localizations` do SDK; sem `^`. |
 | `lucide_icons_flutter` | Ícones da interface nas partes novas. |
 | `url_launcher` | Abre a página "onde assistir" fora do app. |
+| `shared_preferences` | Cache de detalhes salvo no aparelho (localStorage na web). |
 | `sqflite`, `path` | Banco SQLite dos favoritos e das avaliações no Android. |
 | `sqflite_common_ffi_web` | O mesmo banco na web (WebAssembly + IndexedDB). |
 | `sqflite_common_ffi` (dev) | O mesmo banco em memória, no `flutter test`. |

@@ -48,8 +48,8 @@ Nenhum lança exceção.
 ## Erros
 
 `Error.error` é uma `Exception` com mensagem em português, para log. Formato:
-`<contexto> (HTTP <status>).` ou `<contexto> (<tipo do erro de rede>).` A UI
-não exibe essa mensagem.
+`<contexto> (HTTP <status>).`, `<contexto> (<tipo do erro de rede>).` ou, para
+JSON fora do formato, `<contexto>: <erro>`. A UI não exibe essa mensagem.
 
 | Falha | Origem |
 | --- | --- |

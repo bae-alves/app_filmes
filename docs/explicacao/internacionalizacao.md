@@ -59,8 +59,9 @@ encontra no console.
 
 ## Limitações conhecidas
 
-- O idioma e a região são lidos uma vez, quando o app abre. Trocar o idioma
-  do dispositivo só vale depois de reabrir o app (ou recarregar a página).
+- O idioma é lido uma vez, quando o app abre. Trocar o idioma do dispositivo
+  só vale depois de reabrir o app (ou recarregar a página). A região é lida
+  de novo a cada tela de detalhes aberta.
   Uma tela de preferências (MOVIEAI-8) deve tornar a escolha manual e
   imediata; o ponto de troca é `lib/utils/user_locale.dart`.
 - O TMDB guarda dados diferentes por idioma. Título e sinopse são esperados,

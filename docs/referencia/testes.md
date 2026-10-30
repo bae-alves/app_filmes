@@ -5,6 +5,10 @@ flutter test      # suíte inteira, offline
 flutter analyze   # análise estática
 ```
 
+O `.env` precisa existir, mesmo vazio (a cópia do `.env.example` serve): o
+`flutter test` empacota os assets e falha sem ele, com
+`No file or variants found for asset: .env`.
+
 ## Arquivos
 
 | Arquivo | Testes | O que verifica |

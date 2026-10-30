@@ -42,8 +42,10 @@ Como `Result` é `sealed`, o `switch` sem um dos casos não compila. Quem chama
 
 Algumas falhas não impedem a tela de funcionar. Um filme sem trailer, ou sem
 dados de onde assistir, ainda tem informações para mostrar. A
-`MovieDetailsViewModel` trata essas falhas como "não há", e só a falha dos
-detalhes vira erro na tela.
+`MovieDetailsViewModel` trata a falha do trailer como "não há". A de onde
+assistir vira um aviso só na seção (`watchProvidersFailed`), para não dizer
+que o filme não está em nenhum serviço. Só a falha dos detalhes vira erro na
+tela inteira.
 
 ## Por que injetar tudo
 

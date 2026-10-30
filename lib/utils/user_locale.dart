@@ -9,10 +9,11 @@
 ///   TMDB devolve título, sinopse, gêneros e trailer. Segue o idioma que a
 ///   interface usa, para que textos do app e do TMDB nunca se misturem.
 ///
-/// Ambas são lidas uma vez, no `main.dart`. Trocar o idioma ou o país do
-/// dispositivo só vale depois que o app reinicia (na web, ao recarregar a
-/// página). Quando existir a tela de preferências (MOVIEAI-8), a escolha
-/// manual do usuário deve entrar aqui.
+/// Ambas são chamadas no `main.dart`. O idioma é lido uma vez: trocar o
+/// idioma do dispositivo só vale depois que o app reinicia (na web, ao
+/// recarregar a página). A região é lida a cada tela de detalhes aberta.
+/// Quando existir a tela de preferências (MOVIEAI-8), a escolha manual do
+/// usuário deve entrar aqui.
 library;
 
 import 'dart:ui' show PlatformDispatcher;
