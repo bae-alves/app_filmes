@@ -8,11 +8,13 @@ import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
 import 'package:app_filmes/ui/view_model/favorites_view_model.dart';
 import 'package:app_filmes/ui/view_model/home_view_model.dart';
 import 'package:app_filmes/ui/view_model/movie_details_view_model.dart';
+import 'package:app_filmes/ui/view_model/movie_rating_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/fake_favorites_repository.dart';
 import '../../fakes/fake_movies_repository.dart';
+import '../../fakes/fake_ratings_repository.dart';
 import '../../fakes/movie_fixtures.dart';
 
 /// Comportamento coberto por este arquivo:
@@ -47,6 +49,10 @@ void main() {
           moviesRepository: repository,
           movieId: movieId,
           watchRegion: 'BR',
+        ),
+        ratingViewModelFactory: (movieId) => MovieRatingViewModel(
+          ratingsRepository: FakeRatingsRepository(),
+          movieId: movieId,
         ),
         trailerPlayerBuilder: (context, youtubeKey) =>
             Text('trailer-fake:$youtubeKey'),

@@ -43,5 +43,13 @@
   "favoriteAdd": "Add to favorites",
   "favoriteRemove": "Remove from favorites",
   "favoriteRemoved": "Removed {title} from favorites",
-  "undo": "Undo"
+  "undo": "Undo",
+  "ratingTitle": "Your rating",
+  "ratingHint": "Seen it? Rate it and tell us how it felt.",
+  "ratingStars": "{count, plural, =1{1 star} other{{count} stars}}",
+  "moodLoved": "Loved it",
+  "moodFunny": "Funny",
+  "moodMoved": "Moving",
+  "moodTense": "Tense",
+  "moodBored": "Boring"
 }

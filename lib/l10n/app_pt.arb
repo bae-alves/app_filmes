@@ -218,5 +218,48 @@
   "undo": "Desfazer",
   "@undo": {
     "description": "Ação do aviso de filme removido: devolve o filme à lista, no mesmo lugar."
+  },
+
+  "ratingTitle": "Sua avaliação",
+  "@ratingTitle": {
+    "description": "Título da seção da tela de detalhes onde o usuário dá nota e reação de humor ao filme."
+  },
+
+  "ratingHint": "Já assistiu? Dê uma nota e conte como foi.",
+  "@ratingHint": {
+    "description": "Linha abaixo de \"Sua avaliação\". Explica que a avaliação é para filmes já assistidos."
+  },
+
+  "ratingStars": "{count, plural, =1{1 estrela} other{{count} estrelas}}",
+  "@ratingStars": {
+    "description": "Dica e rótulo de acessibilidade de cada estrela da avaliação (de 1 a 5).",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "moodLoved": "Amei",
+  "@moodLoved": {
+    "description": "Reação de humor ao filme, ao lado do emoji 😍."
+  },
+
+  "moodFunny": "Divertido",
+  "@moodFunny": {
+    "description": "Reação de humor ao filme, ao lado do emoji 😂."
+  },
+
+  "moodMoved": "Emocionante",
+  "@moodMoved": {
+    "description": "Reação de humor ao filme, ao lado do emoji 😢. O filme comoveu o usuário."
+  },
+
+  "moodTense": "Tenso",
+  "@moodTense": {
+    "description": "Reação de humor ao filme, ao lado do emoji 😱. Suspense, medo."
+  },
+
+  "moodBored": "Entediante",
+  "@moodBored": {
+    "description": "Reação de humor ao filme, ao lado do emoji 😴."
   }
 }

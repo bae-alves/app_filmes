@@ -8,6 +8,8 @@ import '../../utils/formatters.dart';
 import '../../utils/tmdb_images.dart';
 import '../view_model/favorites_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
+import '../view_model/movie_rating_view_model.dart';
+import 'widgets/rating_section.dart';
 import 'widgets/trailer_player.dart';
 import 'widgets/watch_providers_section.dart';
 
@@ -19,6 +21,7 @@ class MovieDetailsPage extends StatefulWidget {
   const MovieDetailsPage({
     super.key,
     required this.viewModel,
+    required this.ratingViewModel,
     required this.favoritesViewModel,
     this.fallbackTitle,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
@@ -33,6 +36,7 @@ class MovieDetailsPage extends StatefulWidget {
   /// Rota até a tela de detalhes, usada por todas as telas que a abrem.
   static Route<void> route({
     required MovieDetailsViewModel viewModel,
+    required MovieRatingViewModel ratingViewModel,
     required FavoritesViewModel favoritesViewModel,
     String? fallbackTitle,
     TrailerPlayerBuilder trailerPlayerBuilder = defaultTrailerPlayerBuilder,
@@ -41,6 +45,7 @@ class MovieDetailsPage extends StatefulWidget {
       settings: const RouteSettings(name: routeName),
       builder: (_) => MovieDetailsPage(
         viewModel: viewModel,
+        ratingViewModel: ratingViewModel,
         favoritesViewModel: favoritesViewModel,
         fallbackTitle: fallbackTitle,
         trailerPlayerBuilder: trailerPlayerBuilder,
@@ -56,6 +61,9 @@ class MovieDetailsPage extends StatefulWidget {
 
   /// Estado e comandos da tela.
   final MovieDetailsViewModel viewModel;
+
+  /// Nota e humor que o usuário deu ao filme.
+  final MovieRatingViewModel ratingViewModel;
 
   /// Lista de favoritos, compartilhada com o resto do app.
   final FavoritesViewModel favoritesViewModel;
@@ -78,6 +86,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
     // O carregamento é disparado uma única vez, aqui, e não no build: build
     // pode ser chamado várias vezes e dispararia requisições em cascata.
     widget.viewModel.load();
+    widget.ratingViewModel.load();
   }
 
   @override
@@ -116,6 +125,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
               ),
             (_, _, _) => _DetailsContent(
                 viewModel: viewModel,
+                ratingViewModel: widget.ratingViewModel,
                 trailerPlayerBuilder: widget.trailerPlayerBuilder,
               ),
           },
@@ -156,10 +166,12 @@ class _FavoriteButton extends StatelessWidget {
 class _DetailsContent extends StatelessWidget {
   const _DetailsContent({
     required this.viewModel,
+    required this.ratingViewModel,
     required this.trailerPlayerBuilder,
   });
 
   final MovieDetailsViewModel viewModel;
+  final MovieRatingViewModel ratingViewModel;
   final TrailerPlayerBuilder trailerPlayerBuilder;
 
   @override
@@ -244,6 +256,8 @@ class _DetailsContent extends StatelessWidget {
                     : l10n.synopsisUnavailable,
                 style: theme.textTheme.bodyMedium,
               ),
+              const SizedBox(height: 20),
+              RatingSection(viewModel: ratingViewModel),
               if (cast.isNotEmpty) ...[
                 const SizedBox(height: 20),
                 Row(

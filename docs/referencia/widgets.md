@@ -11,17 +11,19 @@ Todos exigem os delegates de `AppLocalizations` no `MaterialApp`.
 | `viewModel` | `HomeViewModel` | — | Estado e comandos. |
 | `favoritesViewModel` | `FavoritesViewModel` | — | Lista de favoritos. O coração da barra abre a `FavoritesPage`. |
 | `detailsViewModelFactory` | `MovieDetailsViewModel Function(int movieId)` | — | Cria a view model da tela de detalhes. |
+| `ratingViewModelFactory` | `MovieRatingViewModel Function(int movieId)` | — | Cria a view model da avaliação, mostrada nos detalhes. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Repassado à tela de detalhes. |
 
 ## `MovieDetailsPage`
 
 `lib/ui/view/movie_details_page.dart`. Trailer, informações e onde assistir.
-A fileira do elenco mostra os 10 primeiros. Com mais gente, o botão "Ver todos"
-abre a lista completa.
+Abaixo da sinopse fica a `RatingSection`. A fileira do elenco mostra os 10
+primeiros. Com mais gente, o botão "Ver todos" abre a lista completa.
 
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `viewModel` | `MovieDetailsViewModel` | — | Estado e comandos. Chama `load()` no `initState`. |
+| `ratingViewModel` | `MovieRatingViewModel` | — | Nota e humor do filme. Também chama `load()` no `initState`. |
 | `favoritesViewModel` | `FavoritesViewModel` | — | Liga e desliga o coração da barra, que aparece quando os detalhes carregam. |
 | `fallbackTitle` | `String?` | `null` | Título da barra enquanto os detalhes carregam. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Constrói o player. |
@@ -32,7 +34,17 @@ abre a lista completa.
 | `trailerKey` | `Key('movie-details-trailer')`: bloco do player. |
 | `emptyTrailerKey` | `Key('movie-details-trailer-empty')`: aviso de filme sem trailer. |
 | `favoriteButtonKey` | `Key('movie-details-favorite')`: coração da barra. |
-| `route({viewModel, favoritesViewModel, fallbackTitle, trailerPlayerBuilder})` | `Route` até a tela, usada pela home e pelos favoritos. |
+| `route({viewModel, ratingViewModel, favoritesViewModel, fallbackTitle, trailerPlayerBuilder})` | `Route` até a tela, usada pela home e pelos favoritos. |
+
+## `RatingSection`
+
+`lib/ui/view/widgets/rating_section.dart`. Seção "Sua avaliação": cinco
+`IconButton`s de estrela (dica "1 estrela" … "5 estrelas") e um `ChoiceChip`
+por `Mood`, com emoji. Tocar na nota ou no humor marcado o desmarca.
+
+| Parâmetro | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `viewModel` | `MovieRatingViewModel` | — | Avaliação do filme. |
 
 ## `FavoritesPage`
 
@@ -51,6 +63,7 @@ falha.
 | --- | --- | --- | --- |
 | `viewModel` | `FavoritesViewModel` | — | A mesma instância da home e dos detalhes. |
 | `detailsViewModelFactory` | `MovieDetailsViewModel Function(int movieId)` | — | Cria a view model da tela de detalhes. |
+| `ratingViewModelFactory` | `MovieRatingViewModel Function(int movieId)` | — | Cria a view model da avaliação, mostrada nos detalhes. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Repassado à tela de detalhes. |
 
 ## `MovieCard`

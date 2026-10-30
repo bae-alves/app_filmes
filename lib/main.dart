@@ -7,6 +7,8 @@ import 'l10n/app_localizations.dart';
 import 'data/repositories/favorites_repository_local.dart';
 import 'data/repositories/movies_repository.dart';
 import 'data/repositories/movies_repository_remote.dart';
+import 'data/repositories/ratings_repository.dart';
+import 'data/repositories/ratings_repository_local.dart';
 import 'data/services/app_database.dart';
 import 'data/services/tmdb_dio.dart';
 import 'data/services/tmdb_rest_client.dart';
@@ -14,6 +16,7 @@ import 'ui/view/home_page.dart';
 import 'ui/view_model/favorites_view_model.dart';
 import 'ui/view_model/home_view_model.dart';
 import 'ui/view_model/movie_details_view_model.dart';
+import 'ui/view_model/movie_rating_view_model.dart';
 import 'utils/env.dart';
 import 'utils/user_locale.dart';
 
@@ -43,7 +46,7 @@ class AppFilmes extends StatefulWidget {
   /// Armazenamento local, usado pelo cache de detalhes do repositório.
   final SharedPreferences preferences;
 
-  /// Banco SQLite do aparelho, onde ficam os favoritos.
+  /// Banco SQLite do aparelho, onde ficam os favoritos e as avaliações.
   final Database database;
 
   @override
@@ -52,6 +55,7 @@ class AppFilmes extends StatefulWidget {
 
 class _AppFilmesState extends State<AppFilmes> {
   late final MoviesRepository _moviesRepository;
+  late final RatingsRepository _ratingsRepository;
   late final HomeViewModel _homeViewModel;
   late final FavoritesViewModel _favoritesViewModel;
 
@@ -71,6 +75,8 @@ class _AppFilmesState extends State<AppFilmes> {
     _favoritesViewModel = FavoritesViewModel(
       favoritesRepository: FavoritesRepositoryLocal(database: widget.database),
     )..load();
+    // Também só no aparelho, pelo mesmo motivo. Veja RatingsRepository.
+    _ratingsRepository = RatingsRepositoryLocal(database: widget.database);
   }
 
   @override
@@ -101,6 +107,10 @@ class _AppFilmesState extends State<AppFilmes> {
           // Lida a cada abertura: se o usuário trocar a região do aparelho,
           // a próxima tela de detalhes já reflete a mudança.
           watchRegion: currentWatchRegion(),
+        ),
+        ratingViewModelFactory: (movieId) => MovieRatingViewModel(
+          ratingsRepository: _ratingsRepository,
+          movieId: movieId,
         ),
       ),
     );

@@ -29,7 +29,7 @@ flutter create --platforms=ios .
   `TrailerPlayer` usa `ThumbnailFormat.jpeg`. É também o motivo de usar o
   `youtube_player_iframe` direto: o `youtube_player_flutter` não repassa o
   formato.
-- O banco dos favoritos é SQLite em WebAssembly (`sqflite_common_ffi_web`),
+- O banco dos favoritos e das avaliações é SQLite em WebAssembly (`sqflite_common_ffi_web`),
   salvo no IndexedDB. Ele precisa de `web/sqlite3.wasm` e
   `web/sqflite_sw.js`, que estão no git. Ao atualizar o `sqflite_common_ffi_web`
   ou o `sqlite3`, gere os dois de novo com

@@ -20,6 +20,7 @@ class FavoritesPage extends StatefulWidget {
     super.key,
     required this.viewModel,
     required this.detailsViewModelFactory,
+    required this.ratingViewModelFactory,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
   });
 
@@ -28,6 +29,9 @@ class FavoritesPage extends StatefulWidget {
 
   /// Fábrica da view model usada ao abrir a tela de detalhes.
   final MovieDetailsViewModelFactory detailsViewModelFactory;
+
+  /// Fábrica da view model da avaliação, usada ao abrir a tela de detalhes.
+  final MovieRatingViewModelFactory ratingViewModelFactory;
 
   /// Repassado para a tela de detalhes. Veja [TrailerPlayerBuilder].
   final TrailerPlayerBuilder trailerPlayerBuilder;
@@ -137,6 +141,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   onTap: () => Navigator.of(context).push(
                     MovieDetailsPage.route(
                       viewModel: widget.detailsViewModelFactory(movie.id),
+                      ratingViewModel: widget.ratingViewModelFactory(movie.id),
                       favoritesViewModel: viewModel,
                       fallbackTitle: movie.title,
                       trailerPlayerBuilder: widget.trailerPlayerBuilder,

@@ -337,6 +337,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Desfazer'**
   String get undo;
+
+  /// Título da seção da tela de detalhes onde o usuário dá nota e reação de humor ao filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua avaliação'**
+  String get ratingTitle;
+
+  /// Linha abaixo de "Sua avaliação". Explica que a avaliação é para filmes já assistidos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já assistiu? Dê uma nota e conte como foi.'**
+  String get ratingHint;
+
+  /// Dica e rótulo de acessibilidade de cada estrela da avaliação (de 1 a 5).
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 estrela} other{{count} estrelas}}'**
+  String ratingStars(int count);
+
+  /// Reação de humor ao filme, ao lado do emoji 😍.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amei'**
+  String get moodLoved;
+
+  /// Reação de humor ao filme, ao lado do emoji 😂.
+  ///
+  /// In pt, this message translates to:
+  /// **'Divertido'**
+  String get moodFunny;
+
+  /// Reação de humor ao filme, ao lado do emoji 😢. O filme comoveu o usuário.
+  ///
+  /// In pt, this message translates to:
+  /// **'Emocionante'**
+  String get moodMoved;
+
+  /// Reação de humor ao filme, ao lado do emoji 😱. Suspense, medo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tenso'**
+  String get moodTense;
+
+  /// Reação de humor ao filme, ao lado do emoji 😴.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entediante'**
+  String get moodBored;
 }
 
 class _AppLocalizationsDelegate

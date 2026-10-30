@@ -6,18 +6,22 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart'
 
 /// Banco SQLite local do app.
 ///
-/// Hoje guarda só a lista de favoritos (veja `FavoritesRepositoryLocal`).
-/// Mudanças de esquema entram como uma nova [version] com um `onUpgrade`,
-/// nunca editando o `CREATE TABLE` de uma versão já publicada.
+/// Guarda a lista de favoritos (veja `FavoritesRepositoryLocal`) e as
+/// avaliações dos filmes (veja `RatingsRepositoryLocal`). Mudanças de esquema
+/// entram como uma nova [version] com um `onUpgrade`, nunca editando o
+/// `CREATE TABLE` de uma versão já publicada.
 abstract final class AppDatabase {
   /// Nome do arquivo do banco (no Android) ou da base no IndexedDB (na web).
   static const fileName = 'app_filmes.db';
 
-  /// Versão do esquema.
-  static const version = 1;
+  /// Versão do esquema. 1: favoritos (MOVIEAI-24). 2: avaliações (MOVIEAI-22).
+  static const version = 2;
 
   /// Tabela de favoritos.
   static const favoritesTable = 'favorites';
+
+  /// Tabela de avaliações.
+  static const ratingsTable = 'ratings';
 
   /// Abre (criando, se preciso) o banco do app.
   ///
@@ -39,7 +43,11 @@ abstract final class AppDatabase {
 
     return dbFactory.openDatabase(
       dbPath,
-      options: OpenDatabaseOptions(version: version, onCreate: _onCreate),
+      options: OpenDatabaseOptions(
+        version: version,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+      ),
     );
   }
 
@@ -58,5 +66,21 @@ abstract final class AppDatabase {
         added_at INTEGER NOT NULL
       )
     ''');
+    await _createRatings(db);
   }
+
+  static Future<void> _onUpgrade(Database db, int from, int to) async {
+    if (from < 2) await _createRatings(db);
+  }
+
+  /// Versão 2. `stars` e `mood` podem ser nulos, mas não os dois: o
+  /// repositório apaga a linha em vez de gravar uma avaliação vazia.
+  static Future<void> _createRatings(Database db) => db.execute('''
+    CREATE TABLE $ratingsTable (
+      movie_id INTEGER PRIMARY KEY,
+      stars INTEGER CHECK (stars BETWEEN 1 AND 5),
+      mood TEXT,
+      rated_at INTEGER NOT NULL
+    )
+  ''');
 }

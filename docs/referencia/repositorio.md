@@ -84,8 +84,32 @@ Assim como em `MoviesRepository`, nada lança: falhas do banco viram
 ### `AppDatabase`
 
 `lib/data/services/app_database.dart`. Abre o banco `app_filmes.db`
-(esquema versão 1), com a tabela `favorites`: `movie_id` (chave), `title`,
-`original_title`, `overview`, `poster_path`, `backdrop_path`,
-`release_date`, `vote_average`, `vote_count` e `added_at` (milissegundos
-desde 1970). `open({factory, path})` aceita uma fábrica e um caminho para os
-testes abrirem um banco em memória.
+(esquema versão 2). Tabelas:
+
+- `favorites` (versão 1): `movie_id` (chave), `title`, `original_title`,
+  `overview`, `poster_path`, `backdrop_path`, `release_date`,
+  `vote_average`, `vote_count` e `added_at` (milissegundos desde 1970).
+- `ratings` (versão 2): `movie_id` (chave), `stars` (1 a 5, ou nulo), `mood`
+  (nome do `Mood`, ou nulo) e `rated_at` (milissegundos desde 1970). Quem
+  abre um banco da versão 1 ganha a tabela no `onUpgrade`.
+
+`open({factory, path})` aceita uma fábrica e um caminho para os testes
+abrirem um banco em memória.
+
+## `RatingsRepository`
+
+`lib/data/repositories/ratings_repository.dart`. Avaliações dos filmes: nota
+de 1 a 5 e reação de humor (`Mood`), uma das duas ou as duas. A
+implementação de produção é `RatingsRepositoryLocal`, em SQLite no aparelho,
+construída com `database`. A de teste é `FakeRatingsRepository`. Por quê:
+[Avaliações](../explicacao/avaliacoes.md).
+
+| Método | `T` | Comportamento |
+| --- | --- | --- |
+| `getRating(movieId)` | `Rating?` | Avaliação do filme, ou `null` se ele não foi avaliado. Um `mood` que o app não conhece vira `null`; se também não há nota, o filme conta como não avaliado. |
+| `saveRating(rating)` | `void` | Grava, trocando a avaliação anterior do mesmo filme. |
+| `removeRating(movieId)` | `void` | Apaga. Apagar o que não existe não é erro. |
+
+`Rating` traz `movieId`, `stars` (`int?`), `mood` (`Mood?`) e `ratedAt`; ao
+menos um de `stars` e `mood` existe. Falhas do banco viram `Error`, como nos
+outros repositórios.

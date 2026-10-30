@@ -5,6 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../view_model/favorites_view_model.dart';
 import '../view_model/home_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
+import '../view_model/movie_rating_view_model.dart';
 import 'favorites_page.dart';
 import 'movie_details_page.dart';
 import 'widgets/movie_card.dart';
@@ -18,12 +19,18 @@ typedef MovieDetailsViewModelFactory = MovieDetailsViewModel Function(
   int movieId,
 );
 
+/// Cria a view model da avaliação de um filme, mostrada na tela de detalhes.
+typedef MovieRatingViewModelFactory = MovieRatingViewModel Function(
+  int movieId,
+);
+
 /// Tela inicial: lista os filmes populares e leva aos detalhes de cada um.
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
     required this.viewModel,
     required this.detailsViewModelFactory,
+    required this.ratingViewModelFactory,
     required this.favoritesViewModel,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
   });
@@ -36,6 +43,9 @@ class HomePage extends StatefulWidget {
 
   /// Fábrica da view model usada ao abrir a tela de detalhes.
   final MovieDetailsViewModelFactory detailsViewModelFactory;
+
+  /// Fábrica da view model da avaliação, também usada ao abrir os detalhes.
+  final MovieRatingViewModelFactory ratingViewModelFactory;
 
   /// Repassado para a tela de detalhes. Veja [TrailerPlayerBuilder].
   final TrailerPlayerBuilder trailerPlayerBuilder;
@@ -62,6 +72,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.of(context).push(
       MovieDetailsPage.route(
         viewModel: widget.detailsViewModelFactory(movie.id),
+        ratingViewModel: widget.ratingViewModelFactory(movie.id),
         favoritesViewModel: widget.favoritesViewModel,
         fallbackTitle: movie.title,
         trailerPlayerBuilder: widget.trailerPlayerBuilder,
@@ -75,6 +86,7 @@ class _HomePageState extends State<HomePage> {
         builder: (_) => FavoritesPage(
           viewModel: widget.favoritesViewModel,
           detailsViewModelFactory: widget.detailsViewModelFactory,
+          ratingViewModelFactory: widget.ratingViewModelFactory,
           trailerPlayerBuilder: widget.trailerPlayerBuilder,
         ),
       ),

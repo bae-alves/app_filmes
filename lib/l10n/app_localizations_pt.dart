@@ -142,4 +142,36 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get undo => 'Desfazer';
+
+  @override
+  String get ratingTitle => 'Sua avaliação';
+
+  @override
+  String get ratingHint => 'Já assistiu? Dê uma nota e conte como foi.';
+
+  @override
+  String ratingStars(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count estrelas',
+      one: '1 estrela',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get moodLoved => 'Amei';
+
+  @override
+  String get moodFunny => 'Divertido';
+
+  @override
+  String get moodMoved => 'Emocionante';
+
+  @override
+  String get moodTense => 'Tenso';
+
+  @override
+  String get moodBored => 'Entediante';
 }
