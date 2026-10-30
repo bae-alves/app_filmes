@@ -50,7 +50,7 @@ lib/
 ├── ui/
 │   ├── view/           # telas e widgets
 │   └── view_model/     # estado das telas (ChangeNotifier)
-├── utils/              # Result, Env, localidade do usuário, formatadores
+├── utils/              # Result, Env, localidade do usuário, formatadores, URLs de imagem do TMDB
 └── main.dart           # composição das dependências
 docs/                   # documentação (Diátaxis)
 test/                   # testes e fakes
