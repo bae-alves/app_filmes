@@ -57,6 +57,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get applyFilters => 'Aplicar filtros';
 
   @override
+  String get clearFilters => 'Limpar filtros';
+
+  @override
   String get genresLoadError => 'Não foi possível carregar os gêneros.';
 
   @override
@@ -118,4 +121,60 @@ class AppLocalizationsPt extends AppLocalizations {
   String certificationLabel(String certification) {
     return 'Classificação indicativa: $certification';
   }
+
+  @override
+  String get favoritesTitle => 'Favoritos';
+
+  @override
+  String get favoritesEmpty =>
+      'Nenhum filme nos favoritos ainda. Toque no coração na tela de um filme para salvá-lo aqui.';
+
+  @override
+  String get favoritesLoadError => 'Não foi possível carregar os favoritos.';
+
+  @override
+  String get favoriteAdd => 'Adicionar aos favoritos';
+
+  @override
+  String get favoriteRemove => 'Remover dos favoritos';
+
+  @override
+  String favoriteRemoved(String title) {
+    return '$title saiu dos favoritos';
+  }
+
+  @override
+  String get undo => 'Desfazer';
+
+  @override
+  String get ratingTitle => 'Sua avaliação';
+
+  @override
+  String get ratingHint => 'Já assistiu? Dê uma nota e conte como foi.';
+
+  @override
+  String ratingStars(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count estrelas',
+      one: '1 estrela',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get moodLoved => 'Amei';
+
+  @override
+  String get moodFunny => 'Divertido';
+
+  @override
+  String get moodMoved => 'Emocionante';
+
+  @override
+  String get moodTense => 'Tenso';
+
+  @override
+  String get moodBored => 'Entediante';
 }

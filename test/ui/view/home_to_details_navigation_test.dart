@@ -1,16 +1,22 @@
 import 'package:app_filmes/data/api_models/movie.dart';
 import 'package:app_filmes/data/api_models/movie_details.dart';
+import 'package:app_filmes/data/api_models/movie_genre.dart';
 import 'package:app_filmes/l10n/app_localizations.dart';
 import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view/movie_details_page.dart';
 import 'package:app_filmes/ui/view/widgets/movie_card.dart';
 import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
+import 'package:app_filmes/ui/view_model/favorites_view_model.dart';
 import 'package:app_filmes/ui/view_model/home_view_model.dart';
 import 'package:app_filmes/ui/view_model/movie_details_view_model.dart';
+import 'package:app_filmes/ui/view_model/movie_rating_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../fakes/fake_favorites_repository.dart';
 import '../../fakes/fake_movies_repository.dart';
+import '../../fakes/fake_ratings_repository.dart';
 import '../../fakes/movie_fixtures.dart';
 
 /// Comportamento coberto por este arquivo:
@@ -30,7 +36,14 @@ void main() {
   Widget buildApp(
     FakeMoviesRepository repository, {
     Locale locale = const Locale('pt'),
+    List<ChangeNotifier>? createdViewModels,
   }) {
+    /// Guarda as view models criadas pelas fábricas em [createdViewModels].
+    T track<T extends ChangeNotifier>(T viewModel) {
+      createdViewModels?.add(viewModel);
+      return viewModel;
+    }
+
     return MaterialApp(
       // A tela de detalhes usa textos traduzidos (seção "Onde assistir").
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -38,11 +51,18 @@ void main() {
       locale: locale,
       home: HomePage(
         viewModel: HomeViewModel(moviesRepository: repository),
-        detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
+        favoritesViewModel: FavoritesViewModel(
+          favoritesRepository: FakeFavoritesRepository(),
+        ),
+        detailsViewModelFactory: (movieId) => track(MovieDetailsViewModel(
           moviesRepository: repository,
           movieId: movieId,
           watchRegion: 'BR',
-        ),
+        )),
+        ratingViewModelFactory: (movieId) => track(MovieRatingViewModel(
+          ratingsRepository: FakeRatingsRepository(),
+          movieId: movieId,
+        )),
         trailerPlayerBuilder: (context, youtubeKey) =>
             Text('trailer-fake:$youtubeKey'),
       ),
@@ -191,6 +211,45 @@ void main() {
     },
   );
 
+  testWidgets('a tela de detalhes mantém o filme quando o app é reconstruído',
+      (tester) async {
+    final repository = buildRepository();
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard).first);
+    await tester.pumpAndSettle();
+
+    // Um novo MaterialApp reconstrói o Navigator, que reconstrói a página da
+    // rota (como numa troca de idioma ou num hot reload).
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+
+    expect(find.text(dunaDetails.overview!), findsOneWidget);
+    expect(repository.requestedDetailIds, [dunaId]);
+  });
+
+  testWidgets('voltar dos detalhes descarta as view models da tela',
+      (tester) async {
+    final created = <ChangeNotifier>[];
+    await tester.pumpWidget(
+      buildApp(buildRepository(), createdViewModels: created),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard).first);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(created, hasLength(2), reason: 'detalhes e avaliação');
+    for (final viewModel in created) {
+      expect(
+        () => ChangeNotifier.debugAssertNotDisposed(viewModel),
+        throwsFlutterError,
+      );
+    }
+  });
+
   testWidgets('é possível voltar da tela de detalhes para a tela inicial',
       (tester) async {
     await tester.pumpWidget(buildApp(buildRepository()));
@@ -207,6 +266,52 @@ void main() {
 
     expect(find.byType(MovieDetailsPage), findsNothing);
     expect(find.byType(MovieCard), findsNWidgets(2));
+  });
+
+  testWidgets('limpar a pesquisa apaga o campo e volta aos populares',
+      (tester) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie, matrixMovie],
+      searchMoviesResult: const [matrixMovie],
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Limpar filtros'), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'matrix');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(find.byType(MovieCard), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Limpar filtros'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MovieCard), findsNWidgets(2));
+    expect(find.text('matrix'), findsNothing);
+    expect(find.byTooltip('Limpar filtros'), findsNothing);
+  });
+
+  testWidgets('aplicar gêneros apaga o texto da pesquisa', (tester) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie, matrixMovie],
+      searchMoviesResult: const [matrixMovie],
+      discoverMoviesResult: const [dunaMovie],
+      movieGenres: const [MovieGenre(id: 878, name: 'Ficção científica')],
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'matrix');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Filtro avançado'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.tap(find.text('Aplicar filtros'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('matrix'), findsNothing);
+    expect(find.byKey(const ValueKey(dunaId)), findsOneWidget);
   });
 
   testWidgets('a tela inicial informa quando não há filmes para exibir',
@@ -312,6 +417,33 @@ void main() {
       scrollable: detailsScrollable,
     );
     expect(find.byKey(WatchProvidersSection.unavailableKey), findsNothing);
+  });
+
+  testWidgets('tocar no logo de um serviço abre o link do TMDB fora do app',
+      (tester) async {
+    // No teste não há plugin nativo: o url_launcher cai neste canal.
+    const channel = MethodChannel('plugins.flutter.io/url_launcher');
+    final opened = <Map<Object?, Object?>>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+        (call) async {
+      if (call.method == 'launch') opened.add(call.arguments as Map);
+      return true;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null));
+    await tester.pumpWidget(buildApp(buildRepository()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard).first);
+    await tester.pumpAndSettle();
+
+    // O logo já existe fora da tela (dentro do cacheExtent da lista).
+    await tester.ensureVisible(find.byTooltip('Netflix'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Netflix'));
+    await tester.pump();
+
+    expect(opened.single['url'], dunaProvidersBr.link);
+    expect(opened.single['useWebView'], isFalse, reason: 'abre fora do app');
   });
 
   group('com a barra de navegação do sistema por cima do app', () {

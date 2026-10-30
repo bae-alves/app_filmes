@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../data/api_models/movie.dart';
 import '../../data/api_models/movie_details.dart';
 import '../../data/api_models/video.dart';
 import '../../data/api_models/watch_providers.dart';
@@ -37,9 +38,38 @@ class MovieDetailsViewModel extends ChangeNotifier {
   bool _watchProvidersFailed = false;
   bool _isLoading = false;
   Exception? _error;
+  bool _disposed = false;
 
   /// Informações do filme, disponíveis após um [load] bem-sucedido.
   MovieDetails? get details => _details;
+
+  /// Resumo do filme no formato da listagem, que é o que os favoritos guardam.
+  /// `null` enquanto os detalhes não chegaram.
+  Movie? get movieSummary {
+    final details = _details;
+    if (details == null) return null;
+    return Movie(
+      id: details.id,
+      title: details.title,
+      originalTitle: details.originalTitle,
+      overview: details.overview,
+      posterPath: details.posterPath,
+      backdropPath: details.backdropPath,
+      releaseDate: details.releaseDate,
+      voteAverage: details.voteAverage,
+      voteCount: details.voteCount,
+    );
+  }
+
+  /// Nomes dos diretores do filme. Vazio sem detalhes ou sem diretor com nome.
+  List<String> get directorNames => [
+        for (final director in _details?.directors ?? const <CrewMember>[])
+          if (director.name?.isNotEmpty == true) director.name!,
+      ];
+
+  /// Elenco na ordem dos créditos; quem não tem ordem vai para o fim.
+  List<CastMember> get cast => [...?_details?.credits?.cast]
+    ..sort((a, b) => (a.order ?? 999).compareTo(b.order ?? 999));
 
   /// Trailer escolhido pelo repositório, ou `null` quando o filme não tem um.
   Video? get trailer => _trailer;
@@ -121,5 +151,18 @@ class MovieDetailsViewModel extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  /// A tela pode fechar antes de uma leitura ou gravação terminar; aí não há
+  /// mais quem avisar.
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
   }
 }

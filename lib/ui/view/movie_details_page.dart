@@ -1,28 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/api_models/genre.dart';
+import '../../data/api_models/movie.dart';
 import '../../data/api_models/movie_details.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/formatters.dart';
 import '../../utils/tmdb_images.dart';
+import '../view_model/favorites_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
+import '../view_model/movie_rating_view_model.dart';
+import 'widgets/rating_section.dart';
 import 'widgets/trailer_player.dart';
 import 'widgets/watch_providers_section.dart';
 
 /// Tela de detalhes: mostra o trailer, as informações completas do filme e
 /// onde ele pode ser assistido.
 ///
-/// É alcançada ao tocar em um cartão da tela inicial.
+/// É alcançada ao tocar em um cartão da tela inicial ou da tela de favoritos.
 class MovieDetailsPage extends StatefulWidget {
   const MovieDetailsPage({
     super.key,
     required this.viewModel,
+    required this.ratingViewModel,
+    required this.favoritesViewModel,
     this.fallbackTitle,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
   });
 
   /// Identificador da rota, útil em testes e em navegação nomeada.
   static const routeName = '/movie-details';
+
+  /// Chave do botão de coração, que liga e desliga o favorito.
+  static const favoriteButtonKey = Key('movie-details-favorite');
+
+  /// Rota até a tela de detalhes, usada por todas as telas que a abrem.
+  static Route<void> route({
+    required MovieDetailsViewModel viewModel,
+    required MovieRatingViewModel ratingViewModel,
+    required FavoritesViewModel favoritesViewModel,
+    String? fallbackTitle,
+    TrailerPlayerBuilder trailerPlayerBuilder = defaultTrailerPlayerBuilder,
+  }) {
+    return MaterialPageRoute<void>(
+      settings: const RouteSettings(name: routeName),
+      builder: (_) => MovieDetailsPage(
+        viewModel: viewModel,
+        ratingViewModel: ratingViewModel,
+        favoritesViewModel: favoritesViewModel,
+        fallbackTitle: fallbackTitle,
+        trailerPlayerBuilder: trailerPlayerBuilder,
+      ),
+    );
+  }
 
   /// Chave do bloco que hospeda o player do trailer.
   static const trailerKey = Key('movie-details-trailer');
@@ -32,6 +62,12 @@ class MovieDetailsPage extends StatefulWidget {
 
   /// Estado e comandos da tela.
   final MovieDetailsViewModel viewModel;
+
+  /// Nota e humor que o usuário deu ao filme.
+  final MovieRatingViewModel ratingViewModel;
+
+  /// Lista de favoritos, compartilhada com o resto do app.
+  final FavoritesViewModel favoritesViewModel;
 
   /// Título já conhecido pela tela anterior. Evita uma AppBar vazia enquanto os
   /// detalhes ainda estão sendo carregados.
@@ -51,6 +87,15 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
     // O carregamento é disparado uma única vez, aqui, e não no build: build
     // pode ser chamado várias vezes e dispararia requisições em cascata.
     widget.viewModel.load();
+    widget.ratingViewModel.load();
+  }
+
+  @override
+  void dispose() {
+    // As duas são da tela, criadas a cada abertura; a de favoritos é do app.
+    widget.viewModel.dispose();
+    widget.ratingViewModel.dispose();
+    super.dispose();
   }
 
   @override
@@ -68,6 +113,13 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                   widget.fallbackTitle ??
                   AppLocalizations.of(context).detailsFallbackTitle,
             ),
+            actions: [
+              if (viewModel.movieSummary case final movie?)
+                _FavoriteButton(
+                  movie: movie,
+                  favoritesViewModel: widget.favoritesViewModel,
+                ),
+            ],
           ),
           body: switch ((viewModel.isLoading, viewModel.error, details)) {
             (true, _, null) => const Center(child: CircularProgressIndicator()),
@@ -82,9 +134,37 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
               ),
             (_, _, _) => _DetailsContent(
                 viewModel: viewModel,
+                ratingViewModel: widget.ratingViewModel,
                 trailerPlayerBuilder: widget.trailerPlayerBuilder,
               ),
           },
+        );
+      },
+    );
+  }
+}
+
+/// Coração da AppBar: favorita ou desfavorita o filme.
+class _FavoriteButton extends StatelessWidget {
+  const _FavoriteButton({required this.movie, required this.favoritesViewModel});
+
+  final Movie movie;
+  final FavoritesViewModel favoritesViewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: favoritesViewModel,
+      builder: (context, _) {
+        final isFavorite = favoritesViewModel.isFavorite(movie.id);
+        return IconButton(
+          key: MovieDetailsPage.favoriteButtonKey,
+          isSelected: isFavorite,
+          icon: const Icon(Icons.favorite_border),
+          selectedIcon: const Icon(Icons.favorite),
+          tooltip: isFavorite ? l10n.favoriteRemove : l10n.favoriteAdd,
+          onPressed: () => favoritesViewModel.toggle(movie),
         );
       },
     );
@@ -95,10 +175,12 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
 class _DetailsContent extends StatelessWidget {
   const _DetailsContent({
     required this.viewModel,
+    required this.ratingViewModel,
     required this.trailerPlayerBuilder,
   });
 
   final MovieDetailsViewModel viewModel;
+  final MovieRatingViewModel ratingViewModel;
   final TrailerPlayerBuilder trailerPlayerBuilder;
 
   @override
@@ -111,12 +193,8 @@ class _DetailsContent extends StatelessWidget {
     final runtime = formatRuntime(details.runtime, l10n);
     final rating = formatRating(details.voteAverage, locale);
     final genres = details.genres ?? const <Genre>[];
-    final directors = [
-      for (final director in details.directors)
-        if (director.name?.isNotEmpty == true) director.name!,
-    ];
-    final cast = [...?details.credits?.cast]
-      ..sort((a, b) => (a.order ?? 999).compareTo(b.order ?? 999));
+    final directors = viewModel.directorNames;
+    final cast = viewModel.cast;
     // A fileira mostra só o elenco principal; o resto fica em "Ver todos".
     const castPreview = 10;
 
@@ -183,6 +261,8 @@ class _DetailsContent extends StatelessWidget {
                     : l10n.synopsisUnavailable,
                 style: theme.textTheme.bodyMedium,
               ),
+              const SizedBox(height: 20),
+              RatingSection(viewModel: ratingViewModel),
               if (cast.isNotEmpty) ...[
                 const SizedBox(height: 20),
                 Row(
@@ -220,7 +300,11 @@ class _DetailsContent extends StatelessWidget {
                       ?.copyWith(color: theme.colorScheme.outline),
                 )
               else
-                WatchProvidersSection(region: viewModel.watchProviders),
+                WatchProvidersSection(
+                  region: viewModel.watchProviders,
+                  onOpenLink: (link) =>
+                      launchUrl(link, mode: LaunchMode.externalApplication),
+                ),
             ],
           ),
         ),

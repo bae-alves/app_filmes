@@ -2,7 +2,6 @@ import 'package:app_filmes/data/api_models/watch_providers.dart';
 import 'package:app_filmes/l10n/app_localizations.dart';
 import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fakes/movie_fixtures.dart';
@@ -17,13 +16,18 @@ void main() {
     WatchProviderRegion? region, {
     bool compact = false,
     Locale locale = const Locale('pt'),
+    ValueChanged<Uri>? onOpenLink,
   }) {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
       home: Scaffold(
-        body: WatchProvidersSection(region: region, compact: compact),
+        body: WatchProvidersSection(
+          region: region,
+          compact: compact,
+          onOpenLink: onOpenLink ?? (_) {},
+        ),
       ),
     );
   }
@@ -46,27 +50,34 @@ void main() {
     expect(find.text('Fonte: JustWatch'), findsOneWidget);
   });
 
-  testWidgets('tocar no logo de um serviço abre a página do link, que continua',
-      (tester) async {
-    // No teste não há plugin nativo: o url_launcher cai neste canal.
-    const channel = MethodChannel('plugins.flutter.io/url_launcher');
-    final opened = <Map<Object?, Object?>>[];
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel,
-        (call) async {
-      if (call.method == 'launch') opened.add(call.arguments as Map);
-      return true;
-    });
-    addTearDown(() => tester.binding.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, null));
-    await tester.pumpWidget(buildSection(dunaProvidersBr));
+  testWidgets('tocar num logo ou no botão entrega o link à tela', (tester) async {
+    final opened = <Uri>[];
+    await tester.pumpWidget(
+      buildSection(dunaProvidersBr, onOpenLink: opened.add),
+    );
 
     await tester.tap(find.byTooltip('Netflix'));
-    await tester.pump();
+    await tester.tap(find.byKey(WatchProvidersSection.linkKey));
 
-    expect(opened.single['url'], dunaProvidersBr.link);
-    expect(opened.single['useWebView'], isFalse, reason: 'abre fora do app');
-    expect(find.byKey(WatchProvidersSection.linkKey), findsOneWidget);
+    final link = Uri.parse(dunaProvidersBr.link!);
+    expect(opened, [link, link]);
     expect(find.text('Fonte: JustWatch'), findsOneWidget);
+  });
+
+  testWidgets('sem onOpenLink não há botão de link', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('pt'),
+        home: const Scaffold(
+          body: WatchProvidersSection(region: dunaProvidersBr),
+        ),
+      ),
+    );
+
+    expect(find.byTooltip('Netflix'), findsOneWidget);
+    expect(find.byKey(WatchProvidersSection.linkKey), findsNothing);
   });
 
   testWidgets('ordena os serviços pela prioridade do TMDB', (tester) async {

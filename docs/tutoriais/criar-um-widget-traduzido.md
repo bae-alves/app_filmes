@@ -59,10 +59,15 @@ widgets:
 import 'widgets/vote_count_label.dart';
 ```
 
-Logo abaixo da linha com `_MetadataRow(...)`, adicione:
+Logo abaixo do `_MetadataRow(...)`, adicione as linhas do `if`:
 
 ```dart
-              _MetadataRow(year: year, runtime: runtime, rating: rating),
+              _MetadataRow(
+                year: year,
+                runtime: runtime,
+                rating: rating,
+                certification: details.certificationFor(viewModel.watchRegion),
+              ),
               if (details.voteCount != null) ...[
                 const SizedBox(height: 4),
                 VoteCountLabel(count: details.voteCount!),

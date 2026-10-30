@@ -16,6 +16,7 @@
   "searchTooltip": "Search",
   "advancedFilter": "Advanced filter",
   "applyFilters": "Apply filters",
+  "clearFilters": "Clear filters",
   "genresLoadError": "Couldn't load the genres.",
 
   "detailsFallbackTitle": "Details",
@@ -36,5 +37,20 @@
   "castTitle": "Cast",
   "castSeeAll": "See all",
   "directedBy": "Directed by {names}",
-  "certificationLabel": "Age rating: {certification}"
+  "certificationLabel": "Age rating: {certification}",
+  "favoritesTitle": "Favorites",
+  "favoritesEmpty": "No favorites yet. Tap the heart on a movie's page to save it here.",
+  "favoritesLoadError": "Couldn't load your favorites.",
+  "favoriteAdd": "Add to favorites",
+  "favoriteRemove": "Remove from favorites",
+  "favoriteRemoved": "Removed {title} from favorites",
+  "undo": "Undo",
+  "ratingTitle": "Your rating",
+  "ratingHint": "Seen it? Rate it and tell us how it felt.",
+  "ratingStars": "{count, plural, =1{1 star} other{{count} stars}}",
+  "moodLoved": "Loved it",
+  "moodFunny": "Funny",
+  "moodMoved": "Moving",
+  "moodTense": "Tense",
+  "moodBored": "Boring"
 }

@@ -182,6 +182,12 @@ abstract class AppLocalizations {
   /// **'Aplicar filtros'**
   String get applyFilters;
 
+  /// Dica e rótulo de acessibilidade do botão de X no campo de pesquisa, que apaga a pesquisa e os gêneros marcados.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar filtros'**
+  String get clearFilters;
+
   /// Erro da folha de filtro avançado quando a lista de gêneros não carrega.
   ///
   /// In pt, this message translates to:
@@ -295,6 +301,96 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Classificação indicativa: {certification}'**
   String certificationLabel(String certification);
+
+  /// Título da tela com a lista de favoritos (watchlist) e dica do botão da tela inicial que a abre.
+  ///
+  /// In pt, this message translates to:
+  /// **'Favoritos'**
+  String get favoritesTitle;
+
+  /// Mensagem da tela de favoritos quando a lista está vazia. Explica como adicionar um filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum filme nos favoritos ainda. Toque no coração na tela de um filme para salvá-lo aqui.'**
+  String get favoritesEmpty;
+
+  /// Mensagem da tela de favoritos quando a leitura da lista salva no aparelho falha.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os favoritos.'**
+  String get favoritesLoadError;
+
+  /// Dica do botão de coração (vazio) da tela de detalhes, que salva o filme nos favoritos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar aos favoritos'**
+  String get favoriteAdd;
+
+  /// Dica do botão de coração (cheio) da tela de detalhes, que tira o filme dos favoritos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover dos favoritos'**
+  String get favoriteRemove;
+
+  /// Aviso na parte de baixo da tela de favoritos depois de remover um filme, ao lado do botão "Desfazer".
+  ///
+  /// In pt, this message translates to:
+  /// **'{title} saiu dos favoritos'**
+  String favoriteRemoved(String title);
+
+  /// Ação do aviso de filme removido: devolve o filme à lista, no mesmo lugar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desfazer'**
+  String get undo;
+
+  /// Título da seção da tela de detalhes onde o usuário dá nota e reação de humor ao filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua avaliação'**
+  String get ratingTitle;
+
+  /// Linha abaixo de "Sua avaliação". Explica que a avaliação é para filmes já assistidos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já assistiu? Dê uma nota e conte como foi.'**
+  String get ratingHint;
+
+  /// Dica e rótulo de acessibilidade de cada estrela da avaliação (de 1 a 5).
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 estrela} other{{count} estrelas}}'**
+  String ratingStars(int count);
+
+  /// Reação de humor ao filme, ao lado do emoji 😍.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amei'**
+  String get moodLoved;
+
+  /// Reação de humor ao filme, ao lado do emoji 😂.
+  ///
+  /// In pt, this message translates to:
+  /// **'Divertido'**
+  String get moodFunny;
+
+  /// Reação de humor ao filme, ao lado do emoji 😢. O filme comoveu o usuário.
+  ///
+  /// In pt, this message translates to:
+  /// **'Emocionante'**
+  String get moodMoved;
+
+  /// Reação de humor ao filme, ao lado do emoji 😱. Suspense, medo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tenso'**
+  String get moodTense;
+
+  /// Reação de humor ao filme, ao lado do emoji 😴.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entediante'**
+  String get moodBored;
 }
 
 class _AppLocalizationsDelegate

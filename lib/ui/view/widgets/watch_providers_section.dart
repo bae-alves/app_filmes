@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/api_models/watch_providers.dart';
 import '../../../l10n/app_localizations.dart';
@@ -21,6 +20,7 @@ class WatchProvidersSection extends StatelessWidget {
     super.key,
     required this.region,
     this.compact = false,
+    this.onOpenLink,
   });
 
   /// Chave do aviso exibido quando o filme não está em nenhum serviço.
@@ -38,40 +38,35 @@ class WatchProvidersSection extends StatelessWidget {
   /// tela que hospeda os cards).
   final bool compact;
 
+  /// Chamado com a página "onde assistir" do TMDB quando o usuário toca num
+  /// logo ou no botão. Quem decide como abrir é a tela. `null` deixa os logos
+  /// sem toque e esconde o botão.
+  final ValueChanged<Uri>? onOpenLink;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final region = this.region;
     if (region == null) return _Unavailable(compact: compact);
 
-    // Ordem dos grupos: do mais acessível ao menos acessível para o usuário.
-    final groups = [
-      (l10n.watchProvidersSubscription, _sortedUnique([...?region.flatrate])),
-      (l10n.watchProvidersFree, _sortedUnique([...?region.free, ...?region.ads])),
-      (l10n.watchProvidersRent, _sortedUnique([...?region.rent])),
-      (l10n.watchProvidersBuy, _sortedUnique([...?region.buy])),
-    ].where((group) => group.$2.isNotEmpty);
-
     if (compact) {
-      // Mantém a ordem dos grupos, mas cada serviço aparece uma vez só
-      // (ex.: Apple TV costuma estar em "Alugar" e em "Comprar").
-      final providers = _uniqueById([for (final g in groups) ...g.$2]);
-      return _LogoWrap(providers: providers, size: 28);
+      return _LogoWrap(providers: region.uniqueProviders, size: 28);
     }
 
     final theme = Theme.of(context);
     final link = region.link == null ? null : Uri.tryParse(region.link!);
     // A API não fornece deep link por serviço: a página do TMDB lista os links
     // para cada um deles no país do usuário. Logos e botão abrem essa página.
-    final openLink = link == null
+    final onOpenLink = this.onOpenLink;
+    final openLink = link == null || onOpenLink == null
         ? null
-        : () => launchUrl(link, mode: LaunchMode.externalApplication);
+        : () => onOpenLink(link);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final (label, providers) in groups) ...[
-          Text(label, style: theme.textTheme.labelLarge),
+        for (final (:access, :providers) in region.groups) ...[
+          Text(_label(access, l10n), style: theme.textTheme.labelLarge),
           const SizedBox(height: 6),
           _LogoWrap(providers: providers, size: 40, onTap: openLink),
           const SizedBox(height: 12),
@@ -94,24 +89,13 @@ class WatchProvidersSection extends StatelessWidget {
     );
   }
 
-  /// Ordena pela prioridade sugerida pelo TMDB, sem repetir serviços — "Grátis"
-  /// junta `free` e `ads`, e o mesmo serviço pode estar nas duas listas.
-  static List<WatchProvider> _sortedUnique(List<WatchProvider> providers) =>
-      _uniqueById(providers)
-        ..sort((a, b) => (a.displayPriority ?? _lastPriority)
-            .compareTo(b.displayPriority ?? _lastPriority));
-
-  /// Remove serviços repetidos (mesmo `providerId`) preservando a ordem.
-  static List<WatchProvider> _uniqueById(List<WatchProvider> providers) {
-    final seen = <int?>{};
-    return [
-      for (final provider in providers)
-        if (seen.add(provider.providerId)) provider,
-    ];
-  }
-
-  /// Serviços sem prioridade informada vão para o fim da lista.
-  static const _lastPriority = 1 << 30;
+  static String _label(WatchProviderAccess access, AppLocalizations l10n) =>
+      switch (access) {
+        WatchProviderAccess.subscription => l10n.watchProvidersSubscription,
+        WatchProviderAccess.free => l10n.watchProvidersFree,
+        WatchProviderAccess.rent => l10n.watchProvidersRent,
+        WatchProviderAccess.buy => l10n.watchProvidersBuy,
+      };
 }
 
 /// Fileira (com quebra de linha) de logos de serviços.
