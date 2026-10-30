@@ -70,7 +70,8 @@ respondem ao toque.
 - `defaultTrailerPlayerBuilder`: devolve `TrailerPlayer(youtubeKey: ...)`.
 - `TrailerPlayer`: player do YouTube (`youtube_player_iframe`), sem
   reprodução automática, com botão de tela cheia e os controles do próprio
-  YouTube.
+  YouTube. Toca no máximo `TrailerPlayer.maxDuration` (2 minutos): ao passar
+  disso, o vídeo para e volta para o início.
 
 Nos testes, passe um builder que devolve um `Text` com a chave: o player real
 precisa de WebView.
