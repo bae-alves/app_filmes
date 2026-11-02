@@ -11,7 +11,7 @@ import '../../data/api_models/movie_genre.dart';
 /// através de [notifyListeners]. É o "UI = f(state)" na prática.
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({required MoviesRepository moviesRepository})
-      : _moviesRepository = moviesRepository;
+    : _moviesRepository = moviesRepository;
 
   final MoviesRepository _moviesRepository;
 
@@ -74,6 +74,7 @@ class HomeViewModel extends ChangeNotifier {
       () => _moviesRepository.getPopularMovies(forceRefresh: forceRefresh),
     );
   }
+
   /// Refaz a busca ativa: a pesquisa, os gêneros ou, sem filtro, os populares
   /// sem cache. É o que "puxar para atualizar" e "Tentar novamente" chamam,
   /// para que a lista continue de acordo com o filtro na tela.

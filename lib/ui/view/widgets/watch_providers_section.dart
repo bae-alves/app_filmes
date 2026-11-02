@@ -128,11 +128,7 @@ class _LogoWrap extends StatelessWidget {
 /// Logos de marcas não existem no Lucide, por isso vêm do servidor de imagens
 /// do TMDB; o ícone [LucideIcons.tv] só aparece se a imagem faltar ou falhar.
 class _ProviderLogo extends StatelessWidget {
-  const _ProviderLogo({
-    required this.provider,
-    required this.size,
-    this.onTap,
-  });
+  const _ProviderLogo({required this.provider, required this.size, this.onTap});
 
   final WatchProvider provider;
   final double size;
@@ -195,10 +191,11 @@ class _Unavailable extends StatelessWidget {
         Flexible(
           child: Text(
             AppLocalizations.of(context).watchProvidersUnavailable,
-            style: (compact
-                    ? theme.textTheme.labelSmall
-                    : theme.textTheme.bodyMedium)
-                ?.copyWith(color: color),
+            style:
+                (compact
+                        ? theme.textTheme.labelSmall
+                        : theme.textTheme.bodyMedium)
+                    ?.copyWith(color: color),
           ),
         ),
       ],

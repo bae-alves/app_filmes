@@ -10,9 +10,7 @@ import '../../fakes/movie_fixtures.dart';
 
 void main() {
   test('começa vazia, sem carregar e sem erro', () {
-    final viewModel = HomeViewModel(
-      moviesRepository: FakeMoviesRepository(),
-    );
+    final viewModel = HomeViewModel(moviesRepository: FakeMoviesRepository());
 
     expect(viewModel.movies, isEmpty);
     expect(viewModel.isLoading, isFalse);
@@ -38,33 +36,38 @@ void main() {
     expect(notifications, 2);
   });
 
-  test('load guarda o erro e limpa a lista quando o repositório falha', () async {
-    final failure = Exception('sem internet');
-    final viewModel = HomeViewModel(
-      moviesRepository: FakeMoviesRepository(
-        popularMovies: const [dunaMovie],
-        popularError: failure,
-      ),
-    );
+  test(
+    'load guarda o erro e limpa a lista quando o repositório falha',
+    () async {
+      final failure = Exception('sem internet');
+      final viewModel = HomeViewModel(
+        moviesRepository: FakeMoviesRepository(
+          popularMovies: const [dunaMovie],
+          popularError: failure,
+        ),
+      );
 
-    final result = await viewModel.load();
+      final result = await viewModel.load();
 
-    expect(result, isA<Error<List<Movie>>>());
-    expect(viewModel.movies, isEmpty);
-    expect(viewModel.error, same(failure));
-  });
+      expect(result, isA<Error<List<Movie>>>());
+      expect(viewModel.movies, isEmpty);
+      expect(viewModel.error, same(failure));
+    },
+  );
 
-  test('isEmpty só é verdadeiro após um carregamento bem-sucedido e vazio',
-      () async {
-    final viewModel = HomeViewModel(moviesRepository: FakeMoviesRepository());
+  test(
+    'isEmpty só é verdadeiro após um carregamento bem-sucedido e vazio',
+    () async {
+      final viewModel = HomeViewModel(moviesRepository: FakeMoviesRepository());
 
-    expect(viewModel.isEmpty, isTrue, reason: 'nada carregado ainda');
+      expect(viewModel.isEmpty, isTrue, reason: 'nada carregado ainda');
 
-    await viewModel.load();
+      await viewModel.load();
 
-    expect(viewModel.isEmpty, isTrue);
-    expect(viewModel.error, isNull);
-  });
+      expect(viewModel.isEmpty, isTrue);
+      expect(viewModel.error, isNull);
+    },
+  );
 
   test('load repassa forceRefresh para o repositório', () async {
     final repository = FakeMoviesRepository(popularMovies: const [dunaMovie]);
@@ -76,36 +79,38 @@ void main() {
     expect(repository.forcedRefreshCount, 1);
   });
 
-  test('clearFilters limpa a pesquisa e os gêneros e volta aos populares',
-      () async {
-    final viewModel = HomeViewModel(
-      moviesRepository: FakeMoviesRepository(
-        popularMovies: const [dunaMovie],
-        searchMoviesResult: const [matrixMovie],
-      ),
-    );
-    expect(viewModel.hasFilters, isFalse);
+  test(
+    'clearFilters limpa a pesquisa e os gêneros e volta aos populares',
+    () async {
+      final viewModel = HomeViewModel(
+        moviesRepository: FakeMoviesRepository(
+          popularMovies: const [dunaMovie],
+          searchMoviesResult: const [matrixMovie],
+        ),
+      );
+      expect(viewModel.hasFilters, isFalse);
 
-    viewModel.toggleGenre(28);
-    await viewModel.search('matrix');
-    expect(viewModel.hasFilters, isTrue);
+      viewModel.toggleGenre(28);
+      await viewModel.search('matrix');
+      expect(viewModel.hasFilters, isTrue);
 
-    await viewModel.clearFilters();
+      await viewModel.clearFilters();
 
-    expect(viewModel.hasFilters, isFalse);
-    expect(viewModel.searchQuery, isEmpty);
-    expect(viewModel.selectedGenreIds, isEmpty);
-    expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
-  });
+      expect(viewModel.hasFilters, isFalse);
+      expect(viewModel.searchQuery, isEmpty);
+      expect(viewModel.selectedGenreIds, isEmpty);
+      expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
+    },
+  );
 
   group('pesquisa e gêneros valem um de cada vez', () {
     HomeViewModel build() => HomeViewModel(
-          moviesRepository: FakeMoviesRepository(
-            popularMovies: const [dunaMovie],
-            searchMoviesResult: const [matrixMovie],
-            discoverMoviesResult: const [dunaMovie, matrixMovie],
-          ),
-        );
+      moviesRepository: FakeMoviesRepository(
+        popularMovies: const [dunaMovie],
+        searchMoviesResult: const [matrixMovie],
+        discoverMoviesResult: const [dunaMovie, matrixMovie],
+      ),
+    );
 
     test('uma pesquisa nova desmarca os gêneros', () async {
       final viewModel = build();
@@ -184,17 +189,19 @@ void main() {
       expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
     });
 
-    test('depois de uma pesquisa que falhou, tenta a pesquisa de novo',
-        () async {
-      final repository = buildRepository(searchError: Exception('sem rede'));
-      final viewModel = HomeViewModel(moviesRepository: repository);
-      await viewModel.search('matrix');
+    test(
+      'depois de uma pesquisa que falhou, tenta a pesquisa de novo',
+      () async {
+        final repository = buildRepository(searchError: Exception('sem rede'));
+        final viewModel = HomeViewModel(moviesRepository: repository);
+        await viewModel.search('matrix');
 
-      await viewModel.refresh();
+        await viewModel.refresh();
 
-      expect(viewModel.error, isNotNull);
-      expect(repository.forcedRefreshCount, 0);
-    });
+        expect(viewModel.error, isNotNull);
+        expect(repository.forcedRefreshCount, 0);
+      },
+    );
   });
 
   group('com duas buscas ao mesmo tempo', () {
@@ -215,28 +222,30 @@ void main() {
       expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
     });
 
-    test('a resposta antiga que chega antes não esconde o carregamento',
-        () async {
-      final repository = _SlowMoviesRepository(
-        popularMovies: const [dunaMovie],
-        searchMoviesResult: const [matrixMovie],
-      );
-      final viewModel = HomeViewModel(moviesRepository: repository);
+    test(
+      'a resposta antiga que chega antes não esconde o carregamento',
+      () async {
+        final repository = _SlowMoviesRepository(
+          popularMovies: const [dunaMovie],
+          searchMoviesResult: const [matrixMovie],
+        );
+        final viewModel = HomeViewModel(moviesRepository: repository);
 
-      final search = viewModel.search('matrix');
-      final refresh = viewModel.load(forceRefresh: true);
-      repository.search.complete();
-      await search;
+        final search = viewModel.search('matrix');
+        final refresh = viewModel.load(forceRefresh: true);
+        repository.search.complete();
+        await search;
 
-      expect(viewModel.isLoading, isTrue);
-      expect(viewModel.movies, isEmpty);
+        expect(viewModel.isLoading, isTrue);
+        expect(viewModel.movies, isEmpty);
 
-      repository.popular.complete();
-      await refresh;
+        repository.popular.complete();
+        await refresh;
 
-      expect(viewModel.isLoading, isFalse);
-      expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
-    });
+        expect(viewModel.isLoading, isFalse);
+        expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
+      },
+    );
   });
 }
 

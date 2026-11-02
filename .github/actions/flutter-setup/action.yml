@@ -1,0 +1,23 @@
+name: Preparar o Flutter
+description: Instala o Flutter, cria um .env falso e baixa as dependências.
+
+runs:
+  using: composite
+  steps:
+    - uses: subosito/flutter-action@v2
+      with:
+        # Mesma versão usada no desenvolvimento.
+        flutter-version: 3.44.9
+        channel: stable
+        cache: true
+
+    # O .env é um asset: sem ele o build não fecha e o app não abre. O CI não
+    # chama o TMDB, então um token falso basta e nenhuma credencial vaza nos
+    # artefatos.
+    - name: Criar .env falso
+      shell: bash
+      run: printf 'TMDB_READ=ci-placeholder\nTMDB_API_KEY=ci-placeholder\n' > .env
+
+    - name: Baixar dependências
+      shell: bash
+      run: flutter pub get

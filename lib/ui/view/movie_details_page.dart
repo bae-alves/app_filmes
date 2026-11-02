@@ -126,17 +126,17 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
             // O detalhe técnico do erro vai para o log (veja a view model);
             // o usuário vê uma mensagem traduzida.
             (_, Exception(), null) => _ErrorState(
-                message: AppLocalizations.of(context).detailsLoadError,
-                onRetry: viewModel.load,
-              ),
+              message: AppLocalizations.of(context).detailsLoadError,
+              onRetry: viewModel.load,
+            ),
             (_, _, null) => Center(
-                child: Text(AppLocalizations.of(context).detailsNotFound),
-              ),
+              child: Text(AppLocalizations.of(context).detailsNotFound),
+            ),
             (_, _, _) => _DetailsContent(
-                viewModel: viewModel,
-                ratingViewModel: widget.ratingViewModel,
-                trailerPlayerBuilder: widget.trailerPlayerBuilder,
-              ),
+              viewModel: viewModel,
+              ratingViewModel: widget.ratingViewModel,
+              trailerPlayerBuilder: widget.trailerPlayerBuilder,
+            ),
           },
         );
       },
@@ -146,7 +146,10 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
 
 /// Coração da AppBar: favorita ou desfavorita o filme.
 class _FavoriteButton extends StatelessWidget {
-  const _FavoriteButton({required this.movie, required this.favoritesViewModel});
+  const _FavoriteButton({
+    required this.movie,
+    required this.favoritesViewModel,
+  });
 
   final Movie movie;
   final FavoritesViewModel favoritesViewModel;
@@ -201,7 +204,8 @@ class _DetailsContent extends StatelessWidget {
     return ListView(
       // Padding explícito desliga o recuo automático do sistema: sem somá-lo, o
       // fim da tela fica sob a barra de navegação.
-      padding: const EdgeInsets.only(bottom: 24) + MediaQuery.paddingOf(context),
+      padding:
+          const EdgeInsets.only(bottom: 24) + MediaQuery.paddingOf(context),
       children: [
         _TrailerSection(
           youtubeKey: viewModel.trailerYoutubeKey,
@@ -296,8 +300,9 @@ class _DetailsContent extends StatelessWidget {
               if (viewModel.watchProvidersFailed)
                 Text(
                   l10n.watchProvidersLoadError,
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(color: theme.colorScheme.outline),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
                 )
               else
                 WatchProvidersSection(
@@ -403,8 +408,11 @@ class _MetadataRow extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.star_rounded,
-                  size: 18, color: theme.colorScheme.primary),
+              Icon(
+                Icons.star_rounded,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 4),
               Text(rating!, style: theme.textTheme.labelLarge),
             ],

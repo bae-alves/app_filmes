@@ -32,8 +32,9 @@ void main() {
     );
   }
 
-  testWidgets('agrupa os serviços por forma de acesso, com link e crédito',
-      (tester) async {
+  testWidgets('agrupa os serviços por forma de acesso, com link e crédito', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildSection(dunaProvidersBr));
 
     expect(find.text('Assinatura'), findsOneWidget);
@@ -50,7 +51,9 @@ void main() {
     expect(find.text('Fonte: JustWatch'), findsOneWidget);
   });
 
-  testWidgets('tocar num logo ou no botão entrega o link à tela', (tester) async {
+  testWidgets('tocar num logo ou no botão entrega o link à tela', (
+    tester,
+  ) async {
     final opened = <Uri>[];
     await tester.pumpWidget(
       buildSection(dunaProvidersBr, onOpenLink: opened.add),
@@ -89,8 +92,9 @@ void main() {
     expect(maxX, lessThan(netflixX));
   });
 
-  testWidgets('avisa quando o filme não está em nenhum serviço',
-      (tester) async {
+  testWidgets('avisa quando o filme não está em nenhum serviço', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildSection(null));
 
     expect(find.byKey(WatchProvidersSection.unavailableKey), findsOneWidget);
@@ -101,8 +105,9 @@ void main() {
     expect(find.byKey(WatchProvidersSection.linkKey), findsNothing);
   });
 
-  testWidgets('exibe os textos em inglês quando o app está em inglês',
-      (tester) async {
+  testWidgets('exibe os textos em inglês quando o app está em inglês', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       buildSection(dunaProvidersBr, locale: const Locale('en')),
     );
@@ -117,8 +122,9 @@ void main() {
     );
   });
 
-  testWidgets('modo compacto mostra só os logos, cada serviço uma vez',
-      (tester) async {
+  testWidgets('modo compacto mostra só os logos, cada serviço uma vez', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildSection(dunaProvidersBr, compact: true));
 
     expect(find.text('Assinatura'), findsNothing);

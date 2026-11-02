@@ -49,17 +49,19 @@ void main() {
       expect(result.value.first.title, 'Duna: Parte Dois');
     });
 
-    test('usa o cache na segunda chamada e refaz a requisição com forceRefresh',
-        () async {
-      restClient.popularPage = const MoviePageResponse(results: [dunaMovie]);
+    test(
+      'usa o cache na segunda chamada e refaz a requisição com forceRefresh',
+      () async {
+        restClient.popularPage = const MoviePageResponse(results: [dunaMovie]);
 
-      await repository.getPopularMovies();
-      await repository.getPopularMovies();
-      expect(restClient.popularCallCount, 1);
+        await repository.getPopularMovies();
+        await repository.getPopularMovies();
+        expect(restClient.popularCallCount, 1);
 
-      await repository.getPopularMovies(forceRefresh: true);
-      expect(restClient.popularCallCount, 2);
-    });
+        await repository.getPopularMovies(forceRefresh: true);
+        expect(restClient.popularCallCount, 2);
+      },
+    );
 
     test('devolve Error quando o status HTTP não é de sucesso', () async {
       restClient.statusCode = 401;
@@ -178,32 +180,39 @@ void main() {
       expect(restClient.detailsCallCount, 1);
     });
 
-    test('cheio, apaga o filme salvo há mais tempo para guardar o novo',
-        () async {
-      const max = MoviesRepositoryRemote.detailsCacheMaxEntries;
-      final now = DateTime.now();
-      SharedPreferences.setMockInitialValues({
-        // O id 1 é o mais antigo; nenhum venceu.
-        for (var id = 1; id <= max; id++)
-          'movie_details:$appLanguage:$id': jsonEncode({
-            'savedAt': now.subtract(Duration(minutes: max - id)).millisecondsSinceEpoch,
-            'details': matrixDetails.toJson(),
-          }),
-      });
-      final storage = await SharedPreferences.getInstance();
-      final full = MoviesRepositoryRemote(
-        restClient: restClient..details = dunaDetails,
-        language: appLanguage,
-        preferences: storage,
-      );
+    test(
+      'cheio, apaga o filme salvo há mais tempo para guardar o novo',
+      () async {
+        const max = MoviesRepositoryRemote.detailsCacheMaxEntries;
+        final now = DateTime.now();
+        SharedPreferences.setMockInitialValues({
+          // O id 1 é o mais antigo; nenhum venceu.
+          for (var id = 1; id <= max; id++)
+            'movie_details:$appLanguage:$id': jsonEncode({
+              'savedAt': now
+                  .subtract(Duration(minutes: max - id))
+                  .millisecondsSinceEpoch,
+              'details': matrixDetails.toJson(),
+            }),
+        });
+        final storage = await SharedPreferences.getInstance();
+        final full = MoviesRepositoryRemote(
+          restClient: restClient..details = dunaDetails,
+          language: appLanguage,
+          preferences: storage,
+        );
 
-      await full.getMovieDetails(dunaId);
+        await full.getMovieDetails(dunaId);
 
-      expect(storage.getKeys(), hasLength(max));
-      expect(storage.containsKey('movie_details:$appLanguage:1'), isFalse);
-      expect(storage.containsKey('movie_details:$appLanguage:2'), isTrue);
-      expect(storage.containsKey('movie_details:$appLanguage:$dunaId'), isTrue);
-    });
+        expect(storage.getKeys(), hasLength(max));
+        expect(storage.containsKey('movie_details:$appLanguage:1'), isFalse);
+        expect(storage.containsKey('movie_details:$appLanguage:2'), isTrue);
+        expect(
+          storage.containsKey('movie_details:$appLanguage:$dunaId'),
+          isTrue,
+        );
+      },
+    );
 
     test('devolve Error quando o serviço falha', () async {
       restClient.errorToThrow = Exception('boom');
@@ -220,9 +229,24 @@ void main() {
         appLanguage: const VideosResponse(
           results: [
             Video(key: 'clipe', site: 'YouTube', type: 'Clip', official: true),
-            Video(key: 'teaser', site: 'YouTube', type: 'Teaser', official: true),
-            Video(key: 'naoOficial', site: 'YouTube', type: 'Trailer', official: false),
-            Video(key: 'oficial', site: 'YouTube', type: 'Trailer', official: true),
+            Video(
+              key: 'teaser',
+              site: 'YouTube',
+              type: 'Teaser',
+              official: true,
+            ),
+            Video(
+              key: 'naoOficial',
+              site: 'YouTube',
+              type: 'Trailer',
+              official: false,
+            ),
+            Video(
+              key: 'oficial',
+              site: 'YouTube',
+              type: 'Trailer',
+              official: true,
+            ),
           ],
         ),
       };
@@ -254,10 +278,10 @@ void main() {
 
       final result = await repository.getMovieTrailer(dunaId);
 
-      expect(
-        restClient.requestedVideoLanguages,
-        [appLanguage, tmdbFallbackLanguage],
-      );
+      expect(restClient.requestedVideoLanguages, [
+        appLanguage,
+        tmdbFallbackLanguage,
+      ]);
       expect((result as Ok<Video?>).value?.key, dunaTrailer.key);
     });
 
@@ -296,19 +320,22 @@ void main() {
 
       final result = await repository.getWatchProviders(dunaId, region: 'us');
 
-      expect((result as Ok<WatchProviderRegion?>).value?.flatrate,
-          [maxStreaming]);
+      expect((result as Ok<WatchProviderRegion?>).value?.flatrate, [
+        maxStreaming,
+      ]);
     });
 
-    test('devolve Ok com null quando a região não aparece na resposta',
-        () async {
-      restClient.watchProviders = dunaProvidersResponse;
+    test(
+      'devolve Ok com null quando a região não aparece na resposta',
+      () async {
+        restClient.watchProviders = dunaProvidersResponse;
 
-      final result = await repository.getWatchProviders(dunaId, region: 'JP');
+        final result = await repository.getWatchProviders(dunaId, region: 'JP');
 
-      expect(result, isA<Ok<WatchProviderRegion?>>());
-      expect((result as Ok<WatchProviderRegion?>).value, isNull);
-    });
+        expect(result, isA<Ok<WatchProviderRegion?>>());
+        expect((result as Ok<WatchProviderRegion?>).value, isNull);
+      },
+    );
 
     test('devolve Ok com null quando a região vem só com o link', () async {
       restClient.watchProviders = dunaProvidersResponse;
@@ -335,27 +362,34 @@ void main() {
       final result = await repository.getWatchProviders(dunaId, region: 'BR');
 
       expect(result, isA<Error<WatchProviderRegion?>>());
-      expect((result as Error<WatchProviderRegion?>).error.toString(),
-          contains('500'));
-    });
-
-    test('não guarda a falha em cache: a próxima chamada tenta de novo',
-        () async {
-      restClient.errorToThrow = DioException.connectionError(
-        requestOptions: RequestOptions(path: '/movie/watch/providers'),
-        reason: 'offline',
+      expect(
+        (result as Error<WatchProviderRegion?>).error.toString(),
+        contains('500'),
       );
-      final failed = await repository.getWatchProviders(dunaId, region: 'BR');
-      expect(failed, isA<Error<WatchProviderRegion?>>());
-
-      restClient
-        ..errorToThrow = null
-        ..watchProviders = dunaProvidersResponse;
-      final retried = await repository.getWatchProviders(dunaId, region: 'BR');
-
-      expect((retried as Ok<WatchProviderRegion?>).value, isNotNull);
-      expect(restClient.watchProvidersCallCount, 2);
     });
+
+    test(
+      'não guarda a falha em cache: a próxima chamada tenta de novo',
+      () async {
+        restClient.errorToThrow = DioException.connectionError(
+          requestOptions: RequestOptions(path: '/movie/watch/providers'),
+          reason: 'offline',
+        );
+        final failed = await repository.getWatchProviders(dunaId, region: 'BR');
+        expect(failed, isA<Error<WatchProviderRegion?>>());
+
+        restClient
+          ..errorToThrow = null
+          ..watchProviders = dunaProvidersResponse;
+        final retried = await repository.getWatchProviders(
+          dunaId,
+          region: 'BR',
+        );
+
+        expect((retried as Ok<WatchProviderRegion?>).value, isNotNull);
+        expect(restClient.watchProvidersCallCount, 2);
+      },
+    );
   });
 
   group('idioma do conteúdo', () {
@@ -375,18 +409,20 @@ void main() {
       expect(restClient.requestedLanguages, List.filled(5, 'en-US'));
     });
 
-    test('em en-US, não repete a busca de trailer no idioma alternativo',
-        () async {
-      final english = MoviesRepositoryRemote(
-        restClient: restClient,
-        language: tmdbFallbackLanguage,
-        preferences: preferences,
-      );
+    test(
+      'em en-US, não repete a busca de trailer no idioma alternativo',
+      () async {
+        final english = MoviesRepositoryRemote(
+          restClient: restClient,
+          language: tmdbFallbackLanguage,
+          preferences: preferences,
+        );
 
-      final result = await english.getMovieTrailer(matrixId);
+        final result = await english.getMovieTrailer(matrixId);
 
-      expect(restClient.requestedVideoLanguages, [tmdbFallbackLanguage]);
-      expect((result as Ok<Video?>).value, isNull);
-    });
+        expect(restClient.requestedVideoLanguages, [tmdbFallbackLanguage]);
+        expect((result as Ok<Video?>).value, isNull);
+      },
+    );
   });
 }

@@ -4,10 +4,7 @@ part 'movie_genre.g.dart';
 
 @JsonSerializable()
 class MovieGenre {
-  const MovieGenre({
-    required this.id,
-    required this.name,
-  });
+  const MovieGenre({required this.id, required this.name});
 
   factory MovieGenre.fromJson(Map<String, dynamic> json) =>
       _$MovieGenreFromJson(json);

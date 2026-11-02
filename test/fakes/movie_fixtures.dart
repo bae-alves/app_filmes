@@ -151,6 +151,8 @@ const dunaProvidersResponse = WatchProvidersResponse(
   results: {
     'BR': dunaProvidersBr,
     'US': dunaProvidersUs,
-    'PT': WatchProviderRegion(link: 'https://www.themoviedb.org/movie/693134/watch?locale=PT'),
+    'PT': WatchProviderRegion(
+      link: 'https://www.themoviedb.org/movie/693134/watch?locale=PT',
+    ),
   },
 );

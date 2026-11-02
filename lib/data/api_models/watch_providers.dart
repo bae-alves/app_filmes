@@ -68,8 +68,13 @@ class WatchProviderRegion {
 
   /// `true` quando nenhuma das listas tem serviço. O TMDB às vezes devolve o
   /// país só com o [link]; para o usuário, isso equivale a "indisponível".
-  bool get isEmpty => [flatrate, free, ads, rent, buy]
-      .every((providers) => providers == null || providers.isEmpty);
+  bool get isEmpty => [
+    flatrate,
+    free,
+    ads,
+    rent,
+    buy,
+  ].every((providers) => providers == null || providers.isEmpty);
 
   /// Serviços por forma de acesso, da mais acessível à menos acessível para o
   /// usuário, cada grupo ordenado pela prioridade do TMDB e sem repetir

@@ -15,14 +15,12 @@ import 'widgets/trailer_player.dart';
 ///
 /// A home não conhece repositórios: ela apenas pede a view model já montada
 /// para quem a construiu (o `main.dart`, ou o teste).
-typedef MovieDetailsViewModelFactory = MovieDetailsViewModel Function(
-  int movieId,
-);
+typedef MovieDetailsViewModelFactory =
+    MovieDetailsViewModel Function(int movieId);
 
 /// Cria a view model da avaliação de um filme, mostrada na tela de detalhes.
-typedef MovieRatingViewModelFactory = MovieRatingViewModel Function(
-  int movieId,
-);
+typedef MovieRatingViewModelFactory =
+    MovieRatingViewModel Function(int movieId);
 
 /// Tela inicial: lista os filmes populares e leva aos detalhes de cada um.
 class HomePage extends StatefulWidget {
@@ -92,95 +90,92 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-Future<void> _openAdvancedFilter() async {
-  await widget.viewModel.loadGenres();
 
-  if (!mounted) return;
+  Future<void> _openAdvancedFilter() async {
+    await widget.viewModel.loadGenres();
 
-  showModalBottomSheet<void>(
-    context: context,
-    builder: (context) {
-      return ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) {
-          final viewModel = widget.viewModel;
+    if (!mounted) return;
 
-          if (viewModel.isLoadingGenres) {
-            return const SizedBox(
-              height: 300,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (context) {
+        return ListenableBuilder(
+          listenable: widget.viewModel,
+          builder: (context, _) {
+            final viewModel = widget.viewModel;
 
-          if (viewModel.genresError != null) {
-            return SizedBox(
-              height: 300,
-              child: Center(
-                child: Text(AppLocalizations.of(context).genresLoadError),
-              ),
-            );
-          }
+            if (viewModel.isLoadingGenres) {
+              return const SizedBox(
+                height: 300,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
 
-          return SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    AppLocalizations.of(context).advancedFilter,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            if (viewModel.genresError != null) {
+              return SizedBox(
+                height: 300,
+                child: Center(
+                  child: Text(AppLocalizations.of(context).genresLoadError),
+                ),
+              );
+            }
+
+            return SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      AppLocalizations.of(context).advancedFilter,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
 
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: viewModel.genres.length,
-                    itemBuilder: (context, index) {
-                      final genre = viewModel.genres[index];
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: viewModel.genres.length,
+                      itemBuilder: (context, index) {
+                        final genre = viewModel.genres[index];
 
-                      return CheckboxListTile(
-                        title: Text(genre.name),
-                        value: viewModel.selectedGenreIds.contains(
-                          genre.id,
-                        ),
-                        onChanged: (_) {
-                          viewModel.toggleGenre(genre.id);
-                        },
-                      );
-                    },
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () async {
-                        _searchController.clear();
-                        await viewModel.applyGenreFilter();
-
-                        if (!context.mounted) return;
-
-                        Navigator.of(context).pop();
+                        return CheckboxListTile(
+                          title: Text(genre.name),
+                          value: viewModel.selectedGenreIds.contains(genre.id),
+                          onChanged: (_) {
+                            viewModel.toggleGenre(genre.id);
+                          },
+                        );
                       },
-                      child: Text(AppLocalizations.of(context).applyFilters),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () async {
+                          _searchController.clear();
+                          await viewModel.applyGenreFilter();
+
+                          if (!context.mounted) return;
+
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(AppLocalizations.of(context).applyFilters),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +227,8 @@ Future<void> _openAdvancedFilter() async {
                   child: ListView.builder(
                     // Padding explícito desliga o recuo automático do sistema:
                     // sem somá-lo, o fim da lista fica sob a barra de navegação.
-                    padding: const EdgeInsets.symmetric(vertical: 8) +
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8) +
                         MediaQuery.paddingOf(context),
                     itemCount: viewModel.movies.length,
                     itemBuilder: (context, index) {
@@ -248,7 +244,7 @@ Future<void> _openAdvancedFilter() async {
               ),
             ],
           );
-        }
+        },
       ),
     );
   }

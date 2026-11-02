@@ -80,14 +80,20 @@ void main() {
       expect(repository.movieIds, [matrixId, otherId]);
     });
 
-    test('desfazer devolve o filme ao mesmo lugar, também no repositório',
-        () async {
-      await viewModel.remove(dunaId);
-      await viewModel.undoRemove();
+    test(
+      'desfazer devolve o filme ao mesmo lugar, também no repositório',
+      () async {
+        await viewModel.remove(dunaId);
+        await viewModel.undoRemove();
 
-      expect(viewModel.favorites.map((m) => m.id), [matrixId, dunaId, otherId]);
-      expect(repository.movieIds, [matrixId, dunaId, otherId]);
-    });
+        expect(viewModel.favorites.map((m) => m.id), [
+          matrixId,
+          dunaId,
+          otherId,
+        ]);
+        expect(repository.movieIds, [matrixId, dunaId, otherId]);
+      },
+    );
 
     test('desfazer só vale uma vez', () async {
       await viewModel.remove(dunaId);

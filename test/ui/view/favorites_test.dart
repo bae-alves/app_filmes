@@ -131,11 +131,9 @@ void main() {
     /// Cartões na tela, de cima para baixo. O SnackBar também usa um
     /// Dismissible, com outra chave; por isso o filtro pelo tipo da chave.
     List<int> cardIds(WidgetTester tester) => [
-          for (final d in tester.widgetList<Dismissible>(
-            find.byType(Dismissible),
-          ))
-            if (d.key case ValueKey<int>(:final value)) value,
-        ];
+      for (final d in tester.widgetList<Dismissible>(find.byType(Dismissible)))
+        if (d.key case ValueKey<int>(:final value)) value,
+    ];
 
     Future<FakeFavoritesRepository> openList(WidgetTester tester) async {
       final favorites = FakeFavoritesRepository(
@@ -170,8 +168,9 @@ void main() {
       expect(favorites.movieIds, [matrixId, dunaId]);
     });
 
-    testWidgets('arrastar o cartão para a esquerda remove o filme',
-        (tester) async {
+    testWidgets('arrastar o cartão para a esquerda remove o filme', (
+      tester,
+    ) async {
       final favorites = await openList(tester);
 
       await tester.drag(
@@ -185,8 +184,9 @@ void main() {
       expect(find.text('Duna: Parte Dois saiu dos favoritos'), findsOneWidget);
     });
 
-    testWidgets('o aviso some sozinho e o filme continua removido',
-        (tester) async {
+    testWidgets('o aviso some sozinho e o filme continua removido', (
+      tester,
+    ) async {
       final favorites = await openList(tester);
 
       await tester.tap(find.byTooltip('Remover dos favoritos').first);
@@ -212,8 +212,9 @@ void main() {
     });
   });
 
-  testWidgets('falha ao ler a lista mostra o erro e permite tentar de novo',
-      (tester) async {
+  testWidgets('falha ao ler a lista mostra o erro e permite tentar de novo', (
+    tester,
+  ) async {
     final favorites = FakeFavoritesRepository(
       readError: Exception('banco indisponível'),
     );
@@ -221,7 +222,10 @@ void main() {
     await tester.pumpAndSettle();
     await openFavorites(tester);
 
-    expect(find.text('Não foi possível carregar os favoritos.'), findsOneWidget);
+    expect(
+      find.text('Não foi possível carregar os favoritos.'),
+      findsOneWidget,
+    );
 
     favorites.readError = null;
     await favorites.addFavorite(dunaMovie);
@@ -231,8 +235,9 @@ void main() {
     expect(find.byType(MovieCard), findsOneWidget);
   });
 
-  testWidgets('em inglês, a lista e o coração aparecem traduzidos',
-      (tester) async {
+  testWidgets('em inglês, a lista e o coração aparecem traduzidos', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       buildApp(FakeFavoritesRepository(), locale: const Locale('en')),
     );
@@ -249,7 +254,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Remove from favorites'));
     await tester.pumpAndSettle();
-    expect(find.text('Removed Duna: Parte Dois from favorites'), findsOneWidget);
+    expect(
+      find.text('Removed Duna: Parte Dois from favorites'),
+      findsOneWidget,
+    );
     expect(find.text('Undo'), findsOneWidget);
     expect(find.textContaining('No favorites yet'), findsOneWidget);
   });

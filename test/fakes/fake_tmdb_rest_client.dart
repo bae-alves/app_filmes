@@ -137,10 +137,10 @@ class FakeTmdbRestClient implements TmdbRestClient {
   }
 
   HttpResponse<T> _wrap<T>(T data) => HttpResponse<T>(
-        data,
-        Response<dynamic>(
-          requestOptions: RequestOptions(path: '/fake'),
-          statusCode: statusCode,
-        ),
-      );
+    data,
+    Response<dynamic>(
+      requestOptions: RequestOptions(path: '/fake'),
+      statusCode: statusCode,
+    ),
+  );
 }

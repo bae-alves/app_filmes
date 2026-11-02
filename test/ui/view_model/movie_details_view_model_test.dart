@@ -110,53 +110,61 @@ void main() {
     expect(viewModel.watchProvidersFailed, isFalse);
   });
 
-  test('watchProviders é null quando o filme não está em nenhum serviço',
-      () async {
-    final viewModel = MovieDetailsViewModel(
-      moviesRepository: FakeMoviesRepository(
-        detailsById: const {matrixId: matrixDetails},
-      ),
-      movieId: matrixId,
-      watchRegion: 'BR',
-    );
+  test(
+    'watchProviders é null quando o filme não está em nenhum serviço',
+    () async {
+      final viewModel = MovieDetailsViewModel(
+        moviesRepository: FakeMoviesRepository(
+          detailsById: const {matrixId: matrixDetails},
+        ),
+        movieId: matrixId,
+        watchRegion: 'BR',
+      );
 
-    await viewModel.load();
+      await viewModel.load();
 
-    expect(viewModel.watchProviders, isNull);
-  });
+      expect(viewModel.watchProviders, isNull);
+    },
+  );
 
-  test('falha em onde assistir não impede a exibição das informações',
-      () async {
-    final viewModel = MovieDetailsViewModel(
-      moviesRepository: FakeMoviesRepository(
-        detailsById: const {dunaId: dunaDetails},
-        watchProvidersError: Exception('provedores indisponíveis'),
-      ),
-      movieId: dunaId,
-      watchRegion: 'BR',
-    );
+  test(
+    'falha em onde assistir não impede a exibição das informações',
+    () async {
+      final viewModel = MovieDetailsViewModel(
+        moviesRepository: FakeMoviesRepository(
+          detailsById: const {dunaId: dunaDetails},
+          watchProvidersError: Exception('provedores indisponíveis'),
+        ),
+        movieId: dunaId,
+        watchRegion: 'BR',
+      );
 
-    await viewModel.load();
+      await viewModel.load();
 
-    expect(viewModel.details?.title, 'Duna: Parte Dois');
-    expect(viewModel.watchProviders, isNull);
-    expect(viewModel.watchProvidersFailed, isTrue);
-    expect(viewModel.error, isNull, reason: 'a tela ainda é utilizável');
-  });
+      expect(viewModel.details?.title, 'Duna: Parte Dois');
+      expect(viewModel.watchProviders, isNull);
+      expect(viewModel.watchProvidersFailed, isTrue);
+      expect(viewModel.error, isNull, reason: 'a tela ainda é utilizável');
+    },
+  );
 
   test('directorNames lista só os diretores com nome', () async {
     final viewModel = MovieDetailsViewModel(
-      moviesRepository: FakeMoviesRepository(detailsById: const {
-        matrixId: MovieDetails(
-          id: matrixId,
-          credits: Credits(crew: [
-            CrewMember(name: 'Lana Wachowski', job: 'Director'),
-            CrewMember(name: '', job: 'Director'),
-            CrewMember(job: 'Director'),
-            CrewMember(name: 'Don Davis', job: 'Original Music Composer'),
-          ]),
-        ),
-      }),
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {
+          matrixId: MovieDetails(
+            id: matrixId,
+            credits: Credits(
+              crew: [
+                CrewMember(name: 'Lana Wachowski', job: 'Director'),
+                CrewMember(name: '', job: 'Director'),
+                CrewMember(job: 'Director'),
+                CrewMember(name: 'Don Davis', job: 'Original Music Composer'),
+              ],
+            ),
+          ),
+        },
+      ),
       movieId: matrixId,
       watchRegion: 'BR',
     );
@@ -169,16 +177,20 @@ void main() {
 
   test('cast segue a ordem dos créditos, sem ordem no fim', () async {
     final viewModel = MovieDetailsViewModel(
-      moviesRepository: FakeMoviesRepository(detailsById: const {
-        matrixId: MovieDetails(
-          id: matrixId,
-          credits: Credits(cast: [
-            CastMember(name: 'C'),
-            CastMember(name: 'B', order: 1),
-            CastMember(name: 'A', order: 0),
-          ]),
-        ),
-      }),
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {
+          matrixId: MovieDetails(
+            id: matrixId,
+            credits: Credits(
+              cast: [
+                CastMember(name: 'C'),
+                CastMember(name: 'B', order: 1),
+                CastMember(name: 'A', order: 0),
+              ],
+            ),
+          ),
+        },
+      ),
       movieId: matrixId,
       watchRegion: 'BR',
     );

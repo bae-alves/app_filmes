@@ -9,10 +9,8 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 /// diretamente: assim o teste de widget consegue substituir o player real (que
 /// depende de uma WebView e, portanto, de plataforma) por um stub, sem abrir
 /// mão de verificar que a chave certa chegou até ele.
-typedef TrailerPlayerBuilder = Widget Function(
-  BuildContext context,
-  String youtubeKey,
-);
+typedef TrailerPlayerBuilder =
+    Widget Function(BuildContext context, String youtubeKey);
 
 /// Implementação padrão de [TrailerPlayerBuilder]: o player real do YouTube.
 Widget defaultTrailerPlayerBuilder(BuildContext context, String youtubeKey) =>

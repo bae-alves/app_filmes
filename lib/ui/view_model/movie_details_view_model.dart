@@ -63,13 +63,14 @@ class MovieDetailsViewModel extends ChangeNotifier {
 
   /// Nomes dos diretores do filme. Vazio sem detalhes ou sem diretor com nome.
   List<String> get directorNames => [
-        for (final director in _details?.directors ?? const <CrewMember>[])
-          if (director.name?.isNotEmpty == true) director.name!,
-      ];
+    for (final director in _details?.directors ?? const <CrewMember>[])
+      if (director.name?.isNotEmpty == true) director.name!,
+  ];
 
   /// Elenco na ordem dos créditos; quem não tem ordem vai para o fim.
-  List<CastMember> get cast => [...?_details?.credits?.cast]
-    ..sort((a, b) => (a.order ?? 999).compareTo(b.order ?? 999));
+  List<CastMember> get cast =>
+      [...?_details?.credits?.cast]
+        ..sort((a, b) => (a.order ?? 999).compareTo(b.order ?? 999));
 
   /// Trailer escolhido pelo repositório, ou `null` quando o filme não tem um.
   Video? get trailer => _trailer;
@@ -131,7 +132,9 @@ class MovieDetailsViewModel extends ChangeNotifier {
       case Error<Video?>(:final error):
         _trailer = null;
         if (kDebugMode) {
-          debugPrint('Não foi possível carregar o trailer do filme $movieId: $error');
+          debugPrint(
+            'Não foi possível carregar o trailer do filme $movieId: $error',
+          );
         }
     }
 

@@ -32,7 +32,9 @@ import '../l10n/app_localizations.dart';
 /// para [tmdbFallbackWatchRegion].
 String currentWatchRegion() {
   final country = PlatformDispatcher.instance.locale.countryCode;
-  return (country == null || country.isEmpty) ? tmdbFallbackWatchRegion : country;
+  return (country == null || country.isEmpty)
+      ? tmdbFallbackWatchRegion
+      : country;
 }
 
 /// Idioma em que o conteúdo do TMDB deve ser pedido, para o dispositivo atual.

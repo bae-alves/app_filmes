@@ -64,8 +64,11 @@ class MovieCard extends StatelessWidget {
                       Row(
                         children: [
                           if (rating != null) ...[
-                            Icon(Icons.star_rounded,
-                                size: 16, color: theme.colorScheme.primary),
+                            Icon(
+                              Icons.star_rounded,
+                              size: 16,
+                              color: theme.colorScheme.primary,
+                            ),
                             const SizedBox(width: 2),
                             Text(rating, style: theme.textTheme.labelMedium),
                           ],
