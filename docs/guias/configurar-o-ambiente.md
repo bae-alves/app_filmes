@@ -4,7 +4,7 @@ Do clone ao app rodando na web ou no Android.
 
 ## Requisitos
 
-- Flutter estável com Dart 3.12 ou mais novo (`flutter --version`).
+- Flutter estável com Dart 3.12.2 ou mais novo (`flutter --version`).
 - Chrome ou Chromium para a web. Se usar Chromium, aponte
   `CHROME_EXECUTABLE` para ele.
 - Android SDK e um emulador, para rodar no Android.

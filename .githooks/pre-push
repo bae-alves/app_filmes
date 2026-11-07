@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Antes de cada push: formata o código, roda a análise estática e os testes.
+# Bloqueia o push se o formatador mudou algum arquivo (faça commit da
+# formatação e repita o push), se a análise achou problemas ou se algum teste
+# falhou. Confere a árvore de trabalho, não só os commits enviados.
+#
+# Ativar uma vez por clone: git config core.hooksPath .githooks
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+fail() { echo "pre-push: $*" >&2; exit 1; }
+
+echo 'pre-push: dart format'
+dart format --set-exit-if-changed . >/dev/null ||
+  fail 'o dart format mudou arquivos; faça commit da formatação e repita o push'
+
+echo 'pre-push: flutter analyze'
+flutter analyze || fail 'a análise estática falhou'
+
+echo 'pre-push: flutter test'
+flutter test || fail 'algum teste falhou'

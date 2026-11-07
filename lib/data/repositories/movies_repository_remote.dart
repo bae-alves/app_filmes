@@ -28,9 +28,9 @@ class MoviesRepositoryRemote implements MoviesRepository {
     required TmdbRestClient restClient,
     required String language,
     required SharedPreferences preferences,
-  })  : _restClient = restClient,
-        _language = language,
-        _preferences = preferences {
+  }) : _restClient = restClient,
+       _language = language,
+       _preferences = preferences {
     _removeExpiredDetails();
   }
 
@@ -83,7 +83,10 @@ class MoviesRepositoryRemote implements MoviesRepository {
       );
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(
-          _httpException('Falha ao carregar os filmes populares', response.response),
+          _httpException(
+            'Falha ao carregar os filmes populares',
+            response.response,
+          ),
         );
       }
 
@@ -113,7 +116,10 @@ class MoviesRepositoryRemote implements MoviesRepository {
       );
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(
-          _httpException('Falha ao carregar os detalhes do filme', response.response),
+          _httpException(
+            'Falha ao carregar os detalhes do filme',
+            response.response,
+          ),
         );
       }
       details = response.data;
@@ -135,7 +141,9 @@ class MoviesRepositoryRemote implements MoviesRepository {
         }),
       );
     } on Object catch (error) {
-      if (kDebugMode) debugPrint('Não foi possível salvar o filme $movieId: $error');
+      if (kDebugMode) {
+        debugPrint('Não foi possível salvar o filme $movieId: $error');
+      }
     }
     return Result.ok(details);
   }
@@ -170,19 +178,14 @@ class MoviesRepositoryRemote implements MoviesRepository {
 
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(
-          _httpException(
-            'Falha ao pesquisar filmes',
-            response.response,
-          ),
+          _httpException('Falha ao pesquisar filmes', response.response),
         );
       }
 
       final movies = response.data.results ?? const <Movie>[];
       return Result.ok(movies);
     } on Object catch (error) {
-      return Result.error(
-        _asException('Falha ao pesquisar filmes', error),
-      );
+      return Result.error(_asException('Falha ao pesquisar filmes', error));
     }
   }
 
@@ -204,19 +207,14 @@ class MoviesRepositoryRemote implements MoviesRepository {
 
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(
-          _httpException(
-            'Falha ao filtrar filmes',
-            response.response,
-          ),
+          _httpException('Falha ao filtrar filmes', response.response),
         );
       }
 
       final movies = response.data.results ?? const <Movie>[];
       return Result.ok(movies);
     } on Object catch (error) {
-      return Result.error(
-        _asException('Falha ao filtrar filmes', error),
-      );
+      return Result.error(_asException('Falha ao filtrar filmes', error));
     }
   }
 
@@ -227,19 +225,14 @@ class MoviesRepositoryRemote implements MoviesRepository {
 
       if (!_isSuccess(response.response.statusCode)) {
         return Result.error(
-          _httpException(
-            'Falha ao carregar os gêneros',
-            response.response,
-          ),
+          _httpException('Falha ao carregar os gêneros', response.response),
         );
       }
 
       final genres = response.data.genres ?? const <MovieGenre>[];
       return Result.ok(genres);
     } on Object catch (error) {
-      return Result.error(
-        _asException('Falha ao carregar os gêneros', error),
-      );
+      return Result.error(_asException('Falha ao carregar os gêneros', error));
     }
   }
 
@@ -254,7 +247,10 @@ class MoviesRepositoryRemote implements MoviesRepository {
         final response = await _restClient.getWatchProviders(movieId);
         if (!_isSuccess(response.response.statusCode)) {
           return Result.error(
-            _httpException('Falha ao carregar onde assistir', response.response),
+            _httpException(
+              'Falha ao carregar onde assistir',
+              response.response,
+            ),
           );
         }
 
@@ -280,8 +276,9 @@ class MoviesRepositoryRemote implements MoviesRepository {
     if (raw == null) return null;
     try {
       final entry = jsonDecode(raw) as Map<String, dynamic>;
-      final savedAt =
-          DateTime.fromMillisecondsSinceEpoch(entry['savedAt'] as int);
+      final savedAt = DateTime.fromMillisecondsSinceEpoch(
+        entry['savedAt'] as int,
+      );
       final age = DateTime.now().difference(savedAt);
       // Idade negativa: o relógio do aparelho voltou no tempo. Sem essa
       // checagem a entrada valeria até o relógio alcançar a data salva.
@@ -296,7 +293,8 @@ class MoviesRepositoryRemote implements MoviesRepository {
   /// armazenamento só cresce, e na web o localStorage tem poucos MB.
   void _removeExpiredDetails() {
     for (final key in _preferences.getKeys()) {
-      if (key.startsWith(_detailsKeyPrefix) && _readCachedDetails(key) == null) {
+      if (key.startsWith(_detailsKeyPrefix) &&
+          _readCachedDetails(key) == null) {
         _preferences.remove(key);
       }
     }
@@ -330,8 +328,14 @@ class MoviesRepositoryRemote implements MoviesRepository {
     }
   }
 
-  Future<List<Video>> _fetchVideos(int movieId, {required String language}) async {
-    final response = await _restClient.getMovieVideos(movieId, language: language);
+  Future<List<Video>> _fetchVideos(
+    int movieId, {
+    required String language,
+  }) async {
+    final response = await _restClient.getMovieVideos(
+      movieId,
+      language: language,
+    );
     if (!_isSuccess(response.response.statusCode)) {
       throw _httpException('Falha ao carregar o trailer', response.response);
     }
@@ -346,7 +350,10 @@ class MoviesRepositoryRemote implements MoviesRepository {
   static Video? _pickBestTrailer(List<Video> videos) {
     // Só sabemos reproduzir vídeos do YouTube, e sem a chave não há o que tocar.
     final playable = videos
-        .where((video) => video.site == 'YouTube' && (video.key?.isNotEmpty ?? false))
+        .where(
+          (video) =>
+              video.site == 'YouTube' && (video.key?.isNotEmpty ?? false),
+        )
         .toList();
     if (playable.isEmpty) return null;
 

@@ -10,13 +10,21 @@ import '../../../utils/tmdb_images.dart';
 /// É um widget "burro": recebe o modelo e um callback, e não conhece nem
 /// repositório nem navegação. Quem decide o que acontece no toque é a página.
 class MovieCard extends StatelessWidget {
-  const MovieCard({super.key, required this.movie, required this.onTap});
+  const MovieCard({
+    super.key,
+    required this.movie,
+    required this.onTap,
+    this.trailing,
+  });
 
   /// Filme exibido pelo cartão.
   final Movie movie;
 
   /// Chamado quando o usuário toca no cartão.
   final VoidCallback onTap;
+
+  /// Widget no canto superior direito, como o botão de remover dos favoritos.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +64,11 @@ class MovieCard extends StatelessWidget {
                       Row(
                         children: [
                           if (rating != null) ...[
-                            Icon(Icons.star_rounded,
-                                size: 16, color: theme.colorScheme.primary),
+                            Icon(
+                              Icons.star_rounded,
+                              size: 16,
+                              color: theme.colorScheme.primary,
+                            ),
                             const SizedBox(width: 2),
                             Text(rating, style: theme.textTheme.labelMedium),
                           ],
@@ -81,6 +92,8 @@ class MovieCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (trailing != null)
+                Align(alignment: Alignment.topCenter, child: trailing),
             ],
           ),
         ),

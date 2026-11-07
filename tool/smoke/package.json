@@ -1,0 +1,9 @@
+{
+  "name": "app-filmes-smoke",
+  "private": true,
+  "type": "module",
+  "description": "Smoke test do CI: abre o app_filmes web num Chrome headless e fecha.",
+  "dependencies": {
+    "playwright-core": "1.64.1"
+  }
+}

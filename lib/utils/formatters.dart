@@ -44,6 +44,8 @@ String? formatRuntime(int? minutes, AppLocalizations l10n) {
 /// nota, então devolvemos `null`.
 String? formatRating(double? voteAverage, String locale) {
   if (voteAverage == null || voteAverage <= 0) return null;
-  return NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 1)
-      .format(voteAverage);
+  return NumberFormat.decimalPatternDigits(
+    locale: locale,
+    decimalDigits: 1,
+  ).format(voteAverage);
 }
