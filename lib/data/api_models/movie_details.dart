@@ -84,9 +84,9 @@ class MovieDetails {
 
   /// Diretores do filme (há filmes com mais de um).
   List<CrewMember> get directors => [
-        for (final member in credits?.crew ?? const <CrewMember>[])
-          if (member.job == 'Director') member,
-      ];
+    for (final member in credits?.crew ?? const <CrewMember>[])
+      if (member.job == 'Director') member,
+  ];
 
   /// Classificação indicativa no país [region] (ISO 3166-1, ex.: `BR`), ou
   /// `null` quando o país não tem uma cadastrada.
@@ -95,7 +95,8 @@ class MovieDetails {
   /// não vale em outro (`14`).
   String? certificationFor(String region) {
     final upper = region.toUpperCase();
-    for (final country in releaseDates?.results ?? const <CountryReleaseDates>[]) {
+    for (final country
+        in releaseDates?.results ?? const <CountryReleaseDates>[]) {
       if (country.iso31661 != upper) continue;
       for (final release in country.releaseDates ?? const <ReleaseDate>[]) {
         final certification = release.certification?.trim();

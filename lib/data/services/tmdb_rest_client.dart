@@ -106,10 +106,7 @@ const String tmdbBaseUrl = 'https://api.themoviedb.org/3';
 /// adicione também a entrada correspondente aqui — sem ela, o conteúdo cai
 /// para [tmdbFallbackLanguage]. Quem consulta este mapa é `tmdbLanguageFor`
 /// (lib/utils/user_locale.dart).
-const Map<String, String> tmdbLanguages = {
-  'pt': 'pt-BR',
-  'en': 'en-US',
-};
+const Map<String, String> tmdbLanguages = {'pt': 'pt-BR', 'en': 'en-US'};
 
 /// Idioma usado quando a interface está num idioma sem entrada em
 /// [tmdbLanguages], e como segunda tentativa quando não há trailer no idioma

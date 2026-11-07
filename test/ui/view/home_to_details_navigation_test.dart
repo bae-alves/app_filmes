@@ -1,16 +1,22 @@
 import 'package:app_filmes/data/api_models/movie.dart';
 import 'package:app_filmes/data/api_models/movie_details.dart';
+import 'package:app_filmes/data/api_models/movie_genre.dart';
 import 'package:app_filmes/l10n/app_localizations.dart';
 import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view/movie_details_page.dart';
 import 'package:app_filmes/ui/view/widgets/movie_card.dart';
 import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
+import 'package:app_filmes/ui/view_model/favorites_view_model.dart';
 import 'package:app_filmes/ui/view_model/home_view_model.dart';
 import 'package:app_filmes/ui/view_model/movie_details_view_model.dart';
+import 'package:app_filmes/ui/view_model/movie_rating_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../fakes/fake_favorites_repository.dart';
 import '../../fakes/fake_movies_repository.dart';
+import '../../fakes/fake_ratings_repository.dart';
 import '../../fakes/movie_fixtures.dart';
 
 /// Comportamento coberto por este arquivo:
@@ -30,7 +36,14 @@ void main() {
   Widget buildApp(
     FakeMoviesRepository repository, {
     Locale locale = const Locale('pt'),
+    List<ChangeNotifier>? createdViewModels,
   }) {
+    /// Guarda as view models criadas pelas fábricas em [createdViewModels].
+    T track<T extends ChangeNotifier>(T viewModel) {
+      createdViewModels?.add(viewModel);
+      return viewModel;
+    }
+
     return MaterialApp(
       // A tela de detalhes usa textos traduzidos (seção "Onde assistir").
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -38,10 +51,21 @@ void main() {
       locale: locale,
       home: HomePage(
         viewModel: HomeViewModel(moviesRepository: repository),
-        detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
-          moviesRepository: repository,
-          movieId: movieId,
-          watchRegion: 'BR',
+        favoritesViewModel: FavoritesViewModel(
+          favoritesRepository: FakeFavoritesRepository(),
+        ),
+        detailsViewModelFactory: (movieId) => track(
+          MovieDetailsViewModel(
+            moviesRepository: repository,
+            movieId: movieId,
+            watchRegion: 'BR',
+          ),
+        ),
+        ratingViewModelFactory: (movieId) => track(
+          MovieRatingViewModel(
+            ratingsRepository: FakeRatingsRepository(),
+            movieId: movieId,
+          ),
         ),
         trailerPlayerBuilder: (context, youtubeKey) =>
             Text('trailer-fake:$youtubeKey'),
@@ -50,16 +74,17 @@ void main() {
   }
 
   FakeMoviesRepository buildRepository() => FakeMoviesRepository(
-        popularMovies: const [dunaMovie, matrixMovie],
-        detailsById: const {dunaId: dunaDetails, matrixId: matrixDetails},
-        trailersById: const {dunaId: dunaTrailer},
-        watchProvidersById: const {
-          dunaId: {'BR': dunaProvidersBr},
-        },
-      );
+    popularMovies: const [dunaMovie, matrixMovie],
+    detailsById: const {dunaId: dunaDetails, matrixId: matrixDetails},
+    trailersById: const {dunaId: dunaTrailer},
+    watchProvidersById: const {
+      dunaId: {'BR': dunaProvidersBr},
+    },
+  );
 
-  testWidgets('a tela inicial lista os filmes populares em cartões',
-      (tester) async {
+  testWidgets('a tela inicial lista os filmes populares em cartões', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildApp(buildRepository()));
     await tester.pumpAndSettle();
 
@@ -145,8 +170,9 @@ void main() {
     expect(find.textContaining('Direção'), findsNothing);
   });
 
-  testWidgets('o elenco não estoura com a fonte do sistema no dobro',
-      (tester) async {
+  testWidgets('o elenco não estoura com a fonte do sistema no dobro', (
+    tester,
+  ) async {
     tester.platformDispatcher.textScaleFactorTestValue = 2;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     await tester.pumpWidget(buildApp(buildRepository()));
@@ -164,35 +190,76 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets(
-    'filme sem trailer mostra o aviso e mantém as informações',
-    (tester) async {
-      final repository = buildRepository();
-      await tester.pumpWidget(buildApp(repository));
-      await tester.pumpAndSettle();
+  testWidgets('filme sem trailer mostra o aviso e mantém as informações', (
+    tester,
+  ) async {
+    final repository = buildRepository();
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const ValueKey(matrixId)));
-      await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey(matrixId)));
+    await tester.pumpAndSettle();
 
-      expect(find.byKey(MovieDetailsPage.trailerKey), findsNothing);
-      expect(find.byKey(MovieDetailsPage.emptyTrailerKey), findsOneWidget);
-      expect(find.text('Trailer não disponível'), findsOneWidget);
-      expect(find.text(matrixDetails.overview!), findsOneWidget);
+    expect(find.byKey(MovieDetailsPage.trailerKey), findsNothing);
+    expect(find.byKey(MovieDetailsPage.emptyTrailerKey), findsOneWidget);
+    expect(find.text('Trailer não disponível'), findsOneWidget);
+    expect(find.text(matrixDetails.overview!), findsOneWidget);
 
-      // Matrix não tem serviços cadastrados no fake: a tela avisa.
-      await tester.scrollUntilVisible(
-        find.byKey(WatchProvidersSection.unavailableKey),
-        200,
-      );
+    // Matrix não tem serviços cadastrados no fake: a tela avisa.
+    await tester.scrollUntilVisible(
+      find.byKey(WatchProvidersSection.unavailableKey),
+      200,
+    );
+    expect(
+      find.text('Indisponível em streaming na sua região'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a tela de detalhes mantém o filme quando o app é reconstruído', (
+    tester,
+  ) async {
+    final repository = buildRepository();
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard).first);
+    await tester.pumpAndSettle();
+
+    // Um novo MaterialApp reconstrói o Navigator, que reconstrói a página da
+    // rota (como numa troca de idioma ou num hot reload).
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+
+    expect(find.text(dunaDetails.overview!), findsOneWidget);
+    expect(repository.requestedDetailIds, [dunaId]);
+  });
+
+  testWidgets('voltar dos detalhes descarta as view models da tela', (
+    tester,
+  ) async {
+    final created = <ChangeNotifier>[];
+    await tester.pumpWidget(
+      buildApp(buildRepository(), createdViewModels: created),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard).first);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(created, hasLength(2), reason: 'detalhes e avaliação');
+    for (final viewModel in created) {
       expect(
-        find.text('Indisponível em streaming na sua região'),
-        findsOneWidget,
+        () => ChangeNotifier.debugAssertNotDisposed(viewModel),
+        throwsFlutterError,
       );
-    },
-  );
+    }
+  });
 
-  testWidgets('é possível voltar da tela de detalhes para a tela inicial',
-      (tester) async {
+  testWidgets('é possível voltar da tela de detalhes para a tela inicial', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildApp(buildRepository()));
     await tester.pumpAndSettle();
 
@@ -209,8 +276,75 @@ void main() {
     expect(find.byType(MovieCard), findsNWidgets(2));
   });
 
-  testWidgets('a tela inicial informa quando não há filmes para exibir',
-      (tester) async {
+  testWidgets('limpar a pesquisa apaga o campo e volta aos populares', (
+    tester,
+  ) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie, matrixMovie],
+      searchMoviesResult: const [matrixMovie],
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Limpar filtros'), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'matrix');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(find.byType(MovieCard), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Limpar filtros'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MovieCard), findsNWidgets(2));
+    expect(find.text('matrix'), findsNothing);
+    expect(find.byTooltip('Limpar filtros'), findsNothing);
+  });
+
+  testWidgets('aplicar gêneros apaga o texto da pesquisa', (tester) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie, matrixMovie],
+      searchMoviesResult: const [matrixMovie],
+      discoverMoviesResult: const [dunaMovie],
+      movieGenres: const [MovieGenre(id: 878, name: 'Ficção científica')],
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'matrix');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Filtro avançado'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.tap(find.text('Aplicar filtros'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('matrix'), findsNothing);
+    expect(find.byKey(const ValueKey(dunaId)), findsOneWidget);
+  });
+
+  testWidgets('puxar para atualizar mantém a pesquisa', (tester) async {
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie, matrixMovie],
+      searchMoviesResult: const [matrixMovie],
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'matrix');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    await tester.fling(find.byType(MovieCard), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+
+    expect(repository.forcedRefreshCount, 0);
+    expect(find.byType(MovieCard), findsOneWidget);
+    expect(find.byKey(const ValueKey(matrixId)), findsOneWidget);
+  });
+
+  testWidgets('a tela inicial informa quando não há filmes para exibir', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildApp(FakeMoviesRepository()));
     await tester.pumpAndSettle();
 
@@ -218,8 +352,9 @@ void main() {
     expect(find.byType(MovieCard), findsNothing);
   });
 
-  testWidgets('a tela inicial mostra o erro e permite tentar novamente',
-      (tester) async {
+  testWidgets('a tela inicial mostra o erro e permite tentar novamente', (
+    tester,
+  ) async {
     final repository = FakeMoviesRepository(
       popularError: Exception('falha de rede'),
     );
@@ -236,8 +371,9 @@ void main() {
     expect(repository.forcedRefreshCount, 1);
   });
 
-  testWidgets('o cartão exibe o filme recebido, sem conhecer o repositório',
-      (tester) async {
+  testWidgets('o cartão exibe o filme recebido, sem conhecer o repositório', (
+    tester,
+  ) async {
     Movie? tapped;
     await tester.pumpWidget(
       MaterialApp(
@@ -245,10 +381,7 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('pt'),
         home: Scaffold(
-          body: MovieCard(
-            movie: dunaMovie,
-            onTap: () => tapped = dunaMovie,
-          ),
+          body: MovieCard(movie: dunaMovie, onTap: () => tapped = dunaMovie),
         ),
       ),
     );
@@ -261,17 +394,21 @@ void main() {
     expect(tapped, same(dunaMovie));
   });
 
-  testWidgets('com mais de 10 no elenco, "Ver todos" abre o elenco completo',
-      (tester) async {
+  testWidgets('com mais de 10 no elenco, "Ver todos" abre o elenco completo', (
+    tester,
+  ) async {
     final repository = FakeMoviesRepository(
       popularMovies: const [matrixMovie],
       detailsById: {
         matrixId: MovieDetails(
           id: matrixId,
           title: 'Matrix',
-          credits: Credits(cast: [
-            for (var i = 1; i <= 11; i++) CastMember(name: 'Ator $i', order: i),
-          ]),
+          credits: Credits(
+            cast: [
+              for (var i = 1; i <= 11; i++)
+                CastMember(name: 'Ator $i', order: i),
+            ],
+          ),
         ),
       },
     );
@@ -294,8 +431,9 @@ void main() {
     expect(find.text('Ator 11'), findsOneWidget);
   });
 
-  testWidgets('falha em onde assistir não aparece como "indisponível"',
-      (tester) async {
+  testWidgets('falha em onde assistir não aparece como "indisponível"', (
+    tester,
+  ) async {
     final repository = FakeMoviesRepository(
       popularMovies: const [dunaMovie],
       detailsById: const {dunaId: dunaDetails},
@@ -314,6 +452,39 @@ void main() {
     expect(find.byKey(WatchProvidersSection.unavailableKey), findsNothing);
   });
 
+  testWidgets('tocar no logo de um serviço abre o link do TMDB fora do app', (
+    tester,
+  ) async {
+    // No teste não há plugin nativo: o url_launcher cai neste canal.
+    const channel = MethodChannel('plugins.flutter.io/url_launcher');
+    final opened = <Map<Object?, Object?>>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+      call,
+    ) async {
+      if (call.method == 'launch') opened.add(call.arguments as Map);
+      return true;
+    });
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        channel,
+        null,
+      ),
+    );
+    await tester.pumpWidget(buildApp(buildRepository()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(MovieCard).first);
+    await tester.pumpAndSettle();
+
+    // O logo já existe fora da tela (dentro do cacheExtent da lista).
+    await tester.ensureVisible(find.byTooltip('Netflix'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Netflix'));
+    await tester.pump();
+
+    expect(opened.single['url'], dunaProvidersBr.link);
+    expect(opened.single['useWebView'], isFalse, reason: 'abre fora do app');
+  });
+
   group('com a barra de navegação do sistema por cima do app', () {
     /// Altura da barra de navegação do Android (edge-to-edge) na tela de teste.
     const navigationBar = 48.0;
@@ -328,13 +499,16 @@ void main() {
       addTearDown(tester.view.reset);
     }
 
-    testWidgets('o último filme da lista termina acima da barra',
-        (tester) async {
+    testWidgets('o último filme da lista termina acima da barra', (
+      tester,
+    ) async {
       useNavigationBar(tester);
       final movies = [
         for (var id = 1; id <= 12; id++) Movie(id: id, title: 'Filme $id'),
       ];
-      await tester.pumpWidget(buildApp(FakeMoviesRepository(popularMovies: movies)));
+      await tester.pumpWidget(
+        buildApp(FakeMoviesRepository(popularMovies: movies)),
+      );
       await tester.pumpAndSettle();
 
       await tester.drag(find.byType(ListView), const Offset(0, -10000));
@@ -346,8 +520,9 @@ void main() {
       );
     });
 
-    testWidgets('o fim da tela de detalhes termina acima da barra',
-        (tester) async {
+    testWidgets('o fim da tela de detalhes termina acima da barra', (
+      tester,
+    ) async {
       useNavigationBar(tester);
       await tester.pumpWidget(buildApp(buildRepository()));
       await tester.pumpAndSettle();
@@ -366,8 +541,9 @@ void main() {
   });
 
   group('em inglês', () {
-    testWidgets('a home e os detalhes aparecem traduzidos e formatados',
-        (tester) async {
+    testWidgets('a home e os detalhes aparecem traduzidos e formatados', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         buildApp(buildRepository(), locale: const Locale('en')),
       );
@@ -402,8 +578,9 @@ void main() {
       expect(find.text('Trailer not available'), findsOneWidget);
     });
 
-    testWidgets('o erro aparece traduzido, com o botão de tentar de novo',
-        (tester) async {
+    testWidgets('o erro aparece traduzido, com o botão de tentar de novo', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         buildApp(
           FakeMoviesRepository(popularError: Exception('falha de rede')),
