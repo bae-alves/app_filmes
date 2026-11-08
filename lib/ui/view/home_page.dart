@@ -31,6 +31,7 @@ class HomePage extends StatefulWidget {
     required this.ratingViewModelFactory,
     required this.favoritesViewModel,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
+    required this.onOpenChat,
   });
 
   /// Estado e comandos da tela.
@@ -38,6 +39,7 @@ class HomePage extends StatefulWidget {
 
   /// Lista de favoritos, aberta pelo botão da AppBar.
   final FavoritesViewModel favoritesViewModel;
+  final VoidCallback onOpenChat;
 
   /// Fábrica da view model usada ao abrir a tela de detalhes.
   final MovieDetailsViewModelFactory detailsViewModelFactory;
@@ -184,6 +186,11 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(l10n.homeTitle),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            tooltip: 'Assistente de recomendações',
+            onPressed: widget.onOpenChat,
+          ),
           IconButton(
             icon: const Icon(Icons.favorite_border),
             tooltip: l10n.favoritesTitle,

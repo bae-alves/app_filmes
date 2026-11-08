@@ -48,6 +48,7 @@ void main() {
           movieId: movieId,
         ),
         trailerPlayerBuilder: (context, youtubeKey) => const SizedBox(),
+        onOpenChat: () {},
       ),
     );
   }

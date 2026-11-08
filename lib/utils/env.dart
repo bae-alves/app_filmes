@@ -20,6 +20,7 @@ abstract final class Env {
   /// Chave de API v3. Mantida para endpoints/ferramentas que ainda usam o
   /// parâmetro `api_key`; a autenticação padrão do app é via [tmdbReadToken].
   static String get tmdbApiKey => _require('TMDB_API_KEY');
+  static String get geminiApiKey => _require('GEMINI_API_KEY');
 
   static String _require(String key) {
     final value = dotenv.env[key]?.trim();

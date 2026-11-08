@@ -19,6 +19,9 @@ import 'ui/view_model/movie_details_view_model.dart';
 import 'ui/view_model/movie_rating_view_model.dart';
 import 'utils/env.dart';
 import 'utils/user_locale.dart';
+import 'data/services/gemini_service.dart';
+import 'ui/view/chat_page.dart';
+import 'ui/view_model/chat_view_model.dart';
 
 Future<void> main() async {
   // `ensureInitialized` é necessário porque carregamos o .env (um asset) e o
@@ -57,6 +60,8 @@ class _AppFilmesState extends State<AppFilmes> {
   late final MoviesRepository _moviesRepository;
   late final RatingsRepository _ratingsRepository;
   late final HomeViewModel _homeViewModel;
+  late final GeminiService _geminiService;
+  late final ChatViewModel _chatViewModel;
   late final FavoritesViewModel _favoritesViewModel;
 
   @override
@@ -71,6 +76,13 @@ class _AppFilmesState extends State<AppFilmes> {
       preferences: widget.preferences,
     );
     _homeViewModel = HomeViewModel(moviesRepository: _moviesRepository);
+
+    _geminiService = GeminiService(apiKey: () => Env.geminiApiKey);
+
+    _chatViewModel = ChatViewModel(
+      geminiService: _geminiService,
+      moviesRepository: _moviesRepository,
+    );
     // Sem login, os favoritos ficam só no aparelho. Veja FavoritesRepository.
     _favoritesViewModel = FavoritesViewModel(
       favoritesRepository: FavoritesRepositoryLocal(database: widget.database),
@@ -82,6 +94,7 @@ class _AppFilmesState extends State<AppFilmes> {
   @override
   void dispose() {
     _homeViewModel.dispose();
+    _chatViewModel.dispose();
     _favoritesViewModel.dispose();
     super.dispose();
   }
@@ -93,24 +106,28 @@ class _AppFilmesState extends State<AppFilmes> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
       ),
-      // Idiomas suportados (EN e PT) e os textos traduzidos de lib/l10n. O
-      // Flutter escolhe o idioma pela localidade do dispositivo, caindo para o
-      // primeiro da lista quando ela não é suportada.
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: HomePage(
-        viewModel: _homeViewModel,
-        favoritesViewModel: _favoritesViewModel,
-        detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
-          moviesRepository: _moviesRepository,
-          movieId: movieId,
-          // Lida a cada abertura: se o usuário trocar a região do aparelho,
-          // a próxima tela de detalhes já reflete a mudança.
-          watchRegion: currentWatchRegion(),
-        ),
-        ratingViewModelFactory: (movieId) => MovieRatingViewModel(
-          ratingsRepository: _ratingsRepository,
-          movieId: movieId,
+      home: Builder(
+        builder: (context) => HomePage(
+          viewModel: _homeViewModel,
+          favoritesViewModel: _favoritesViewModel,
+          detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
+            moviesRepository: _moviesRepository,
+            movieId: movieId,
+            watchRegion: currentWatchRegion(),
+          ),
+          ratingViewModelFactory: (movieId) => MovieRatingViewModel(
+            ratingsRepository: _ratingsRepository,
+            movieId: movieId,
+          ),
+          onOpenChat: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => ChatPage(viewModel: _chatViewModel),
+              ),
+            );
+          },
         ),
       ),
     );

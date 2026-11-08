@@ -44,6 +44,7 @@ void main() {
         ratingViewModelFactory: (movieId) =>
             MovieRatingViewModel(ratingsRepository: ratings, movieId: movieId),
         trailerPlayerBuilder: (context, youtubeKey) => const SizedBox(),
+        onOpenChat: () {},
       ),
     );
   }
