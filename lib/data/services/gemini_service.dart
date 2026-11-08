@@ -3,11 +3,13 @@ import 'dart:convert';
 
 /// Serviço responsável por interpretar as preferências do usuário com a Gemini.
 class GeminiService {
-  GeminiService({required String apiKey, Dio? dio})
+  GeminiService({required String Function() apiKey, Dio? dio})
     : _apiKey = apiKey,
       _dio = dio ?? Dio();
 
-  final String _apiKey;
+  /// Lida só ao enviar uma mensagem: a chave serve apenas ao chat, e o app
+  /// precisa abrir mesmo sem ela no `.env`.
+  final String Function() _apiKey;
   final Dio _dio;
 
   static const String _baseUrl =
@@ -23,7 +25,7 @@ class GeminiService {
       '$_baseUrl/models/gemini-2.5-flash:generateContent',
       options: Options(
         headers: {
-          'x-goog-api-key': _apiKey,
+          'x-goog-api-key': _apiKey(),
           'Content-Type': 'application/json',
         },
         receiveTimeout: const Duration(seconds: 5),

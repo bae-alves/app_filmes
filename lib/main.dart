@@ -77,7 +77,7 @@ class _AppFilmesState extends State<AppFilmes> {
     );
     _homeViewModel = HomeViewModel(moviesRepository: _moviesRepository);
 
-    _geminiService = GeminiService(apiKey: Env.geminiApiKey);
+    _geminiService = GeminiService(apiKey: () => Env.geminiApiKey);
 
     _chatViewModel = ChatViewModel(
       geminiService: _geminiService,
