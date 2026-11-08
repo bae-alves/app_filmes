@@ -3,6 +3,7 @@ import '../api_models/movie.dart';
 import '../api_models/movie_details.dart';
 import '../api_models/movie_genre.dart';
 import '../api_models/video.dart';
+import '../api_models/watch_providers.dart';
 
 /// Fonte única da verdade sobre filmes para a aplicação.
 ///
@@ -42,4 +43,15 @@ abstract class MoviesRepository {
   /// O sucesso com valor `null` é legítimo e diferente de erro: significa que
   /// a requisição funcionou, mas o filme não tem trailer publicado.
   Future<Result<Video?>> getMovieTrailer(int movieId);
+
+  /// Onde assistir o filme [movieId] no país [region].
+  ///
+  /// [region] é um código ISO 3166-1 de duas letras (`BR`, `US`...) e deve vir
+  /// da região do usuário — veja `currentWatchRegion`. Assim como em
+  /// [getMovieTrailer], o sucesso com valor `null` é legítimo: significa que o
+  /// filme não está em nenhum serviço naquele país.
+  Future<Result<WatchProviderRegion?>> getWatchProviders(
+    int movieId, {
+    required String region,
+  });
 }

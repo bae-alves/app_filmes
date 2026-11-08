@@ -1,3 +1,4 @@
+import 'package:app_filmes/data/api_models/movie_details.dart';
 import 'package:app_filmes/ui/view_model/movie_details_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,6 +14,7 @@ void main() {
     final viewModel = MovieDetailsViewModel(
       moviesRepository: repository,
       movieId: dunaId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -31,6 +33,7 @@ void main() {
         detailsById: const {matrixId: matrixDetails},
       ),
       movieId: matrixId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -47,6 +50,7 @@ void main() {
         trailerError: Exception('vídeos indisponíveis'),
       ),
       movieId: dunaId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -61,6 +65,7 @@ void main() {
     final viewModel = MovieDetailsViewModel(
       moviesRepository: FakeMoviesRepository(detailsError: failure),
       movieId: dunaId,
+      watchRegion: 'BR',
     );
 
     await viewModel.load();
@@ -75,6 +80,7 @@ void main() {
         detailsById: const {dunaId: dunaDetails},
       ),
       movieId: dunaId,
+      watchRegion: 'BR',
     );
     var notifications = 0;
     viewModel.addListener(() => notifications++);
@@ -82,5 +88,131 @@ void main() {
     await viewModel.load();
 
     expect(notifications, 2);
+  });
+
+  test('load busca onde assistir na região informada', () async {
+    final repository = FakeMoviesRepository(
+      detailsById: const {dunaId: dunaDetails},
+      watchProvidersById: const {
+        dunaId: {'BR': dunaProvidersBr, 'US': dunaProvidersUs},
+      },
+    );
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: repository,
+      movieId: dunaId,
+      watchRegion: 'US',
+    );
+
+    await viewModel.load();
+
+    expect(repository.requestedWatchRegions, ['US']);
+    expect(viewModel.watchProviders, same(dunaProvidersUs));
+    expect(viewModel.watchProvidersFailed, isFalse);
+  });
+
+  test(
+    'watchProviders é null quando o filme não está em nenhum serviço',
+    () async {
+      final viewModel = MovieDetailsViewModel(
+        moviesRepository: FakeMoviesRepository(
+          detailsById: const {matrixId: matrixDetails},
+        ),
+        movieId: matrixId,
+        watchRegion: 'BR',
+      );
+
+      await viewModel.load();
+
+      expect(viewModel.watchProviders, isNull);
+    },
+  );
+
+  test(
+    'falha em onde assistir não impede a exibição das informações',
+    () async {
+      final viewModel = MovieDetailsViewModel(
+        moviesRepository: FakeMoviesRepository(
+          detailsById: const {dunaId: dunaDetails},
+          watchProvidersError: Exception('provedores indisponíveis'),
+        ),
+        movieId: dunaId,
+        watchRegion: 'BR',
+      );
+
+      await viewModel.load();
+
+      expect(viewModel.details?.title, 'Duna: Parte Dois');
+      expect(viewModel.watchProviders, isNull);
+      expect(viewModel.watchProvidersFailed, isTrue);
+      expect(viewModel.error, isNull, reason: 'a tela ainda é utilizável');
+    },
+  );
+
+  test('directorNames lista só os diretores com nome', () async {
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {
+          matrixId: MovieDetails(
+            id: matrixId,
+            credits: Credits(
+              crew: [
+                CrewMember(name: 'Lana Wachowski', job: 'Director'),
+                CrewMember(name: '', job: 'Director'),
+                CrewMember(job: 'Director'),
+                CrewMember(name: 'Don Davis', job: 'Original Music Composer'),
+              ],
+            ),
+          ),
+        },
+      ),
+      movieId: matrixId,
+      watchRegion: 'BR',
+    );
+
+    expect(viewModel.directorNames, isEmpty, reason: 'antes do load');
+    await viewModel.load();
+
+    expect(viewModel.directorNames, ['Lana Wachowski']);
+  });
+
+  test('cast segue a ordem dos créditos, sem ordem no fim', () async {
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {
+          matrixId: MovieDetails(
+            id: matrixId,
+            credits: Credits(
+              cast: [
+                CastMember(name: 'C'),
+                CastMember(name: 'B', order: 1),
+                CastMember(name: 'A', order: 0),
+              ],
+            ),
+          ),
+        },
+      ),
+      movieId: matrixId,
+      watchRegion: 'BR',
+    );
+
+    expect(viewModel.cast, isEmpty, reason: 'antes do load');
+    await viewModel.load();
+
+    expect([for (final member in viewModel.cast) member.name], ['A', 'B', 'C']);
+  });
+
+  test('load que termina depois do dispose não falha', () async {
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {dunaId: dunaDetails},
+      ),
+      movieId: dunaId,
+      watchRegion: 'BR',
+    );
+
+    final load = viewModel.load();
+    viewModel.dispose();
+
+    await expectLater(load, completes);
   });
 }

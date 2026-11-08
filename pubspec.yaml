@@ -39,8 +39,22 @@ dependencies:
   json_annotation: ^4.12.0
   pretty_dio_logger: ^1.4.0
   flutter_dotenv: ^6.0.1
-  youtube_player_flutter: ^10.0.1
+  # Player do trailer. Usado direto, e não pelo youtube_player_flutter, porque
+  # este não deixa escolher o formato da miniatura (veja TrailerPlayer).
+  youtube_player_iframe: ^6.0.2
   url_launcher: ^6.3.2
+  # Ícones da interface (https://lucide.dev). Logos de serviços de streaming
+  # não fazem parte do Lucide: vêm como imagem do TMDB.
+  lucide_icons_flutter: ^3.1.24
+  # Internacionalização (EN / PT-BR). A versão do intl é fixada pelo
+  # flutter_localizations do SDK, por isso não usamos `^` aqui.
+  intl: ^0.20.3
+  flutter_localizations:
+    sdk: flutter
+  shared_preferences: ^2.5.6
+  sqflite: ^2.4.5
+  sqflite_common_ffi_web: ^1.2.0
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +69,7 @@ dev_dependencies:
   build_runner: ^2.15.1
   retrofit_generator: ^10.2.9
   json_serializable: ^6.14.1
+  sqflite_common_ffi: ^2.4.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -66,6 +81,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Gera `AppLocalizations` a partir dos arquivos .arb de lib/l10n
+  # (configuração em l10n.yaml). Veja a seção "Internacionalização" do README.
+  generate: true
 
   # O arquivo .env guarda as credenciais do TMDB e é carregado em tempo de
   # execução pelo flutter_dotenv. Ele está no .gitignore: cada desenvolvedor

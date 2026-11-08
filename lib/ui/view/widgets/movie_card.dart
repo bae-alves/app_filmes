@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../data/api_models/movie.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../utils/formatters.dart';
 import '../../../utils/tmdb_images.dart';
 
@@ -9,7 +10,12 @@ import '../../../utils/tmdb_images.dart';
 /// É um widget "burro": recebe o modelo e um callback, e não conhece nem
 /// repositório nem navegação. Quem decide o que acontece no toque é a página.
 class MovieCard extends StatelessWidget {
-  const MovieCard({super.key, required this.movie, required this.onTap});
+  const MovieCard({
+    super.key,
+    required this.movie,
+    required this.onTap,
+    this.trailing,
+  });
 
   /// Filme exibido pelo cartão.
   final Movie movie;
@@ -17,11 +23,18 @@ class MovieCard extends StatelessWidget {
   /// Chamado quando o usuário toca no cartão.
   final VoidCallback onTap;
 
+  /// Widget no canto superior direito, como o botão de remover dos favoritos.
+  final Widget? trailing;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final year = formatReleaseYear(movie.releaseDate);
-    final rating = formatRating(movie.voteAverage);
+    final l10n = AppLocalizations.of(context);
+    final rating = formatRating(
+      movie.voteAverage,
+      Localizations.localeOf(context).toString(),
+    );
     final posterUrl = TmdbImages.poster(movie.posterPath, size: 'w185');
 
     return Card(
@@ -42,7 +55,7 @@ class MovieCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        movie.title ?? movie.originalTitle ?? 'Sem título',
+                        movie.title ?? movie.originalTitle ?? l10n.untitled,
                         style: theme.textTheme.titleMedium,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -51,8 +64,11 @@ class MovieCard extends StatelessWidget {
                       Row(
                         children: [
                           if (rating != null) ...[
-                            Icon(Icons.star_rounded,
-                                size: 16, color: theme.colorScheme.primary),
+                            Icon(
+                              Icons.star_rounded,
+                              size: 16,
+                              color: theme.colorScheme.primary,
+                            ),
                             const SizedBox(width: 2),
                             Text(rating, style: theme.textTheme.labelMedium),
                           ],
@@ -67,7 +83,7 @@ class MovieCard extends StatelessWidget {
                         child: Text(
                           movie.overview?.isNotEmpty == true
                               ? movie.overview!
-                              : 'Sinopse não disponível.',
+                              : l10n.synopsisUnavailable,
                           style: theme.textTheme.bodySmall,
                           overflow: TextOverflow.fade,
                         ),
@@ -76,6 +92,8 @@ class MovieCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (trailing != null)
+                Align(alignment: Alignment.topCenter, child: trailing),
             ],
           ),
         ),

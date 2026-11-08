@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../data/api_models/movie.dart';
+import '../../l10n/app_localizations.dart';
+import '../view_model/favorites_view_model.dart';
 import '../view_model/home_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
+import '../view_model/movie_rating_view_model.dart';
+import 'favorites_page.dart';
 import 'movie_details_page.dart';
 import 'widgets/movie_card.dart';
 import 'widgets/trailer_player.dart';
@@ -11,9 +15,12 @@ import 'widgets/trailer_player.dart';
 ///
 /// A home não conhece repositórios: ela apenas pede a view model já montada
 /// para quem a construiu (o `main.dart`, ou o teste).
-typedef MovieDetailsViewModelFactory = MovieDetailsViewModel Function(
-  int movieId,
-);
+typedef MovieDetailsViewModelFactory =
+    MovieDetailsViewModel Function(int movieId);
+
+/// Cria a view model da avaliação de um filme, mostrada na tela de detalhes.
+typedef MovieRatingViewModelFactory =
+    MovieRatingViewModel Function(int movieId);
 
 /// Tela inicial: lista os filmes populares e leva aos detalhes de cada um.
 class HomePage extends StatefulWidget {
@@ -21,16 +28,24 @@ class HomePage extends StatefulWidget {
     super.key,
     required this.viewModel,
     required this.detailsViewModelFactory,
+    required this.ratingViewModelFactory,
+    required this.favoritesViewModel,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
     required this.onOpenChat,
   });
 
   /// Estado e comandos da tela.
   final HomeViewModel viewModel;
+
+  /// Lista de favoritos, aberta pelo botão da AppBar.
+  final FavoritesViewModel favoritesViewModel;
   final VoidCallback onOpenChat;
 
   /// Fábrica da view model usada ao abrir a tela de detalhes.
   final MovieDetailsViewModelFactory detailsViewModelFactory;
+
+  /// Fábrica da view model da avaliação, também usada ao abrir os detalhes.
+  final MovieRatingViewModelFactory ratingViewModelFactory;
 
   /// Repassado para a tela de detalhes. Veja [TrailerPlayerBuilder].
   final TrailerPlayerBuilder trailerPlayerBuilder;
@@ -55,115 +70,131 @@ class _HomePageState extends State<HomePage> {
   /// arquitetura em camadas: a view model continua sem depender do Navigator.
   void _openDetails(Movie movie) {
     Navigator.of(context).push(
+      MovieDetailsPage.route(
+        viewModel: widget.detailsViewModelFactory(movie.id),
+        ratingViewModel: widget.ratingViewModelFactory(movie.id),
+        favoritesViewModel: widget.favoritesViewModel,
+        fallbackTitle: movie.title,
+        trailerPlayerBuilder: widget.trailerPlayerBuilder,
+      ),
+    );
+  }
+
+  void _openFavorites() {
+    Navigator.of(context).push(
       MaterialPageRoute<void>(
-        settings: const RouteSettings(name: MovieDetailsPage.routeName),
-        builder: (_) => MovieDetailsPage(
-          viewModel: widget.detailsViewModelFactory(movie.id),
-          fallbackTitle: movie.title,
+        builder: (_) => FavoritesPage(
+          viewModel: widget.favoritesViewModel,
+          detailsViewModelFactory: widget.detailsViewModelFactory,
+          ratingViewModelFactory: widget.ratingViewModelFactory,
           trailerPlayerBuilder: widget.trailerPlayerBuilder,
         ),
       ),
     );
   }
-Future<void> _openAdvancedFilter() async {
-  await widget.viewModel.loadGenres();
 
-  if (!mounted) return;
+  Future<void> _openAdvancedFilter() async {
+    await widget.viewModel.loadGenres();
 
-  showModalBottomSheet<void>(
-    context: context,
-    builder: (context) {
-      return ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) {
-          final viewModel = widget.viewModel;
+    if (!mounted) return;
 
-          if (viewModel.isLoadingGenres) {
-            return const SizedBox(
-              height: 300,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (context) {
+        return ListenableBuilder(
+          listenable: widget.viewModel,
+          builder: (context, _) {
+            final viewModel = widget.viewModel;
 
-          if (viewModel.genresError != null) {
-            return const SizedBox(
-              height: 300,
-              child: Center(
-                child: Text('Não foi possível carregar os gêneros.'),
-              ),
-            );
-          }
+            if (viewModel.isLoadingGenres) {
+              return const SizedBox(
+                height: 300,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
 
-          return SafeArea(
-            child: Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Filtro avançado',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            if (viewModel.genresError != null) {
+              return SizedBox(
+                height: 300,
+                child: Center(
+                  child: Text(AppLocalizations.of(context).genresLoadError),
+                ),
+              );
+            }
+
+            return SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      AppLocalizations.of(context).advancedFilter,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
 
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: viewModel.genres.length,
-                    itemBuilder: (context, index) {
-                      final genre = viewModel.genres[index];
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: viewModel.genres.length,
+                      itemBuilder: (context, index) {
+                        final genre = viewModel.genres[index];
 
-                      return CheckboxListTile(
-                        title: Text(genre.name),
-                        value: viewModel.selectedGenreIds.contains(
-                          genre.id,
-                        ),
-                        onChanged: (_) {
-                          viewModel.toggleGenre(genre.id);
-                        },
-                      );
-                    },
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () async {
-                        await viewModel.applyGenreFilter();
-
-                        if (!context.mounted) return;
-
-                        Navigator.of(context).pop();
+                        return CheckboxListTile(
+                          title: Text(genre.name),
+                          value: viewModel.selectedGenreIds.contains(genre.id),
+                          onChanged: (_) {
+                            viewModel.toggleGenre(genre.id);
+                          },
+                        );
                       },
-                      child: const Text('Aplicar filtros'),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () async {
+                          _searchController.clear();
+                          await viewModel.applyGenreFilter();
+
+                          if (!context.mounted) return;
+
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(AppLocalizations.of(context).applyFilters),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-            appBar: AppBar(
-        title: const Text('Filmes populares'),
+      appBar: AppBar(
+        title: Text(l10n.homeTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.auto_awesome),
             tooltip: 'Assistente de recomendações',
             onPressed: widget.onOpenChat,
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite_border),
+            tooltip: l10n.favoritesTitle,
+            onPressed: _openFavorites,
           ),
         ],
       ),
@@ -176,104 +207,51 @@ Future<void> _openAdvancedFilter() async {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final error = viewModel.error;
-          if (error != null) {
+          // O detalhe técnico do erro vai para o log (veja a view model); o
+          // usuário vê uma mensagem traduzida.
+          if (viewModel.error != null) {
             return _ErrorState(
-              message: error.toString(),
-              onRetry: () => viewModel.load(forceRefresh: true),
+              message: l10n.homeLoadError,
+              onRetry: viewModel.refresh,
             );
           }
 
           if (viewModel.isEmpty) {
             return Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: TextField(
-                    controller: _searchController,
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (_) => _search(),
-                    decoration: InputDecoration(
-                      labelText: 'Nome do filme',
-                      hintText: 'Digite o nome do filme',
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.search),
-                            onPressed: _search,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.tune),
-                            tooltip: 'Filtro avançado',
-                            onPressed: _openAdvancedFilter,
-                          ),
-                        ],
-                      ),
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const Expanded(
-                  child: Center(
-                    child: Text('Nenhum filme encontrado no momento.'),
-                  ),
-                ),
+                _buildSearchField(l10n),
+                Expanded(child: Center(child: Text(l10n.homeEmpty))),
               ],
             );
           }
 
           return Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: _searchController,
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (_) => _search(),
-                  decoration: InputDecoration(
-                    labelText: 'Nome do filme',
-                    hintText: 'Digite o nome do filme',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.search),
-                          onPressed: _search,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.tune),
-                          tooltip: 'Filtro avançado',
-                          onPressed: _openAdvancedFilter,
-                        ),
-                      ],
-                    ),
-                    border: const OutlineInputBorder(),
+              _buildSearchField(l10n),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: viewModel.refresh,
+                  child: ListView.builder(
+                    // Padding explícito desliga o recuo automático do sistema:
+                    // sem somá-lo, o fim da lista fica sob a barra de navegação.
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8) +
+                        MediaQuery.paddingOf(context),
+                    itemCount: viewModel.movies.length,
+                    itemBuilder: (context, index) {
+                      final movie = viewModel.movies[index];
+                      return MovieCard(
+                        key: ValueKey(movie.id),
+                        movie: movie,
+                        onTap: () => _openDetails(movie),
+                      );
+                    },
                   ),
                 ),
               ),
-              Expanded(
-                child: RefreshIndicator(
-            onRefresh: () => viewModel.load(forceRefresh: true),
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: viewModel.movies.length,
-              itemBuilder: (context, index) {
-                final movie = viewModel.movies[index];
-                return MovieCard(
-                  key: ValueKey(movie.id),
-                  movie: movie,
-                  onTap: () => _openDetails(movie),
-                );
-              },
-            ),
-          ),
-              ),
             ],
           );
-        }
+        },
       ),
     );
   }
@@ -284,8 +262,55 @@ Future<void> _openAdvancedFilter() async {
     super.dispose();
   }
 
+  /// Campo de pesquisa com os botões de pesquisar e de filtro avançado.
+  ///
+  /// Aparece tanto com a lista cheia quanto vazia: o usuário precisa poder
+  /// pesquisar de novo depois de uma busca sem resultado.
+  Widget _buildSearchField(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _searchController,
+        textInputAction: TextInputAction.search,
+        onSubmitted: (_) => _search(),
+        decoration: InputDecoration(
+          labelText: l10n.searchLabel,
+          hintText: l10n.searchHint,
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.viewModel.hasFilters)
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: l10n.clearFilters,
+                  onPressed: _clearFilters,
+                ),
+              IconButton(
+                icon: const Icon(Icons.search),
+                tooltip: l10n.searchTooltip,
+                onPressed: _search,
+              ),
+              IconButton(
+                icon: const Icon(Icons.tune),
+                tooltip: l10n.advancedFilter,
+                onPressed: _openAdvancedFilter,
+              ),
+            ],
+          ),
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
   void _search() {
     widget.viewModel.search(_searchController.text);
+  }
+
+  void _clearFilters() {
+    _searchController.clear();
+    widget.viewModel.clearFilters();
   }
 }
 
@@ -310,7 +335,7 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onRetry,
-              child: const Text('Tentar novamente'),
+              child: Text(AppLocalizations.of(context).retry),
             ),
           ],
         ),

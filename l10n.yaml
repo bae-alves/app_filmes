@@ -1,0 +1,14 @@
+# Configuração do gerador de traduções do Flutter (gen-l10n).
+#
+# Os textos ficam em lib/l10n/app_<idioma>.arb. O arquivo em português é o
+# modelo: toda chave nova nasce nele (com a descrição em "@chave") e depois é
+# traduzida em app_en.arb. O código gerado (`AppLocalizations`) é recriado a
+# cada `flutter pub get` / `flutter run`.
+#
+# Referência: https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization
+arb-dir: lib/l10n
+template-arb-file: app_pt.arb
+output-localization-file: app_localizations.dart
+# Sem isso, `AppLocalizations.of(context)` devolve um tipo anulável e cada uso
+# precisaria de `!`.
+nullable-getter: false
