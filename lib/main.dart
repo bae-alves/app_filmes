@@ -38,6 +38,8 @@ class _AppFilmesState extends State<AppFilmes> {
   late final HomeViewModel _homeViewModel;
   late final GeminiService _geminiService;
   late final ChatViewModel _chatViewModel;
+
+  BuildContext? _homePageContext;
   @override
   void initState() {
     super.initState();
@@ -54,6 +56,7 @@ class _AppFilmesState extends State<AppFilmes> {
 
     _chatViewModel = ChatViewModel(
       geminiService: _geminiService,
+      moviesRepository: _moviesRepository,
     );
   }
 
@@ -71,23 +74,29 @@ class _AppFilmesState extends State<AppFilmes> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
       ),
-      home: HomePage(
+      home: Builder(
+      builder: (context) {
+        _homePageContext = context;
+        return HomePage(
         viewModel: _homeViewModel,
         detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
           moviesRepository: _moviesRepository,
           movieId: movieId,
-        ),
+        ),        
         onOpenChat: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => ChatPage(
-                viewModel: _chatViewModel,
-              ),
+        Navigator.of(
+          _homePageContext!,
+        ).push(
+          MaterialPageRoute(
+            builder: (_) => ChatPage(
+              viewModel: _chatViewModel,
             ),
-          );
-        },
-      ),
-
+          ),
+        );
+      },
+      );
+      },
+    ),
     );
   }
 }

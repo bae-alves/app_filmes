@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../view_model/chat_message.dart';
 import '../view_model/chat_view_model.dart';
+import 'widgets/movie_card.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({
@@ -88,8 +89,7 @@ class _ChatPageState extends State<ChatPage> {
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: messages.length +
-                      (widget.viewModel.isLoading ? 1 : 0),
+                  itemCount: messages.length + (widget.viewModel.isLoading ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index >= messages.length) {
                       return const Padding(
@@ -103,7 +103,23 @@ class _ChatPageState extends State<ChatPage> {
 
                     final message = messages[index];
 
-                    return _MessageBubble(message: message);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (message.text.isNotEmpty)
+                          _MessageBubble(message: message),
+
+                        if (message.movies.isNotEmpty)
+                          ...message.movies.map(
+                            (movie) => MovieCard(
+                              movie: movie,
+                              onTap: () {
+                                // A navegação para os detalhes será conectada depois.
+                              },
+                            ),
+                          ),
+                      ],
+                    );
                   },
                 );
               },
