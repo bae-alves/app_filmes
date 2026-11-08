@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../view_model/chat_message.dart';
@@ -6,10 +5,7 @@ import '../view_model/chat_view_model.dart';
 import 'widgets/movie_card.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({
-    super.key,
-    required this.viewModel,
-  });
+  const ChatPage({super.key, required this.viewModel});
 
   final ChatViewModel viewModel;
 
@@ -62,10 +58,7 @@ class _ChatPageState extends State<ChatPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.movie_filter_outlined,
-                            size: 64,
-                          ),
+                          Icon(Icons.movie_filter_outlined, size: 64),
                           SizedBox(height: 16),
                           Text(
                             'Qual é o seu clima para hoje?',
@@ -89,7 +82,8 @@ class _ChatPageState extends State<ChatPage> {
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: messages.length + (widget.viewModel.isLoading ? 1 : 0),
+                  itemCount:
+                      messages.length + (widget.viewModel.isLoading ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index >= messages.length) {
                       return const Padding(
@@ -135,9 +129,7 @@ class _ChatPageState extends State<ChatPage> {
                 children: [
                   if (error != null)
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         error,
                         style: const TextStyle(color: Colors.red),
@@ -153,16 +145,14 @@ class _ChatPageState extends State<ChatPage> {
                             child: TextField(
                               controller: _controller,
                               enabled: !widget.viewModel.isLoading,
-                              textCapitalization:
-                                  TextCapitalization.sentences,
+                              textCapitalization: TextCapitalization.sentences,
                               onSubmitted: (_) => _sendMessage(),
                               decoration: InputDecoration(
                                 hintText: 'Descreva seu humor...',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(24),
                                 ),
-                                contentPadding:
-                                    const EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 18,
                                   vertical: 12,
                                 ),
@@ -192,9 +182,7 @@ class _ChatPageState extends State<ChatPage> {
 }
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({
-    required this.message,
-  });
+  const _MessageBubble({required this.message});
 
   final ChatMessage message;
 
@@ -204,17 +192,13 @@ class _MessageBubble extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Align(
-      alignment:
-          isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.sizeOf(context).width * 0.8,
         ),
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isUser
               ? colorScheme.primaryContainer

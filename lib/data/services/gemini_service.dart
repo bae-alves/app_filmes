@@ -1,13 +1,11 @@
-
 import 'package:dio/dio.dart';
 import 'dart:convert';
+
 /// Serviço responsável por interpretar as preferências do usuário com a Gemini.
 class GeminiService {
-  GeminiService({
-    required String apiKey,
-    Dio? dio,
-  })  : _apiKey = apiKey,
-        _dio = dio ?? Dio();
+  GeminiService({required String apiKey, Dio? dio})
+    : _apiKey = apiKey,
+      _dio = dio ?? Dio();
 
   final String _apiKey;
   final Dio _dio;

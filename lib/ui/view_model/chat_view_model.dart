@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 
 import '../../data/services/gemini_service.dart';
@@ -62,18 +61,13 @@ class ChatViewModel extends ChangeNotifier {
   //     notifyListeners();
   //   }
   // }
-  
+
   Future<void> sendMessage(String message) async {
     final text = message.trim();
 
     if (text.isEmpty || _isLoading) return;
 
-    _messages.add(
-      ChatMessage(
-        text: text,
-        role: ChatMessageRole.user,
-      ),
-    );
+    _messages.add(ChatMessage(text: text, role: ChatMessageRole.user));
 
     _isLoading = true;
     _errorMessage = null;
@@ -81,12 +75,11 @@ class ChatViewModel extends ChangeNotifier {
 
     try {
       // 1. A Gemini interpreta o pedido.
-      final interpretation =
-          await _geminiService.interpretPreferences(text);
+      final interpretation = await _geminiService.interpretPreferences(text);
 
       final explanation =
           interpretation['explanation'] as String? ??
-              'Encontrei alguns critérios para sua busca.';
+          'Encontrei alguns critérios para sua busca.';
 
       final rawGenres = interpretation['genres'];
 
@@ -102,23 +95,22 @@ class ChatViewModel extends ChangeNotifier {
       final genresResult = await _moviesRepository.getMovieGenres();
 
       final genreIds = switch (genresResult) {
-        Ok(:final value) => value
-            .where(
-              (genre) => requestedGenres.any(
-                (requested) =>
-                    genre.name.trim().toLowerCase() ==
-                    requested.trim().toLowerCase(),
-              ),
-            )
-            .map((genre) => genre.id)
-            .toList(),
+        Ok(:final value) =>
+          value
+              .where(
+                (genre) => requestedGenres.any(
+                  (requested) =>
+                      genre.name.trim().toLowerCase() ==
+                      requested.trim().toLowerCase(),
+                ),
+              )
+              .map((genre) => genre.id)
+              .toList(),
         Error(:final error) => throw error,
       };
 
       if (genreIds.isEmpty) {
-        throw Exception(
-          'Não encontrei os gêneros solicitados no TMDB.',
-        );
+        throw Exception('Não encontrei os gêneros solicitados no TMDB.');
       }
 
       // 3. Buscamos filmes reais pelos gêneros identificados.
@@ -137,10 +129,7 @@ class ChatViewModel extends ChangeNotifier {
 
       // 4. Adicionamos a resposta e os filmes ao histórico.
       _messages.add(
-        ChatMessage(
-          text: explanation,
-          role: ChatMessageRole.assistant,
-        ),
+        ChatMessage(text: explanation, role: ChatMessageRole.assistant),
       );
 
       _messages.add(
@@ -151,12 +140,10 @@ class ChatViewModel extends ChangeNotifier {
         ),
       );
     } catch (error) {
-      _errorMessage =
-          'Não consegui encontrar os filmes. Tente novamente.';
+      _errorMessage = 'Não consegui encontrar os filmes. Tente novamente.';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-
 }

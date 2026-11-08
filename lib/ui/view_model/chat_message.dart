@@ -1,10 +1,6 @@
-
 import '../../data/api_models/movie.dart';
 
-enum ChatMessageRole {
-  user,
-  assistant,
-}
+enum ChatMessageRole { user, assistant }
 
 class ChatMessage {
   const ChatMessage({
