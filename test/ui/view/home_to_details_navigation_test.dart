@@ -125,7 +125,7 @@ void main() {
       expect(find.text('8,2'), findsOneWidget);
       expect(find.text('Ficção científica'), findsOneWidget);
       expect(find.text('Aventura'), findsOneWidget);
-      expect(find.text('Direção: Denis Villeneuve'), findsOneWidget);
+      expect(find.text('(5\u00a0mil)'), findsOneWidget, reason: 'votos');
       // Classificação da região do usuário (BR), não a dos EUA.
       expect(find.text('14'), findsOneWidget);
       expect(find.text('PG-13'), findsNothing);
@@ -142,6 +142,18 @@ void main() {
         lessThan(tester.getTopLeft(find.text('Zendaya')).dx),
       );
       expect(find.text('Paul Atreides'), findsOneWidget);
+
+      // Direção e trilha sonora; sem roteirista no fixture, sem "Roteiro".
+      await tester.scrollUntilVisible(
+        find.text('Direção e equipe'),
+        200,
+        scrollable: detailsScrollable,
+      );
+      expect(find.text('Direção'), findsOneWidget);
+      expect(find.text('Denis Villeneuve'), findsOneWidget);
+      expect(find.text('Trilha sonora'), findsOneWidget);
+      expect(find.text('Hans Zimmer'), findsOneWidget);
+      expect(find.text('Roteiro'), findsNothing);
 
       // E onde assisti-lo, na região informada à view model.
       expect(repository.requestedWatchRegions, ['BR']);
@@ -168,6 +180,93 @@ void main() {
     // Sem créditos nem classificação: as seções somem.
     expect(find.text('Elenco'), findsNothing);
     expect(find.textContaining('Direção'), findsNothing);
+  });
+
+  /// Rola até [finder] antes de tocar: na tela de teste (800 × 600), o
+  /// trailer ocupa quase tudo e o resto começa abaixo da dobra.
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
+    await tester.tap(finder);
+    await tester.pumpAndSettle();
+  }
+
+  group('atalhos abaixo do título', () {
+    Future<void> openDuna(WidgetTester tester) async {
+      await tester.pumpWidget(buildApp(buildRepository()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey(dunaId)));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('"Favoritar" salva o filme, como o coração da barra', (
+      tester,
+    ) async {
+      await openDuna(tester);
+
+      await tapVisible(tester, find.text('Favoritar'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Nos favoritos'), findsOneWidget);
+      expect(find.byTooltip('Remover dos favoritos'), findsOneWidget);
+    });
+
+    testWidgets('"Avaliar" rola até a avaliação e "Assistir" até os serviços', (
+      tester,
+    ) async {
+      await openDuna(tester);
+      expect(find.text('Sua avaliação').hitTestable(), findsNothing);
+
+      await tapVisible(tester, find.text('Avaliar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Sua avaliação').hitTestable(), findsOneWidget);
+
+      await tester.tap(find.byTooltip('4 estrelas'));
+      await tester.pumpAndSettle();
+      await tester.drag(detailsScrollable, const Offset(0, 10000));
+      await tester.pumpAndSettle();
+      expect(find.text('Avaliado'), findsOneWidget);
+
+      await tapVisible(tester, find.text('Assistir'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Netflix').hitTestable(), findsOneWidget);
+    });
+  });
+
+  testWidgets('sinopse longa vem cortada, com "ler mais" e "ler menos"', (
+    tester,
+  ) async {
+    final longOverview = List.filled(40, 'Uma frase da sinopse.').join(' ');
+    final repository = FakeMoviesRepository(
+      popularMovies: const [dunaMovie],
+      detailsById: {
+        dunaId: MovieDetails(id: dunaId, title: 'Duna', overview: longOverview),
+      },
+    );
+    await tester.pumpWidget(buildApp(repository));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
+    await tester.pumpAndSettle();
+
+    double synopsisHeight() => tester.getSize(find.text(longOverview)).height;
+    final collapsed = synopsisHeight();
+
+    await tapVisible(tester, find.text('ler mais'));
+    await tester.pumpAndSettle();
+    expect(synopsisHeight(), greaterThan(collapsed));
+
+    await tapVisible(tester, find.text('ler menos'));
+    await tester.pumpAndSettle();
+    expect(synopsisHeight(), collapsed);
+  });
+
+  testWidgets('sinopse curta não mostra "ler mais"', (tester) async {
+    await tester.pumpWidget(buildApp(buildRepository()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ler mais'), findsNothing);
   });
 
   testWidgets('o elenco não estoura com a fonte do sistema no dobro', (

@@ -116,9 +116,37 @@ class AppLocalizationsPt extends AppLocalizations {
   String get castSeeAll => 'Ver todos';
 
   @override
-  String directedBy(String names) {
-    return 'Direção: $names';
-  }
+  String get crewTitle => 'Direção e equipe';
+
+  @override
+  String get crewDirector => 'Direção';
+
+  @override
+  String get crewWriter => 'Roteiro';
+
+  @override
+  String get crewMusic => 'Trilha sonora';
+
+  @override
+  String get readMore => 'ler mais';
+
+  @override
+  String get readLess => 'ler menos';
+
+  @override
+  String get actionFavorite => 'Favoritar';
+
+  @override
+  String get actionFavorited => 'Nos favoritos';
+
+  @override
+  String get actionRate => 'Avaliar';
+
+  @override
+  String get actionRated => 'Avaliado';
+
+  @override
+  String get actionWatch => 'Assistir';
 
   @override
   String certificationLabel(String certification) {

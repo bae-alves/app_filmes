@@ -176,12 +176,59 @@
     "description": "Botão ao lado do título \"Elenco\" que abre a lista completa do elenco."
   },
 
-  "directedBy": "Direção: {names}",
-  "@directedBy": {
-    "description": "Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.",
-    "placeholders": {
-      "names": {"type": "String"}
-    }
+  "crewTitle": "Direção e equipe",
+  "@crewTitle": {
+    "description": "Título do cartão da tela de detalhes com direção, roteiro e trilha sonora do filme."
+  },
+
+  "crewDirector": "Direção",
+  "@crewDirector": {
+    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem dirigiu o filme."
+  },
+
+  "crewWriter": "Roteiro",
+  "@crewWriter": {
+    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem escreveu o roteiro."
+  },
+
+  "crewMusic": "Trilha sonora",
+  "@crewMusic": {
+    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem compôs a trilha sonora."
+  },
+
+  "readMore": "ler mais",
+  "@readMore": {
+    "description": "Botão abaixo da sinopse cortada, que mostra o texto inteiro."
+  },
+
+  "readLess": "ler menos",
+  "@readLess": {
+    "description": "Botão abaixo da sinopse aberta, que volta a cortá-la."
+  },
+
+  "actionFavorite": "Favoritar",
+  "@actionFavorite": {
+    "description": "Atalho da tela de detalhes, abaixo do título, que salva o filme nos favoritos. Mantenha curto: divide a linha com outros dois atalhos."
+  },
+
+  "actionFavorited": "Nos favoritos",
+  "@actionFavorited": {
+    "description": "O mesmo atalho de actionFavorite quando o filme já está nos favoritos; tocar o tira de lá."
+  },
+
+  "actionRate": "Avaliar",
+  "@actionRate": {
+    "description": "Atalho da tela de detalhes que rola até a seção \"Sua avaliação\"."
+  },
+
+  "actionRated": "Avaliado",
+  "@actionRated": {
+    "description": "O mesmo atalho de actionRate quando o usuário já deu nota ou humor ao filme."
+  },
+
+  "actionWatch": "Assistir",
+  "@actionWatch": {
+    "description": "Atalho da tela de detalhes que rola até a seção \"Onde assistir\"."
   },
 
   "certificationLabel": "Classificação indicativa: {certification}",

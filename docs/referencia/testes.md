@@ -13,7 +13,7 @@ O `.env` precisa existir, mesmo vazio (a cópia do `.env.example` serve): o
 
 | Arquivo | Testes | O que verifica |
 | --- | --- | --- |
-| `test/utils/formatters_test.dart` | 10 | Ano, duração e nota, em pt e en. |
+| `test/utils/formatters_test.dart` | 13 | Ano, duração, nota e votos abreviados, em pt e en. |
 | `test/utils/user_locale_test.dart` | 4 | Idioma do TMDB a partir dos idiomas do dispositivo. |
 | `test/data/api_models/movie_details_test.dart` | 5 | Diretores, classificação indicativa por país e ida e volta do JSON do cache. |
 | `test/data/api_models/watch_providers_test.dart` | 5 | Grupos de onde assistir: ordem, "Grátis" sem repetir serviço, prioridade, grupo vazio omitido e a lista sem repetição do modo compacto. |
@@ -24,9 +24,9 @@ O `.env` precisa existir, mesmo vazio (a cópia do `.env.example` serve): o
 | `test/ui/view_model/favorites_view_model_test.dart` | 8 | Leitura, erro, favoritar e desfavoritar, remover e desfazer no mesmo lugar, e a lista que volta quando a gravação falha. |
 | `test/ui/view_model/home_view_model_test.dart` | 11 | Estados de carregamento e erro da home, limpar filtros, pesquisa e gêneros um de cada vez, e a busca mais recente que vence quando duas se cruzam. |
 | `test/ui/view_model/movie_rating_view_model_test.dart` | 6 | Leitura, nota e humor sem apagar um ao outro, desmarcar, a avaliação que volta quando a gravação falha, e leitura e gravação que terminam depois do `dispose`. |
-| `test/ui/view_model/movie_details_view_model_test.dart` | 11 | Detalhes, trailer e onde assistir; falhas toleradas e a de onde assistir sinalizada; diretores e elenco em ordem; carga que termina depois do `dispose`. |
+| `test/ui/view_model/movie_details_view_model_test.dart` | 12 | Detalhes, trailer e onde assistir; falhas toleradas e a de onde assistir sinalizada; diretores, roteiristas e trilha sonora sem repetir; elenco em ordem; carga que termina depois do `dispose`. |
 | `test/ui/view/app_shell_test.dart` | 4 | Abre no Início e monta as abas só ao visitá-las, a aba guarda o estado ao trocar, o voltar do sistema leva ao Início, en. |
-| `test/ui/view/home_to_details_navigation_test.dart` | 21 | Navegação da home aos detalhes, em pt e en, o elenco com fonte grande e o "Ver todos", a falha em onde assistir, o link de onde assistir aberto fora do app, os detalhes que sobrevivem a uma reconstrução do app, as view models descartadas ao voltar, limpar a pesquisa, gêneros que apagam a pesquisa e o fim das listas acima da barra de navegação. |
+| `test/ui/view/home_to_details_navigation_test.dart` | 25 | Navegação da home aos detalhes, em pt e en, o cartão de equipe, os atalhos "Favoritar", "Avaliar" e "Assistir", a sinopse com "ler mais", o elenco com fonte grande e o "Ver todos", a falha em onde assistir, o link de onde assistir aberto fora do app, os detalhes que sobrevivem a uma reconstrução do app, as view models descartadas ao voltar, limpar a pesquisa, gêneros que apagam a pesquisa e o fim das listas acima da barra de navegação. |
 | `test/ui/view/favorites_test.dart` | 9 | Favoritar nos detalhes e ver na lista, abrir e desfavoritar a partir da lista, remover pela lixeira e arrastando, desfazer, lista vazia, erro, en. |
 | `test/ui/view/rating_test.dart` | 5 | Seção abaixo da sinopse, avaliar e reabrir, desmarcar, avaliar a partir dos favoritos, en. |
 | `test/ui/view/watch_providers_section_test.dart` | 7 | Grupos, ordem, toque no logo e no botão entregue a `onOpenLink`, sem botão quando não há `onOpenLink`, indisponível, modo compacto, pt e en. |

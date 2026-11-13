@@ -30,8 +30,14 @@ tooltip. Cada aba só é construída na primeira visita e depois fica viva
 ## `MovieDetailsPage`
 
 `lib/ui/view/movie_details_page.dart`. Trailer, informações e onde assistir.
-Abaixo da sinopse fica a `RatingSection`. A fileira do elenco mostra os 10
-primeiros. Com mais gente, o botão "Ver todos" abre a lista completa.
+Abaixo do trailer: etiquetas de gênero, título, frase de efeito e a linha
+ano • classificação • duração • nota (com os votos abreviados). Depois, três
+atalhos: "Favoritar" (o mesmo efeito do coração da barra), "Avaliar" e
+"Assistir", que rolam até as seções. As seções ficam em cartões: sinopse
+(cortada em 4 linhas, com "ler mais"), `RatingSection`, elenco, "Direção e
+equipe" (direção, roteiro e trilha sonora, só as que têm alguém) e onde
+assistir. A fileira do elenco mostra os 10 primeiros. Com mais gente, o botão
+"Ver todos" abre a lista completa.
 
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
@@ -137,3 +143,4 @@ precisa de WebView.
 | `formatReleaseYear(date)` | `2024` | `2024` | Data ausente ou inválida |
 | `formatRuntime(minutes, l10n)` | `2h 46min`, `2h`, `45min` | `2h 46m`, `2h`, `45m` | `null` ou ≤ 0 |
 | `formatRating(average, locale)` | `8,2` | `8.2` | `null` ou ≤ 0 |
+| `formatVoteCount(count, locale)` | `5 mil` | `5K`, `42.5K` | `null` ou ≤ 0 |

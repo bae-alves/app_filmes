@@ -296,11 +296,71 @@ abstract class AppLocalizations {
   /// **'Ver todos'**
   String get castSeeAll;
 
-  /// Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.
+  /// Título do cartão da tela de detalhes com direção, roteiro e trilha sonora do filme.
   ///
   /// In pt, this message translates to:
-  /// **'Direção: {names}'**
-  String directedBy(String names);
+  /// **'Direção e equipe'**
+  String get crewTitle;
+
+  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem dirigiu o filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Direção'**
+  String get crewDirector;
+
+  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem escreveu o roteiro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Roteiro'**
+  String get crewWriter;
+
+  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem compôs a trilha sonora.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trilha sonora'**
+  String get crewMusic;
+
+  /// Botão abaixo da sinopse cortada, que mostra o texto inteiro.
+  ///
+  /// In pt, this message translates to:
+  /// **'ler mais'**
+  String get readMore;
+
+  /// Botão abaixo da sinopse aberta, que volta a cortá-la.
+  ///
+  /// In pt, this message translates to:
+  /// **'ler menos'**
+  String get readLess;
+
+  /// Atalho da tela de detalhes, abaixo do título, que salva o filme nos favoritos. Mantenha curto: divide a linha com outros dois atalhos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Favoritar'**
+  String get actionFavorite;
+
+  /// O mesmo atalho de actionFavorite quando o filme já está nos favoritos; tocar o tira de lá.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nos favoritos'**
+  String get actionFavorited;
+
+  /// Atalho da tela de detalhes que rola até a seção "Sua avaliação".
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliar'**
+  String get actionRate;
+
+  /// O mesmo atalho de actionRate quando o usuário já deu nota ou humor ao filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliado'**
+  String get actionRated;
+
+  /// Atalho da tela de detalhes que rola até a seção "Onde assistir".
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistir'**
+  String get actionWatch;
 
   /// Dica e rótulo de acessibilidade do selo com a classificação indicativa do país do usuário (ex.: 14, L, PG-13).
   ///

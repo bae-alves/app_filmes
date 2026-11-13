@@ -135,6 +135,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
             (_, _, _) => _DetailsContent(
               viewModel: viewModel,
               ratingViewModel: widget.ratingViewModel,
+              favoritesViewModel: widget.favoritesViewModel,
               trailerPlayerBuilder: widget.trailerPlayerBuilder,
             ),
           },
@@ -175,145 +176,179 @@ class _FavoriteButton extends StatelessWidget {
 }
 
 /// Conteúdo da tela quando os detalhes já foram carregados.
-class _DetailsContent extends StatelessWidget {
+///
+/// Usa uma `Column` rolável, e não uma `ListView`, para que todas as seções
+/// existam desde o início: os atalhos "Avaliar" e "Assistir" rolam até elas.
+class _DetailsContent extends StatefulWidget {
   const _DetailsContent({
     required this.viewModel,
     required this.ratingViewModel,
+    required this.favoritesViewModel,
     required this.trailerPlayerBuilder,
   });
 
   final MovieDetailsViewModel viewModel;
   final MovieRatingViewModel ratingViewModel;
+  final FavoritesViewModel favoritesViewModel;
   final TrailerPlayerBuilder trailerPlayerBuilder;
+
+  @override
+  State<_DetailsContent> createState() => _DetailsContentState();
+}
+
+class _DetailsContentState extends State<_DetailsContent> {
+  final _ratingKey = GlobalKey();
+  final _watchKey = GlobalKey();
+
+  void _scrollTo(GlobalKey section) => Scrollable.ensureVisible(
+    section.currentContext!,
+    duration: const Duration(milliseconds: 300),
+    curve: Curves.easeOut,
+  );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toString();
+    final viewModel = widget.viewModel;
     final details = viewModel.details!;
-    final year = formatReleaseYear(details.releaseDate);
-    final runtime = formatRuntime(details.runtime, l10n);
-    final rating = formatRating(details.voteAverage, locale);
     final genres = details.genres ?? const <Genre>[];
-    final directors = viewModel.directorNames;
     final cast = viewModel.cast;
+    final crew = [
+      (l10n.crewDirector, viewModel.directorNames),
+      (l10n.crewWriter, viewModel.writerNames),
+      (l10n.crewMusic, viewModel.composerNames),
+    ].where((role) => role.$2.isNotEmpty).toList();
     // A fileira mostra só o elenco principal; o resto fica em "Ver todos".
     const castPreview = 10;
 
-    return ListView(
+    return SingleChildScrollView(
       // Padding explícito desliga o recuo automático do sistema: sem somá-lo, o
       // fim da tela fica sob a barra de navegação.
       padding:
           const EdgeInsets.only(bottom: 24) + MediaQuery.paddingOf(context),
-      children: [
-        _TrailerSection(
-          youtubeKey: viewModel.trailerYoutubeKey,
-          backdropPath: details.backdropPath,
-          trailerPlayerBuilder: trailerPlayerBuilder,
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                details.title ?? details.originalTitle ?? l10n.untitled,
-                style: theme.textTheme.headlineSmall,
-              ),
-              if (details.tagline?.isNotEmpty == true) ...[
-                const SizedBox(height: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _TrailerSection(
+            youtubeKey: viewModel.trailerYoutubeKey,
+            backdropPath: details.backdropPath,
+            trailerPlayerBuilder: widget.trailerPlayerBuilder,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (genres.isNotEmpty) ...[
+                  _GenreTags(genres: genres),
+                  const SizedBox(height: 12),
+                ],
                 Text(
-                  details.tagline!,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontStyle: FontStyle.italic,
-                    color: theme.colorScheme.outline,
+                  details.title ?? details.originalTitle ?? l10n.untitled,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
                   ),
                 ),
-              ],
-              if (directors.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  l10n.directedBy(directors.join(', ')),
-                  style: theme.textTheme.bodyMedium,
-                ),
-              ],
-              const SizedBox(height: 12),
-              _MetadataRow(
-                year: year,
-                runtime: runtime,
-                rating: rating,
-                certification: details.certificationFor(viewModel.watchRegion),
-              ),
-              if (genres.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: [
-                    for (final genre in genres)
-                      Chip(label: Text(genre.name ?? '—')),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 20),
-              Text(l10n.synopsisTitle, style: theme.textTheme.titleMedium),
-              const SizedBox(height: 6),
-              Text(
-                details.overview?.isNotEmpty == true
-                    ? details.overview!
-                    : l10n.synopsisUnavailable,
-                style: theme.textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 20),
-              RatingSection(viewModel: ratingViewModel),
-              if (cast.isNotEmpty) ...[
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l10n.castTitle,
-                        style: theme.textTheme.titleMedium,
-                      ),
+                if (details.tagline?.isNotEmpty == true) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    details.tagline!,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontStyle: FontStyle.italic,
+                      color: theme.colorScheme.outline,
                     ),
-                    if (cast.length > castPreview)
-                      TextButton(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => _FullCastPage(cast: cast),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                _MetadataRow(
+                  year: formatReleaseYear(details.releaseDate),
+                  runtime: formatRuntime(details.runtime, l10n),
+                  rating: formatRating(details.voteAverage, locale),
+                  votes: formatVoteCount(details.voteCount, locale),
+                  certification: details.certificationFor(
+                    viewModel.watchRegion,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _ActionRow(
+                  movie: viewModel.movieSummary!,
+                  favoritesViewModel: widget.favoritesViewModel,
+                  ratingViewModel: widget.ratingViewModel,
+                  onRate: () => _scrollTo(_ratingKey),
+                  onWatch: () => _scrollTo(_watchKey),
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  title: l10n.synopsisTitle,
+                  child: _ExpandableText(
+                    details.overview?.isNotEmpty == true
+                        ? details.overview!
+                        : l10n.synopsisUnavailable,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  key: _ratingKey,
+                  child: RatingSection(viewModel: widget.ratingViewModel),
+                ),
+                if (cast.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.castTitle,
+                          style: _SectionCard.titleStyle(theme),
+                        ),
+                      ),
+                      if (cast.length > castPreview)
+                        TextButton(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => _FullCastPage(cast: cast),
+                            ),
+                          ),
+                          child: Text(l10n.castSeeAll),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _CastList(cast: cast.take(castPreview).toList()),
+                ],
+                if (crew.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  _SectionCard(
+                    title: l10n.crewTitle,
+                    child: _CrewGrid(crew: crew),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                _SectionCard(
+                  key: _watchKey,
+                  title: l10n.watchProvidersTitle,
+                  child: viewModel.watchProvidersFailed
+                      ? Text(
+                          l10n.watchProvidersLoadError,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.outline,
+                          ),
+                        )
+                      : WatchProvidersSection(
+                          region: viewModel.watchProviders,
+                          onOpenLink: (link) => launchUrl(
+                            link,
+                            mode: LaunchMode.externalApplication,
                           ),
                         ),
-                        child: Text(l10n.castSeeAll),
-                      ),
-                  ],
                 ),
-                const SizedBox(height: 8),
-                _CastList(cast: cast.take(castPreview).toList()),
               ],
-              const SizedBox(height: 20),
-              Text(
-                l10n.watchProvidersTitle,
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              if (viewModel.watchProvidersFailed)
-                Text(
-                  l10n.watchProvidersLoadError,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.outline,
-                  ),
-                )
-              else
-                WatchProvidersSection(
-                  region: viewModel.watchProviders,
-                  onOpenLink: (link) =>
-                      launchUrl(link, mode: LaunchMode.externalApplication),
-                ),
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -379,64 +414,373 @@ class _TrailerSection extends StatelessWidget {
   }
 }
 
-/// Linha com nota, ano, duração e classificação indicativa do filme.
+/// Gêneros do filme em etiquetas: o primeiro em âmbar, o segundo em lilás e
+/// os demais em cinza, como no design.
+class _GenreTags extends StatelessWidget {
+  const _GenreTags({required this.genres});
+
+  final List<Genre> genres;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final accents = [scheme.primary, scheme.secondary];
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final (index, genre) in genres.indexed)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: index < accents.length
+                  ? accents[index].withValues(alpha: 0.16)
+                  : scheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              genre.name ?? '—',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: index < accents.length
+                    ? accents[index]
+                    : scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Linha com ano, classificação indicativa, duração e nota do filme,
+/// separados por pontos.
 class _MetadataRow extends StatelessWidget {
   const _MetadataRow({
     this.year,
     this.runtime,
     this.rating,
+    this.votes,
     this.certification,
   });
 
   final String? year;
   final String? runtime;
   final String? rating;
+  final String? votes;
   final String? certification;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final strong = theme.textTheme.labelLarge?.copyWith(
+      fontWeight: FontWeight.w700,
+    );
     final certificationLabel = certification == null
         ? null
         : AppLocalizations.of(context).certificationLabel(certification!);
-    return Wrap(
-      spacing: 16,
-      runSpacing: 4,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        if (rating != null)
-          Row(
+    final items = <Widget>[
+      if (year != null) Text(year!, style: strong),
+      if (certificationLabel != null)
+        Tooltip(
+          message: certificationLabel,
+          excludeFromSemantics: true,
+          child: Semantics(
+            label: certificationLabel,
+            excludeSemantics: true,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(certification!, style: strong),
+            ),
+          ),
+        ),
+      if (runtime != null) Text(runtime!, style: theme.textTheme.labelLarge),
+      if (rating != null)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.star_rounded,
-                size: 18,
-                color: theme.colorScheme.primary,
-              ),
+              Icon(Icons.star_rounded, size: 16, color: scheme.primary),
               const SizedBox(width: 4),
-              Text(rating!, style: theme.textTheme.labelLarge),
+              Text(rating!, style: strong?.copyWith(color: scheme.primary)),
+              if (votes != null) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '($votes)',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: scheme.outline,
+                  ),
+                ),
+              ],
             ],
           ),
-        if (year != null) Text(year!, style: theme.textTheme.labelLarge),
-        if (runtime != null) Text(runtime!, style: theme.textTheme.labelLarge),
-        if (certificationLabel != null)
-          Tooltip(
-            message: certificationLabel,
-            excludeFromSemantics: true,
-            child: Semantics(
-              label: certificationLabel,
-              excludeSemantics: true,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  border: Border.all(color: theme.colorScheme.outline),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(certification!, style: theme.textTheme.labelLarge),
+        ),
+    ];
+    final dot = Text('•', style: TextStyle(color: scheme.outline));
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        for (final (index, item) in items.indexed) ...[
+          if (index > 0) dot,
+          item,
+        ],
+      ],
+    );
+  }
+}
+
+/// Atalhos abaixo do título: favoritar, ir até a avaliação e ir até onde
+/// assistir.
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({
+    required this.movie,
+    required this.favoritesViewModel,
+    required this.ratingViewModel,
+    required this.onRate,
+    required this.onWatch,
+  });
+
+  final Movie movie;
+  final FavoritesViewModel favoritesViewModel;
+  final MovieRatingViewModel ratingViewModel;
+  final VoidCallback onRate;
+  final VoidCallback onWatch;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: Listenable.merge([favoritesViewModel, ratingViewModel]),
+      builder: (context, _) {
+        final isFavorite = favoritesViewModel.isFavorite(movie.id);
+        final isRated =
+            ratingViewModel.stars != null || ratingViewModel.mood != null;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8,
+          children: [
+            _ActionTile(
+              icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+              label: isFavorite ? l10n.actionFavorited : l10n.actionFavorite,
+              selected: isFavorite,
+              onTap: () => favoritesViewModel.toggle(movie),
+            ),
+            _ActionTile(
+              icon: isRated ? Icons.star_rounded : Icons.star_border_rounded,
+              label: isRated ? l10n.actionRated : l10n.actionRate,
+              selected: isRated,
+              onTap: onRate,
+            ),
+            _ActionTile(
+              icon: Icons.play_circle_outline,
+              label: l10n.actionWatch,
+              onTap: onWatch,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Um atalho da [_ActionRow]: ícone em âmbar sobre um rótulo curto.
+class _ActionTile extends StatelessWidget {
+  const _ActionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.selected = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Semantics(
+        button: true,
+        selected: selected,
+        child: Material(
+          color: theme.colorScheme.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+              child: Column(
+                children: [
+                  Icon(icon, color: theme.colorScheme.primary),
+                  const SizedBox(height: 6),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelMedium,
+                  ),
+                ],
               ),
             ),
           ),
-      ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Cartão de uma seção da tela, com título opcional.
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({super.key, this.title, required this.child});
+
+  final String? title;
+  final Widget child;
+
+  /// Estilo dos títulos de seção, também usado pelo "Elenco", que não tem
+  /// cartão.
+  static TextStyle? titleStyle(ThemeData theme) =>
+      theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Text(title!, style: titleStyle(theme)),
+            const SizedBox(height: 12),
+          ],
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+/// Texto cortado em [maxLines] linhas, com "ler mais" quando não cabe.
+class _ExpandableText extends StatefulWidget {
+  const _ExpandableText(this.text);
+
+  final String text;
+
+  static const maxLines = 4;
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final style = theme.textTheme.bodyLarge?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+      height: 1.5,
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final painter = TextPainter(
+          text: TextSpan(text: widget.text, style: style),
+          maxLines: _ExpandableText.maxLines,
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+        )..layout(maxWidth: constraints.maxWidth);
+        final overflows = painter.didExceedMaxLines;
+        painter.dispose();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.text,
+              style: style,
+              maxLines: _expanded ? null : _ExpandableText.maxLines,
+              overflow: _expanded ? null : TextOverflow.ellipsis,
+            ),
+            if (overflows)
+              TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () => setState(() => _expanded = !_expanded),
+                child: Text(_expanded ? l10n.readLess : l10n.readMore),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Direção, roteiro e trilha sonora, em duas colunas.
+class _CrewGrid extends StatelessWidget {
+  const _CrewGrid({required this.crew});
+
+  /// Pares (função, nomes), só com as funções que têm alguém.
+  final List<(String, List<String>)> crew;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    const gap = 16.0;
+    return LayoutBuilder(
+      builder: (context, constraints) => Wrap(
+        spacing: gap,
+        runSpacing: 12,
+        children: [
+          for (final (role, names) in crew)
+            SizedBox(
+              width: (constraints.maxWidth - gap) / 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    role,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    names.join(', '),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -483,7 +827,9 @@ class _CastMemberTile extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: theme.textTheme.labelMedium,
+            style: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
           if (member.character?.isNotEmpty == true)
             Text(
@@ -513,6 +859,7 @@ class _CastAvatar extends StatelessWidget {
     final photoUrl = TmdbImages.profile(member.profilePath);
     return CircleAvatar(
       radius: radius,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       foregroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
       // Foto que não carrega fica no ícone, sem erro no log.
       onForegroundImageError: photoUrl != null ? (error, stackTrace) {} : null,

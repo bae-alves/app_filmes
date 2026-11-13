@@ -116,9 +116,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get castSeeAll => 'See all';
 
   @override
-  String directedBy(String names) {
-    return 'Directed by $names';
-  }
+  String get crewTitle => 'Director and crew';
+
+  @override
+  String get crewDirector => 'Director';
+
+  @override
+  String get crewWriter => 'Writing';
+
+  @override
+  String get crewMusic => 'Music';
+
+  @override
+  String get readMore => 'read more';
+
+  @override
+  String get readLess => 'read less';
+
+  @override
+  String get actionFavorite => 'Favorite';
+
+  @override
+  String get actionFavorited => 'Favorited';
+
+  @override
+  String get actionRate => 'Rate';
+
+  @override
+  String get actionRated => 'Rated';
+
+  @override
+  String get actionWatch => 'Watch';
 
   @override
   String certificationLabel(String certification) {

@@ -62,10 +62,21 @@ class MovieDetailsViewModel extends ChangeNotifier {
   }
 
   /// Nomes dos diretores do filme. Vazio sem detalhes ou sem diretor com nome.
-  List<String> get directorNames => [
-    for (final director in _details?.directors ?? const <CrewMember>[])
-      if (director.name?.isNotEmpty == true) director.name!,
-  ];
+  List<String> get directorNames => _crewNames(const {'Director'});
+
+  /// Nomes de quem escreveu o roteiro, na ordem dos créditos.
+  List<String> get writerNames => _crewNames(const {'Screenplay', 'Writer'});
+
+  /// Nomes de quem compôs a trilha sonora.
+  List<String> get composerNames =>
+      _crewNames(const {'Original Music Composer'});
+
+  /// Nomes da equipe com uma das [jobs], sem repetir quem acumula funções.
+  List<String> _crewNames(Set<String> jobs) => {
+    for (final member in _details?.credits?.crew ?? const <CrewMember>[])
+      if (jobs.contains(member.job) && member.name?.isNotEmpty == true)
+        member.name!,
+  }.toList();
 
   /// Elenco na ordem dos créditos; quem não tem ordem vai para o fim.
   List<CastMember> get cast =>
