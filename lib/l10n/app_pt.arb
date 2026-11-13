@@ -101,11 +101,6 @@
     "description": "Texto de exemplo dentro do campo de pesquisa vazio."
   },
 
-  "searchTooltip": "Pesquisar",
-  "@searchTooltip": {
-    "description": "Dica e rótulo de acessibilidade do botão de lupa que dispara a pesquisa."
-  },
-
   "advancedFilter": "Filtro avançado",
   "@advancedFilter": {
     "description": "Botão da tela inicial e título da folha que filtra os filmes por gênero."

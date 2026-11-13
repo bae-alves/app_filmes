@@ -20,7 +20,6 @@
   "assistantCardBody": "Tell MovieAI how you feel and get movies for the moment.",
   "assistantCardAction": "Ask MovieAI",
   "searchHint": "Type a movie title",
-  "searchTooltip": "Search",
   "advancedFilter": "Advanced filter",
   "applyFilters": "Apply filters",
   "clearFilters": "Clear filters",

@@ -26,7 +26,8 @@ tooltip. Cada aba só é construída na primeira visita e depois fica viva
 `lib/ui/view/home_page.dart`. AppBar com o logo e "MovieAI", e uma única
 rolagem (`CustomScrollView`, com puxar para atualizar), de cima para baixo:
 
-- Campo de pesquisa em pílula, com limpar, pesquisar e filtro avançado.
+- Campo de pesquisa em pílula, com limpar e filtro avançado. A pesquisa parte
+  pela tecla de pesquisar do teclado.
 - Sem pesquisa nem gênero: o primeiro dos populares em destaque (selo
   "#1 em alta", nota, título, sinopse curta, "Ver detalhes" e coração), com a
   chave `ValueKey(movie.id)`.

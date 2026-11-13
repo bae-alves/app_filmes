@@ -206,12 +206,6 @@ abstract class AppLocalizations {
   /// **'Digite o nome do filme'**
   String get searchHint;
 
-  /// Dica e rótulo de acessibilidade do botão de lupa que dispara a pesquisa.
-  ///
-  /// In pt, this message translates to:
-  /// **'Pesquisar'**
-  String get searchTooltip;
-
   /// Botão da tela inicial e título da folha que filtra os filmes por gênero.
   ///
   /// In pt, this message translates to:

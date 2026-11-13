@@ -70,9 +70,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get searchHint => 'Digite o nome do filme';
 
   @override
-  String get searchTooltip => 'Pesquisar';
-
-  @override
   String get advancedFilter => 'Filtro avançado';
 
   @override

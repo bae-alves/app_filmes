@@ -308,11 +308,6 @@ class _HomePageState extends State<HomePage> {
                   onPressed: _clearFilters,
                 ),
               IconButton(
-                icon: const Icon(Icons.search),
-                tooltip: l10n.searchTooltip,
-                onPressed: _search,
-              ),
-              IconButton(
                 icon: const Icon(Icons.tune),
                 tooltip: l10n.advancedFilter,
                 onPressed: _openAdvancedFilter,
