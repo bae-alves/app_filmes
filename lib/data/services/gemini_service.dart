@@ -1,7 +1,8 @@
-import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 
-/// Serviço responsável por interpretar as preferências do usuário com a Gemini.
+import '../models/recommendation_context.dart';
+
 class GeminiService {
   GeminiService({required String Function() apiKey, Dio? dio})
     : _apiKey = apiKey,
@@ -15,40 +16,93 @@ class GeminiService {
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta';
 
-  /// Interpreta o pedido e retorna critérios para recomendar filmes.
-  Future<Map<String, dynamic>> interpretPreferences(String message) async {
+  Future<Map<String, dynamic>> interpretPreferences(
+    String message, {
+    RecommendationContext? context,
+    String language = 'pt-BR',
+  }) async {
     if (message.trim().isEmpty) {
       throw ArgumentError('Digite seu humor ou suas preferências.');
     }
+    final contextInformation =
+        context?.toPromptContext() ??
+        'Não há informações históricas disponíveis para este usuário.';
+
+    final languageInstruction = language.startsWith('en')
+        ? 'Respond in English.'
+        : 'Responda no idioma Português (pt-BR).';
 
     final response = await _dio.post<Map<String, dynamic>>(
-      '$_baseUrl/models/gemini-2.5-flash:generateContent',
+      '$_baseUrl/models/gemini-3.5-flash-lite:generateContent',
       options: Options(
         headers: {
           'x-goog-api-key': _apiKey(),
           'Content-Type': 'application/json',
         },
-        receiveTimeout: const Duration(seconds: 5),
-        sendTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
       ),
       data: {
         'system_instruction': {
           'parts': [
             {
-              'text': '''
-Você é um assistente de recomendações de filmes.
-Interprete o humor, os gostos e as restrições informados pelo usuário.
-Responda somente com JSON válido, sem Markdown, neste formato:
-{
-  "genres": ["Suspense", "Drama"],
-  "mood": "tenso",
-  "preferences": ["suspense psicológico"],
-  "avoid": ["violência excessiva"],
-  "explanation": "Filmes de suspense psicológico com violência moderada."
-}
-Use nomes de gêneros de filmes reconhecíveis pelo TMDB.
-Não invente títulos, notas, classificações etárias ou plataformas.
-''',
+              'text':
+                  '''
+              Você é um assistente inteligente de recomendações de filmes.
+              $languageInstruction
+
+              Sua função é interpretar o pedido atual do usuário e combinar
+              suas preferências com seu histórico de avaliações e contexto temporal.
+
+              Considere as seguintes regras:
+
+              1. GÊNEROS FAVORITOS:
+              Dê preferência aos gêneros que possuem avaliações positivas
+              e que aparecem frequentemente nos filmes favoritos.
+
+              2. GÊNEROS MENOS APRECIADOS:
+              Evite sugerir gêneros que receberam avaliações negativas,
+              a menos que o usuário solicite explicitamente esses gêneros.
+
+              3. HISTÓRICO:
+              Considere as avaliações recentes e as reações emocionais
+              para compreender os gostos do usuário.
+
+              4. CONTEXTO TEMPORAL:
+              Considere o dia da semana e o horário local.
+              Em noites de dias úteis, priorize filmes mais curtos,
+              que sejam adequados para assistir após um dia de trabalho.
+              Nos finais de semana, considere também filmes mais longos.
+
+              5. PRIORIDADE DO PEDIDO:
+              O pedido atual do usuário sempre tem prioridade sobre
+              as preferências históricas.
+              Não recomende um gênero que o usuário explicitamente
+              pediu para evitar.
+
+              6. DURAÇÃO:
+              Classifique a duração desejada em:
+              - short: até 90 minutos
+              - medium: de 91 a 120 minutos
+              - long: acima de 120 minutos
+              - any: sem preferência de duração
+
+              Não invente títulos, notas, classificações etárias,
+              durações ou plataformas.
+
+              Responda somente com JSON válido, sem Markdown,
+              neste formato:
+
+              {
+                "genres": ["Comédia", "Animação"],
+                "mood": "descontraído",
+                "preferences": ["filme leve"],
+                "avoid": ["terror"],
+                "durationPreference": "short",
+                "explanation": "Sugestões leves para relaxar durante a noite."
+              }
+
+              Use nomes de gêneros conhecidos de cinema (ex.: Comédia, Ação, Animação, Terror, Suspense, Drama, Ficção Científica, Romance, Aventura, Fantasia, Crime, Documentário, Família, História, Música, Mistério, Guerra, Faroeste).''',
             },
           ],
         },
@@ -56,7 +110,17 @@ Não invente títulos, notas, classificações etárias ou plataformas.
           {
             'role': 'user',
             'parts': [
-              {'text': message},
+              {
+                'text':
+                    '''
+            Contexto personalizado do usuário:
+
+            $contextInformation
+
+            Pedido atual:
+            $message
+            ''',
+              },
             ],
           },
         ],
@@ -65,6 +129,10 @@ Não invente títulos, notas, classificações etárias ou plataformas.
           'responseSchema': {
             'type': 'OBJECT',
             'properties': {
+              'durationPreference': {
+                'type': 'STRING',
+                'enum': ['short', 'medium', 'long', 'any'],
+              },
               'genres': {
                 'type': 'ARRAY',
                 'items': {'type': 'STRING'},
@@ -81,6 +149,7 @@ Não invente títulos, notas, classificações etárias ou plataformas.
               'explanation': {'type': 'STRING'},
             },
             'required': [
+              'durationPreference',
               'genres',
               'mood',
               'preferences',

@@ -7,6 +7,9 @@ import '../../utils/result.dart';
 /// lista de favoritos, hoje moram só no aparelho, em SQLite
 /// (`RatingsRepositoryLocal`). Veja docs/explicacao/avaliacoes.md.
 abstract class RatingsRepository {
+  /// Todas as avaliações, da mais recente para a mais antiga.
+  Future<Result<List<Rating>>> getRatings();
+
   /// Avaliação do filme [movieId], ou `null` se ele ainda não foi avaliado.
   Future<Result<Rating?>> getRating(int movieId);
 

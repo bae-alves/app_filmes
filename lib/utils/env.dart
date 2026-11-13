@@ -1,11 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Acesso tipado às variáveis de ambiente do arquivo `.env`.
-///
-/// As credenciais do TMDB não ficam versionadas: o `.env` está no `.gitignore`
-/// e é declarado como asset no `pubspec.yaml` para ser lido em tempo de
-/// execução. Concentrar a leitura aqui evita `dotenv.env['...']` espalhado pelo
-/// código e permite falhar cedo, com mensagem clara, quando falta alguma chave.
 abstract final class Env {
   /// Nome do arquivo de ambiente carregado no boot da aplicação.
   static const envFileName = '.env';
@@ -21,6 +16,19 @@ abstract final class Env {
   /// parâmetro `api_key`; a autenticação padrão do app é via [tmdbReadToken].
   static String get tmdbApiKey => _require('TMDB_API_KEY');
   static String get geminiApiKey => _require('GEMINI_API_KEY');
+
+  /// URL do projeto Supabase (opcional).
+  static String? get supabaseUrl => dotenv.env['SUPABASE_URL']?.trim();
+
+  /// Chave anônima pública do projeto Supabase (opcional).
+  static String? get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY']?.trim();
+
+  /// Verifica se as credenciais do Supabase foram configuradas.
+  static bool get isSupabaseConfigured =>
+      supabaseUrl != null &&
+      supabaseUrl!.isNotEmpty &&
+      supabaseAnonKey != null &&
+      supabaseAnonKey!.isNotEmpty;
 
   static String _require(String key) {
     final value = dotenv.env[key]?.trim();

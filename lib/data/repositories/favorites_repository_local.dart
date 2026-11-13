@@ -6,27 +6,30 @@ import '../services/app_database.dart';
 import 'favorites_repository.dart';
 
 /// [FavoritesRepository] guardado no SQLite do aparelho (veja [AppDatabase]).
-///
-/// Cada favorito guarda o resumo do filme (o mesmo da listagem do TMDB), e não
-/// só o id: assim a lista aparece sem nenhuma requisição, até offline.
 class FavoritesRepositoryLocal implements FavoritesRepository {
   FavoritesRepositoryLocal({
     required Database database,
+    String? Function()? currentUserIdProvider,
     DateTime Function()? now,
   }) : _database = database,
+       _currentUserIdProvider = currentUserIdProvider,
        _now = now ?? DateTime.now;
 
   final Database _database;
+  final String? Function()? _currentUserIdProvider;
 
-  /// Relógio usado em `added_at` quando `addFavorite` não recebe um. Injetável
-  /// para os testes controlarem a ordem.
+  /// Relógio usado em `added_at` quando `addFavorite` não recebe um.
   final DateTime Function() _now;
+
+  String get _activeUserId => _currentUserIdProvider?.call() ?? 'default_user';
 
   @override
   Future<Result<List<Favorite>>> getFavorites() async {
     try {
       final rows = await _database.query(
         AppDatabase.favoritesTable,
+        where: 'user_id = ?',
+        whereArgs: [_activeUserId],
         orderBy: 'added_at DESC',
       );
       return Result.ok([for (final row in rows) _favoriteFromRow(row)]);
@@ -40,6 +43,7 @@ class FavoritesRepositoryLocal implements FavoritesRepository {
     try {
       await _database.insert(AppDatabase.favoritesTable, {
         'movie_id': movie.id,
+        'user_id': _activeUserId,
         'title': movie.title,
         'original_title': movie.originalTitle,
         'overview': movie.overview,
@@ -63,8 +67,8 @@ class FavoritesRepositoryLocal implements FavoritesRepository {
     try {
       await _database.delete(
         AppDatabase.favoritesTable,
-        where: 'movie_id = ?',
-        whereArgs: [movieId],
+        where: 'movie_id = ? AND user_id = ?',
+        whereArgs: [movieId, _activeUserId],
       );
       return const Result.ok(null);
     } on Exception catch (error) {

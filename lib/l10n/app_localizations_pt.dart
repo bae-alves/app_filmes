@@ -18,17 +18,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get synopsisUnavailable => 'Sinopse não disponível.';
 
   @override
-  String runtimeHoursMinutes(int hours, int minutes) {
+  String runtimeHoursMinutes(Object hours, Object minutes) {
     return '${hours}h ${minutes}min';
   }
 
   @override
-  String runtimeHours(int hours) {
+  String runtimeHours(Object hours) {
     return '${hours}h';
   }
 
   @override
-  String runtimeMinutes(int minutes) {
+  String runtimeMinutes(Object minutes) {
     return '${minutes}min';
   }
 
@@ -165,7 +165,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get actionWatch => 'Assistir';
 
   @override
-  String certificationLabel(String certification) {
+  String certificationLabel(Object certification) {
     return 'Classificação indicativa: $certification';
   }
 
@@ -186,7 +186,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get favoriteRemove => 'Remover dos favoritos';
 
   @override
-  String favoriteRemoved(String title) {
+  String favoriteRemoved(Object title) {
     return '$title saiu dos favoritos';
   }
 
@@ -200,7 +200,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get ratingHint => 'Já assistiu? Dê uma nota e conte como foi.';
 
   @override
-  String ratingStars(int count) {
+  String ratingStars(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
@@ -224,4 +224,140 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get moodBored => 'Entediante';
+
+  @override
+  String get chatEmptyTitle => 'Qual é o seu clima para hoje?';
+
+  @override
+  String get chatEmptyBody =>
+      'Conte como você está se sentindo ou qual tipo de filme gostaria de assistir.';
+
+  @override
+  String get chatInputHint => 'Descreva seu humor...';
+
+  @override
+  String get chatSendTooltip => 'Enviar mensagem';
+
+  @override
+  String get chatMovieSuggestions => 'Separei estes filmes para você:';
+
+  @override
+  String get profileTitle => 'Perfil';
+
+  @override
+  String get loginTitle => 'Entrar';
+
+  @override
+  String get signUpTitle => 'Criar conta';
+
+  @override
+  String get emailLabel => 'E-mail';
+
+  @override
+  String get passwordLabel => 'Senha';
+
+  @override
+  String get nameLabel => 'Nome completo';
+
+  @override
+  String get loginSocialGoogle => 'Entrar com Google';
+
+  @override
+  String get loginSocialApple => 'Entrar com Apple';
+
+  @override
+  String get orDivider => 'ou';
+
+  @override
+  String get noAccountPrompt => 'Não tem uma conta?';
+
+  @override
+  String get hasAccountPrompt => 'Já tem uma conta?';
+
+  @override
+  String get logoutAction => 'Sair da conta';
+
+  @override
+  String get saveProfile => 'Salvar alterações';
+
+  @override
+  String get accountCreatedSuccess => 'Conta criada com sucesso!';
+
+  @override
+  String get onboardingTitle => 'Monte seu Perfil de Gosto';
+
+  @override
+  String onboardingStepLabel(Object step, Object total) {
+    return 'Etapa $step de $total';
+  }
+
+  @override
+  String get onboardingGenresTitle => 'Quais são seus gêneros favoritos?';
+
+  @override
+  String get onboardingGenresSubtitle =>
+      'Selecione os estilos de filme que você mais gosta de assistir.';
+
+  @override
+  String get onboardingActorsTitle => 'Atores e Atrizes que você curte';
+
+  @override
+  String get onboardingActorsSubtitle =>
+      'Escolha os artistas que te fazem querer assistir um filme.';
+
+  @override
+  String get onboardingDirectorsTitle => 'Diretores marcantes';
+
+  @override
+  String get onboardingDirectorsSubtitle =>
+      'Selecione cineastas cujo estilo de direção você admira.';
+
+  @override
+  String get btnBack => 'Voltar';
+
+  @override
+  String get btnSkip => 'Pular';
+
+  @override
+  String get btnNext => 'Avançar';
+
+  @override
+  String get btnFinish => 'Concluir';
+
+  @override
+  String get profileLoginPrompt =>
+      'Faça login para salvar seus filmes e preferências';
+
+  @override
+  String get profileUpdatedSuccess => 'Perfil atualizado com sucesso!';
+
+  @override
+  String get btnCancel => 'Cancelar';
+
+  @override
+  String get emailRequiredError => 'Digite seu e-mail';
+
+  @override
+  String get emailInvalidError => 'E-mail inválido';
+
+  @override
+  String get passwordRequiredError => 'Digite sua senha';
+
+  @override
+  String get nameRequiredError => 'Digite seu nome completo';
+
+  @override
+  String get passwordTooShortError =>
+      'A senha deve ter pelo menos 6 caracteres';
+
+  @override
+  String get tastePreferencesTitle => 'Preferências de gosto';
+
+  @override
+  String get tastePreferencesSubtitle =>
+      'Editar gêneros, atores e diretores favoritos';
+
+  @override
+  String get tastePreferencesUpdatedSuccess =>
+      'Preferências de gosto atualizadas! A IA já ajustou suas recomendações.';
 }
