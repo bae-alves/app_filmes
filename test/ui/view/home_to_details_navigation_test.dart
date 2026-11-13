@@ -5,6 +5,7 @@ import 'package:app_filmes/l10n/app_localizations.dart';
 import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view/movie_details_page.dart';
 import 'package:app_filmes/ui/view/widgets/movie_card.dart';
+import 'package:app_filmes/ui/view/widgets/poster_card.dart';
 import 'package:app_filmes/ui/view/widgets/watch_providers_section.dart';
 import 'package:app_filmes/ui/view_model/favorites_view_model.dart';
 import 'package:app_filmes/ui/view_model/home_view_model.dart';
@@ -82,6 +83,15 @@ void main() {
     },
   );
 
+  /// Rola até [finder] antes de tocar: na tela de teste (800 × 600), o
+  /// trailer ocupa quase tudo e o resto começa abaixo da dobra.
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
+    await tester.tap(finder);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('a tela inicial lista os filmes populares em cartões', (
     tester,
   ) async {
@@ -89,7 +99,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Filmes populares'), findsOneWidget);
-    expect(find.byType(MovieCard), findsNWidgets(2));
+    expect(
+      find.byKey(const ValueKey(dunaId)),
+      findsOneWidget,
+      reason: 'destaque',
+    );
+    expect(
+      find.byKey(const ValueKey(matrixId)),
+      findsOneWidget,
+      reason: 'grade',
+    );
     expect(find.text('Duna: Parte Dois'), findsOneWidget);
     expect(find.text('Matrix'), findsOneWidget);
   });
@@ -101,7 +120,7 @@ void main() {
       await tester.pumpWidget(buildApp(repository));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(MovieCard).first);
+      await tester.tap(find.byKey(const ValueKey(dunaId)));
       await tester.pumpAndSettle();
 
       // Saímos da tela inicial e chegamos à tela de detalhes.
@@ -171,7 +190,7 @@ void main() {
     await tester.pumpWidget(buildApp(repository));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey(matrixId)));
+    await tapVisible(tester, find.byKey(const ValueKey(matrixId)));
     await tester.pumpAndSettle();
 
     expect(repository.requestedDetailIds, [matrixId]);
@@ -181,15 +200,6 @@ void main() {
     expect(find.text('Elenco'), findsNothing);
     expect(find.textContaining('Direção'), findsNothing);
   });
-
-  /// Rola até [finder] antes de tocar: na tela de teste (800 × 600), o
-  /// trailer ocupa quase tudo e o resto começa abaixo da dobra.
-  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
-    await tester.ensureVisible(finder);
-    await tester.pumpAndSettle();
-    await tester.tap(finder);
-    await tester.pumpAndSettle();
-  }
 
   group('atalhos abaixo do título', () {
     Future<void> openDuna(WidgetTester tester) async {
@@ -277,7 +287,7 @@ void main() {
     await tester.pumpWidget(buildApp(buildRepository()));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(MovieCard).first);
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Paul Atreides'),
@@ -296,7 +306,7 @@ void main() {
     await tester.pumpWidget(buildApp(repository));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey(matrixId)));
+    await tapVisible(tester, find.byKey(const ValueKey(matrixId)));
     await tester.pumpAndSettle();
 
     expect(find.byKey(MovieDetailsPage.trailerKey), findsNothing);
@@ -321,7 +331,7 @@ void main() {
     final repository = buildRepository();
     await tester.pumpWidget(buildApp(repository));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(MovieCard).first);
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
     await tester.pumpAndSettle();
 
     // Um novo MaterialApp reconstrói o Navigator, que reconstrói a página da
@@ -341,7 +351,7 @@ void main() {
       buildApp(buildRepository(), createdViewModels: created),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(MovieCard).first);
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byType(BackButton));
@@ -362,7 +372,7 @@ void main() {
     await tester.pumpWidget(buildApp(buildRepository()));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(MovieCard).first);
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
     await tester.pumpAndSettle();
     expect(find.byType(MovieDetailsPage), findsOneWidget);
 
@@ -372,7 +382,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(MovieDetailsPage), findsNothing);
-    expect(find.byType(MovieCard), findsNWidgets(2));
+    expect(find.byKey(const ValueKey(dunaId)), findsOneWidget);
+    expect(find.byKey(const ValueKey(matrixId)), findsOneWidget);
   });
 
   testWidgets('limpar a pesquisa apaga o campo e volta aos populares', (
@@ -389,12 +400,14 @@ void main() {
     await tester.enterText(find.byType(TextField), 'matrix');
     await tester.testTextInput.receiveAction(TextInputAction.search);
     await tester.pumpAndSettle();
-    expect(find.byType(MovieCard), findsOneWidget);
+    expect(find.byKey(const ValueKey(matrixId)), findsOneWidget);
+    expect(find.byKey(const ValueKey(dunaId)), findsNothing);
 
     await tester.tap(find.byTooltip('Limpar filtros'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(MovieCard), findsNWidgets(2));
+    expect(find.byKey(const ValueKey(dunaId)), findsOneWidget);
+    expect(find.byKey(const ValueKey(matrixId)), findsOneWidget);
     expect(find.text('matrix'), findsNothing);
     expect(find.byTooltip('Limpar filtros'), findsNothing);
   });
@@ -433,11 +446,15 @@ void main() {
     await tester.testTextInput.receiveAction(TextInputAction.search);
     await tester.pumpAndSettle();
 
-    await tester.fling(find.byType(MovieCard), const Offset(0, 400), 1000);
+    await tester.fling(
+      find.byKey(const ValueKey(matrixId)),
+      const Offset(0, 400),
+      1000,
+    );
     await tester.pumpAndSettle();
 
     expect(repository.forcedRefreshCount, 0);
-    expect(find.byType(MovieCard), findsOneWidget);
+    expect(find.byKey(const ValueKey(dunaId)), findsNothing);
     expect(find.byKey(const ValueKey(matrixId)), findsOneWidget);
   });
 
@@ -448,7 +465,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Nenhum filme encontrado no momento.'), findsOneWidget);
-    expect(find.byType(MovieCard), findsNothing);
+    expect(find.byType(PosterCard), findsNothing);
   });
 
   testWidgets('a tela inicial mostra o erro e permite tentar novamente', (
@@ -513,7 +530,7 @@ void main() {
     );
     await tester.pumpWidget(buildApp(repository));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(MovieCard));
+    await tester.tap(find.byKey(const ValueKey(matrixId)));
     await tester.pumpAndSettle();
 
     // O botão já existe fora da tela (dentro do cacheExtent da lista), então
@@ -540,7 +557,7 @@ void main() {
     );
     await tester.pumpWidget(buildApp(repository));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(MovieCard));
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
     await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(
@@ -571,7 +588,7 @@ void main() {
     );
     await tester.pumpWidget(buildApp(buildRepository()));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(MovieCard).first);
+    await tester.tap(find.byKey(const ValueKey(dunaId)));
     await tester.pumpAndSettle();
 
     // O logo já existe fora da tela (dentro do cacheExtent da lista).
@@ -610,7 +627,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.drag(find.byType(ListView), const Offset(0, -10000));
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -10000));
       await tester.pumpAndSettle();
 
       expect(
@@ -625,7 +642,7 @@ void main() {
       useNavigationBar(tester);
       await tester.pumpWidget(buildApp(buildRepository()));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(MovieCard).first);
+      await tester.tap(find.byKey(const ValueKey(dunaId)));
       await tester.pumpAndSettle();
 
       await tester.drag(detailsScrollable, const Offset(0, -10000));
@@ -649,9 +666,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Popular movies'), findsOneWidget);
-      expect(find.text('Movie title'), findsOneWidget);
+      expect(find.text('Type a movie title'), findsOneWidget);
 
-      await tester.tap(find.byType(MovieCard).first);
+      await tester.tap(find.byKey(const ValueKey(dunaId)));
       await tester.pumpAndSettle();
 
       expect(find.text('Synopsis'), findsOneWidget);
@@ -671,7 +688,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const ValueKey(matrixId)));
+      await tapVisible(tester, find.byKey(const ValueKey(matrixId)));
       await tester.pumpAndSettle();
 
       expect(find.text('Trailer not available'), findsOneWidget);

@@ -158,11 +158,47 @@ abstract class AppLocalizations {
   /// **'Não foi possível carregar os filmes.'**
   String get homeLoadError;
 
-  /// Rótulo do campo de pesquisa da tela inicial.
+  /// Título da grade da tela inicial quando há pesquisa ou filtro de gênero ativo (sem filtro, o título é homeTitle).
   ///
   /// In pt, this message translates to:
-  /// **'Nome do filme'**
-  String get searchLabel;
+  /// **'Resultados'**
+  String get homeResults;
+
+  /// Selo do filme em destaque no topo da tela inicial: o primeiro da lista de populares do TMDB.
+  ///
+  /// In pt, this message translates to:
+  /// **'#1 em alta'**
+  String get featuredBadge;
+
+  /// Botão do filme em destaque que abre a tela de detalhes, com o trailer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver detalhes'**
+  String get featuredDetails;
+
+  /// Primeiro chip da fileira de gêneros da tela inicial: tira o filtro de gênero.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos'**
+  String get genreAll;
+
+  /// Título do cartão da tela inicial que leva ao assistente MovieAI.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem ideia do que assistir?'**
+  String get assistantCardTitle;
+
+  /// Texto do cartão da tela inicial que leva ao assistente MovieAI. Não traduza o nome MovieAI.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conte como você está e o MovieAI sugere filmes para o seu momento.'**
+  String get assistantCardBody;
+
+  /// Botão do cartão da tela inicial que abre a aba do assistente MovieAI. Não traduza o nome MovieAI.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perguntar ao MovieAI'**
+  String get assistantCardAction;
 
   /// Texto de exemplo dentro do campo de pesquisa vazio.
   ///

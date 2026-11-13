@@ -61,9 +61,39 @@
     "description": "Erro da tela inicial quando a lista de filmes não carrega. O detalhe técnico vai só para o log."
   },
 
-  "searchLabel": "Nome do filme",
-  "@searchLabel": {
-    "description": "Rótulo do campo de pesquisa da tela inicial."
+  "homeResults": "Resultados",
+  "@homeResults": {
+    "description": "Título da grade da tela inicial quando há pesquisa ou filtro de gênero ativo (sem filtro, o título é homeTitle)."
+  },
+
+  "featuredBadge": "#1 em alta",
+  "@featuredBadge": {
+    "description": "Selo do filme em destaque no topo da tela inicial: o primeiro da lista de populares do TMDB."
+  },
+
+  "featuredDetails": "Ver detalhes",
+  "@featuredDetails": {
+    "description": "Botão do filme em destaque que abre a tela de detalhes, com o trailer."
+  },
+
+  "genreAll": "Todos",
+  "@genreAll": {
+    "description": "Primeiro chip da fileira de gêneros da tela inicial: tira o filtro de gênero."
+  },
+
+  "assistantCardTitle": "Sem ideia do que assistir?",
+  "@assistantCardTitle": {
+    "description": "Título do cartão da tela inicial que leva ao assistente MovieAI."
+  },
+
+  "assistantCardBody": "Conte como você está e o MovieAI sugere filmes para o seu momento.",
+  "@assistantCardBody": {
+    "description": "Texto do cartão da tela inicial que leva ao assistente MovieAI. Não traduza o nome MovieAI."
+  },
+
+  "assistantCardAction": "Perguntar ao MovieAI",
+  "@assistantCardAction": {
+    "description": "Botão do cartão da tela inicial que abre a aba do assistente MovieAI. Não traduza o nome MovieAI."
   },
 
   "searchHint": "Digite o nome do filme",

@@ -21,15 +21,24 @@ class AppShell extends StatefulWidget {
   final Widget assistant;
   final Widget favorites;
 
+  /// Índice da aba MovieAI, para [AppShellState.selectTab].
+  static const assistantTab = 1;
+
+  /// Estrutura que envolve [context], ou `null` fora dela (como nos testes que
+  /// montam uma página sozinha).
+  static AppShellState? maybeOf(BuildContext context) =>
+      context.findAncestorStateOfType<AppShellState>();
+
   @override
-  State<AppShell> createState() => _AppShellState();
+  State<AppShell> createState() => AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class AppShellState extends State<AppShell> {
   int _index = 0;
   final Set<int> _visited = {0};
 
-  void _select(int index) => setState(() {
+  /// Mostra a aba [index], como um toque na barra inferior.
+  void selectTab(int index) => setState(() {
     _index = index;
     _visited.add(index);
   });
@@ -43,7 +52,7 @@ class _AppShellState extends State<AppShell> {
     return PopScope(
       canPop: _index == 0,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _select(0);
+        if (!didPop) selectTab(0);
       },
       child: Scaffold(
         body: IndexedStack(
@@ -55,7 +64,7 @@ class _AppShellState extends State<AppShell> {
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: _index,
-          onDestinationSelected: _select,
+          onDestinationSelected: selectTab,
           destinations: [
             NavigationDestination(
               icon: const Icon(LucideIcons.clapperboard),

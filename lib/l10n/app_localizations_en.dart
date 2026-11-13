@@ -45,7 +45,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeLoadError => 'Couldn\'t load the movies.';
 
   @override
-  String get searchLabel => 'Movie title';
+  String get homeResults => 'Results';
+
+  @override
+  String get featuredBadge => '#1 trending';
+
+  @override
+  String get featuredDetails => 'See details';
+
+  @override
+  String get genreAll => 'All';
+
+  @override
+  String get assistantCardTitle => 'Not sure what to watch?';
+
+  @override
+  String get assistantCardBody =>
+      'Tell MovieAI how you feel and get movies for the moment.';
+
+  @override
+  String get assistantCardAction => 'Ask MovieAI';
 
   @override
   String get searchHint => 'Type a movie title';

@@ -9,6 +9,40 @@ import '../../fakes/fake_movies_repository.dart';
 import '../../fakes/movie_fixtures.dart';
 
 void main() {
+  group('quickToggleGenre', () {
+    test('aplica o gênero na hora e apaga a pesquisa', () async {
+      final viewModel = HomeViewModel(
+        moviesRepository: FakeMoviesRepository(
+          popularMovies: const [dunaMovie, matrixMovie],
+          searchMoviesResult: const [matrixMovie],
+          discoverMoviesResult: const [dunaMovie],
+        ),
+      );
+      await viewModel.search('matrix');
+
+      await viewModel.quickToggleGenre(878);
+
+      expect(viewModel.selectedGenreIds, [878]);
+      expect(viewModel.searchQuery, isEmpty);
+      expect(viewModel.movies.map((movie) => movie.id), [dunaId]);
+    });
+
+    test('desmarcar o último gênero volta aos populares', () async {
+      final viewModel = HomeViewModel(
+        moviesRepository: FakeMoviesRepository(
+          popularMovies: const [dunaMovie, matrixMovie],
+          discoverMoviesResult: const [dunaMovie],
+        ),
+      );
+      await viewModel.quickToggleGenre(878);
+
+      await viewModel.quickToggleGenre(878);
+
+      expect(viewModel.hasFilters, isFalse);
+      expect(viewModel.movies.map((movie) => movie.id), [dunaId, matrixId]);
+    });
+  });
+
   test('começa vazia, sem carregar e sem erro', () {
     final viewModel = HomeViewModel(moviesRepository: FakeMoviesRepository());
 

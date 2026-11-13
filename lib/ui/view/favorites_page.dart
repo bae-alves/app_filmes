@@ -48,7 +48,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
   void initState() {
     super.initState();
     // Lê de novo ao abrir: a primeira leitura, no main.dart, pode ter falhado.
-    widget.viewModel.load();
+    // Só depois do quadro: `load` avisa os ouvintes na hora, e a home, que
+    // também ouve os favoritos, não pode ser marcada no meio de um build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.viewModel.load();
+    });
   }
 
   /// Remove [movie] e oferece desfazer.

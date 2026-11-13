@@ -134,8 +134,20 @@ abstract final class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: scheme.surfaceContainerHigh,
         selectedColor: scheme.primary,
+        checkmarkColor: scheme.onPrimary,
         side: BorderSide.none,
         shape: stadium,
+        // O chip resolve a cor do rótulo pelo estado: escuro sobre o âmbar
+        // do selecionado, claro sobre o cinza dos demais.
+        labelStyle: TextStyle(
+          fontFamily: fontFamily,
+          fontWeight: FontWeight.w600,
+          color: WidgetStateColor.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? scheme.onPrimary
+                : scheme.onSurfaceVariant,
+          ),
+        ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: scheme.surfaceContainerLow,

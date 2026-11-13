@@ -45,7 +45,26 @@ class AppLocalizationsPt extends AppLocalizations {
   String get homeLoadError => 'Não foi possível carregar os filmes.';
 
   @override
-  String get searchLabel => 'Nome do filme';
+  String get homeResults => 'Resultados';
+
+  @override
+  String get featuredBadge => '#1 em alta';
+
+  @override
+  String get featuredDetails => 'Ver detalhes';
+
+  @override
+  String get genreAll => 'Todos';
+
+  @override
+  String get assistantCardTitle => 'Sem ideia do que assistir?';
+
+  @override
+  String get assistantCardBody =>
+      'Conte como você está e o MovieAI sugere filmes para o seu momento.';
+
+  @override
+  String get assistantCardAction => 'Perguntar ao MovieAI';
 
   @override
   String get searchHint => 'Digite o nome do filme';
