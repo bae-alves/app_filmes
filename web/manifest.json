@@ -1,6 +1,6 @@
 {
-    "name": "App Filmes",
-    "short_name": "App Filmes",
+    "name": "MovieAI",
+    "short_name": "MovieAI",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

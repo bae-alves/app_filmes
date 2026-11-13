@@ -69,7 +69,6 @@ void main() {
         ),
         trailerPlayerBuilder: (context, youtubeKey) =>
             Text('trailer-fake:$youtubeKey'),
-        onOpenChat: () {},
       ),
     );
   }

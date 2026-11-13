@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../view_model/chat_message.dart';
 import '../view_model/chat_view_model.dart';
+import 'widgets/movie_ai_logo.dart';
 import 'widgets/movie_card.dart';
 
 class ChatPage extends StatefulWidget {
@@ -36,11 +37,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Row(
-          children: [
-            Icon(Icons.auto_awesome),
-            SizedBox(width: 8),
-            Text('MOVIEAI'),
-          ],
+          children: [MovieAiLogo(), SizedBox(width: 8), Text('MovieAI')],
         ),
       ),
       body: Column(
@@ -132,7 +129,9 @@ class _ChatPageState extends State<ChatPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         error,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     ),
                   SafeArea(
@@ -149,9 +148,6 @@ class _ChatPageState extends State<ChatPage> {
                               onSubmitted: (_) => _sendMessage(),
                               decoration: InputDecoration(
                                 hintText: 'Descreva seu humor...',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 18,
                                   vertical: 12,

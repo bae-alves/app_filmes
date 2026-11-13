@@ -68,7 +68,7 @@ encontra no console.
   mas até a duração de um filme pode diferir entre `pt-BR` e `en-US`.
 - Nem todo filme tem tradução no TMDB. Sem ela, o campo vem no idioma
   original ou vazio, e o app mostra "Sinopse não disponível."
-- O nome do app ("App Filmes") não é traduzido.
+- O nome do app ("MovieAI") não é traduzido.
 
 ## Veja também
 

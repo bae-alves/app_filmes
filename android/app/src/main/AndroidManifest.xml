@@ -4,7 +4,7 @@
          linha, a build de release ficaria sem acesso à internet. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="app_filmes"
+        android:label="MovieAI"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'{minutes}min'**
   String runtimeMinutes(int minutes);
 
+  /// Aba da barra inferior que leva à tela inicial. Mantenha curto: divide a barra com outras duas abas.
+  ///
+  /// In pt, this message translates to:
+  /// **'Início'**
+  String get navHome;
+
   /// Título da tela inicial, que lista os filmes populares do momento.
   ///
   /// In pt, this message translates to:

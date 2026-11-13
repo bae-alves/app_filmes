@@ -1,4 +1,5 @@
 import 'package:app_filmes/l10n/app_localizations.dart';
+import 'package:app_filmes/ui/view/app_shell.dart';
 import 'package:app_filmes/ui/view/favorites_page.dart';
 import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view/movie_details_page.dart';
@@ -31,24 +32,36 @@ void main() {
     final favoritesViewModel = FavoritesViewModel(
       favoritesRepository: favorites,
     )..load();
+    MovieDetailsViewModel details(int movieId) => MovieDetailsViewModel(
+      moviesRepository: movies,
+      movieId: movieId,
+      watchRegion: 'BR',
+    );
+    MovieRatingViewModel rating(int movieId) => MovieRatingViewModel(
+      ratingsRepository: FakeRatingsRepository(),
+      movieId: movieId,
+    );
+    Widget noTrailer(BuildContext context, String youtubeKey) =>
+        const SizedBox();
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
-      home: HomePage(
-        viewModel: HomeViewModel(moviesRepository: movies),
-        favoritesViewModel: favoritesViewModel,
-        detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
-          moviesRepository: movies,
-          movieId: movieId,
-          watchRegion: 'BR',
+      home: AppShell(
+        home: HomePage(
+          viewModel: HomeViewModel(moviesRepository: movies),
+          favoritesViewModel: favoritesViewModel,
+          detailsViewModelFactory: details,
+          ratingViewModelFactory: rating,
+          trailerPlayerBuilder: noTrailer,
         ),
-        ratingViewModelFactory: (movieId) => MovieRatingViewModel(
-          ratingsRepository: FakeRatingsRepository(),
-          movieId: movieId,
+        assistant: const SizedBox(),
+        favorites: FavoritesPage(
+          viewModel: favoritesViewModel,
+          detailsViewModelFactory: details,
+          ratingViewModelFactory: rating,
+          trailerPlayerBuilder: noTrailer,
         ),
-        trailerPlayerBuilder: (context, youtubeKey) => const SizedBox(),
-        onOpenChat: () {},
       ),
     );
   }

@@ -9,7 +9,7 @@ flutter build web
 cd build/web && python3 -m http.server 8791 --bind 127.0.0.1
 ```
 
-Abra <http://127.0.0.1:8791>. Confira o título da aba ("App Filmes"): outra
+Abra <http://127.0.0.1:8791>. Confira o título da aba ("MovieAI"): outra
 aplicação pode estar na porta.
 
 ## Ver o app em outro idioma

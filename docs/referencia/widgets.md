@@ -2,6 +2,19 @@
 
 Todos exigem os delegates de `AppLocalizations` no `MaterialApp`.
 
+## `AppShell`
+
+`lib/ui/view/app_shell.dart`. Raiz do app: barra inferior (`NavigationBar`)
+com as abas Início, MovieAI e Favoritos. O rótulo de cada aba também é o seu
+tooltip. Cada aba só é construída na primeira visita e depois fica viva
+(`IndexedStack`). Fora do Início, o "voltar" do sistema volta ao Início.
+
+| Parâmetro | Tipo | Descrição |
+| --- | --- | --- |
+| `home` | `Widget` | Aba Início; no app, a `HomePage`. |
+| `assistant` | `Widget` | Aba MovieAI; no app, a `ChatPage`. |
+| `favorites` | `Widget` | Aba Favoritos; no app, a `FavoritesPage`. |
+
 ## `HomePage`
 
 `lib/ui/view/home_page.dart`. Lista de filmes, pesquisa e filtro por gênero.
@@ -9,7 +22,7 @@ Todos exigem os delegates de `AppLocalizations` no `MaterialApp`.
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `viewModel` | `HomeViewModel` | — | Estado e comandos. |
-| `favoritesViewModel` | `FavoritesViewModel` | — | Lista de favoritos. O coração da barra abre a `FavoritesPage`. |
+| `favoritesViewModel` | `FavoritesViewModel` | — | Lista de favoritos, repassada ao coração da tela de detalhes. |
 | `detailsViewModelFactory` | `MovieDetailsViewModel Function(int movieId)` | — | Cria a view model da tela de detalhes. |
 | `ratingViewModelFactory` | `MovieRatingViewModel Function(int movieId)` | — | Cria a view model da avaliação, mostrada nos detalhes. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Repassado à tela de detalhes. |

@@ -8,6 +8,7 @@
   "runtimeHours": "{hours}h",
   "runtimeMinutes": "{minutes}m",
 
+  "navHome": "Home",
   "homeTitle": "Popular movies",
   "homeEmpty": "No movies found right now.",
   "homeLoadError": "Couldn't load the movies.",

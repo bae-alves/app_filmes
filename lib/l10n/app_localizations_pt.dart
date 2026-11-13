@@ -33,6 +33,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get navHome => 'Início';
+
+  @override
   String get homeTitle => 'Filmes populares';
 
   @override

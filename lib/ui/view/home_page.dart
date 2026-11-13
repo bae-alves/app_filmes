@@ -6,8 +6,8 @@ import '../view_model/favorites_view_model.dart';
 import '../view_model/home_view_model.dart';
 import '../view_model/movie_details_view_model.dart';
 import '../view_model/movie_rating_view_model.dart';
-import 'favorites_page.dart';
 import 'movie_details_page.dart';
+import 'widgets/movie_ai_logo.dart';
 import 'widgets/movie_card.dart';
 import 'widgets/trailer_player.dart';
 
@@ -31,15 +31,13 @@ class HomePage extends StatefulWidget {
     required this.ratingViewModelFactory,
     required this.favoritesViewModel,
     this.trailerPlayerBuilder = defaultTrailerPlayerBuilder,
-    required this.onOpenChat,
   });
 
   /// Estado e comandos da tela.
   final HomeViewModel viewModel;
 
-  /// Lista de favoritos, aberta pelo botão da AppBar.
+  /// Lista de favoritos, repassada para o coração da tela de detalhes.
   final FavoritesViewModel favoritesViewModel;
-  final VoidCallback onOpenChat;
 
   /// Fábrica da view model usada ao abrir a tela de detalhes.
   final MovieDetailsViewModelFactory detailsViewModelFactory;
@@ -76,19 +74,6 @@ class _HomePageState extends State<HomePage> {
         favoritesViewModel: widget.favoritesViewModel,
         fallbackTitle: movie.title,
         trailerPlayerBuilder: widget.trailerPlayerBuilder,
-      ),
-    );
-  }
-
-  void _openFavorites() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => FavoritesPage(
-          viewModel: widget.favoritesViewModel,
-          detailsViewModelFactory: widget.detailsViewModelFactory,
-          ratingViewModelFactory: widget.ratingViewModelFactory,
-          trailerPlayerBuilder: widget.trailerPlayerBuilder,
-        ),
       ),
     );
   }
@@ -184,19 +169,8 @@ class _HomePageState extends State<HomePage> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
+        leading: const Center(child: MovieAiLogo()),
         title: Text(l10n.homeTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.auto_awesome),
-            tooltip: 'Assistente de recomendações',
-            onPressed: widget.onOpenChat,
-          ),
-          IconButton(
-            icon: const Icon(Icons.favorite_border),
-            tooltip: l10n.favoritesTitle,
-            onPressed: _openFavorites,
-          ),
-        ],
       ),
       body: ListenableBuilder(
         listenable: widget.viewModel,
@@ -298,7 +272,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          border: const OutlineInputBorder(),
         ),
       ),
     );

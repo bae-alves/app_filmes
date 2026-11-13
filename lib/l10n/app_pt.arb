@@ -41,6 +41,11 @@
     }
   },
 
+  "navHome": "Início",
+  "@navHome": {
+    "description": "Aba da barra inferior que leva à tela inicial. Mantenha curto: divide a barra com outras duas abas."
+  },
+
   "homeTitle": "Filmes populares",
   "@homeTitle": {
     "description": "Título da tela inicial, que lista os filmes populares do momento."

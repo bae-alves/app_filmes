@@ -9,7 +9,7 @@ import 'widgets/movie_card.dart';
 import 'widgets/trailer_player.dart';
 
 /// Lista de favoritos (watchlist): os filmes que o usuário salvou para ver
-/// depois. Aberta pelo coração da AppBar da tela inicial.
+/// depois. É a aba Favoritos da barra inferior (veja AppShell).
 ///
 /// Um filme sai da lista pelo botão de lixeira do cartão, arrastando o cartão
 /// para a esquerda, ou pelo coração da tela de detalhes. As duas primeiras

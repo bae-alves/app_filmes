@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -12,6 +14,9 @@ import 'data/repositories/ratings_repository_local.dart';
 import 'data/services/app_database.dart';
 import 'data/services/tmdb_dio.dart';
 import 'data/services/tmdb_rest_client.dart';
+import 'ui/theme/app_theme.dart';
+import 'ui/view/app_shell.dart';
+import 'ui/view/favorites_page.dart';
 import 'ui/view/home_page.dart';
 import 'ui/view_model/favorites_view_model.dart';
 import 'ui/view_model/home_view_model.dart';
@@ -27,6 +32,10 @@ Future<void> main() async {
   // `ensureInitialized` é necessário porque carregamos o .env (um asset) e o
   // armazenamento local antes de `runApp`.
   WidgetsFlutterBinding.ensureInitialized();
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('assets/fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['PlusJakartaSans'], license);
+  });
   await Env.load();
   final preferences = await SharedPreferences.getInstance();
   final database = await AppDatabase.open();
@@ -99,35 +108,36 @@ class _AppFilmesState extends State<AppFilmes> {
     super.dispose();
   }
 
+  MovieDetailsViewModel _detailsViewModel(int movieId) => MovieDetailsViewModel(
+    moviesRepository: _moviesRepository,
+    movieId: movieId,
+    watchRegion: currentWatchRegion(),
+  );
+
+  MovieRatingViewModel _ratingViewModel(int movieId) => MovieRatingViewModel(
+    ratingsRepository: _ratingsRepository,
+    movieId: movieId,
+  );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'App Filmes',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
-      ),
+      title: 'MovieAI',
+      theme: AppTheme.dark(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: Builder(
-        builder: (context) => HomePage(
+      home: AppShell(
+        home: HomePage(
           viewModel: _homeViewModel,
           favoritesViewModel: _favoritesViewModel,
-          detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
-            moviesRepository: _moviesRepository,
-            movieId: movieId,
-            watchRegion: currentWatchRegion(),
-          ),
-          ratingViewModelFactory: (movieId) => MovieRatingViewModel(
-            ratingsRepository: _ratingsRepository,
-            movieId: movieId,
-          ),
-          onOpenChat: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => ChatPage(viewModel: _chatViewModel),
-              ),
-            );
-          },
+          detailsViewModelFactory: _detailsViewModel,
+          ratingViewModelFactory: _ratingViewModel,
+        ),
+        assistant: ChatPage(viewModel: _chatViewModel),
+        favorites: FavoritesPage(
+          viewModel: _favoritesViewModel,
+          detailsViewModelFactory: _detailsViewModel,
+          ratingViewModelFactory: _ratingViewModel,
         ),
       ),
     );
