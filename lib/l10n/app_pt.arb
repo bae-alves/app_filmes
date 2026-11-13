@@ -2,346 +2,116 @@
   "@@locale": "pt",
 
   "retry": "Tentar novamente",
-  "@retry": {
-    "description": "Botão das telas de erro que repete o carregamento."
-  },
-
   "untitled": "Sem título",
-  "@untitled": {
-    "description": "Substitui o título de um filme que o TMDB devolve sem nome."
-  },
-
   "synopsisUnavailable": "Sinopse não disponível.",
-  "@synopsisUnavailable": {
-    "description": "Substitui a sinopse de um filme que o TMDB devolve sem texto (cartão da home e tela de detalhes)."
-  },
-
   "runtimeHoursMinutes": "{hours}h {minutes}min",
-  "@runtimeHoursMinutes": {
-    "description": "Duração do filme com horas e minutos (ex.: 2h 46min). Mantenha curto: aparece numa linha de metadados.",
-    "placeholders": {
-      "hours": {"type": "int"},
-      "minutes": {"type": "int"}
-    }
-  },
-
   "runtimeHours": "{hours}h",
-  "@runtimeHours": {
-    "description": "Duração do filme exata em horas (ex.: 2h).",
-    "placeholders": {
-      "hours": {"type": "int"}
-    }
-  },
-
   "runtimeMinutes": "{minutes}min",
-  "@runtimeMinutes": {
-    "description": "Duração de um filme com menos de uma hora (ex.: 45min).",
-    "placeholders": {
-      "minutes": {"type": "int"}
-    }
-  },
 
   "navHome": "Início",
-  "@navHome": {
-    "description": "Aba da barra inferior que leva à tela inicial. Mantenha curto: divide a barra com outras duas abas."
-  },
-
   "homeTitle": "Filmes populares",
-  "@homeTitle": {
-    "description": "Título da tela inicial, que lista os filmes populares do momento."
-  },
-
   "homeEmpty": "Nenhum filme encontrado no momento.",
-  "@homeEmpty": {
-    "description": "Aviso da tela inicial quando a lista (populares, pesquisa ou filtro) volta vazia."
-  },
-
   "homeLoadError": "Não foi possível carregar os filmes.",
-  "@homeLoadError": {
-    "description": "Erro da tela inicial quando a lista de filmes não carrega. O detalhe técnico vai só para o log."
-  },
-
   "homeResults": "Resultados",
-  "@homeResults": {
-    "description": "Título da grade da tela inicial quando há pesquisa ou filtro de gênero ativo (sem filtro, o título é homeTitle)."
-  },
-
   "featuredBadge": "#1 em alta",
-  "@featuredBadge": {
-    "description": "Selo do filme em destaque no topo da tela inicial: o primeiro da lista de populares do TMDB."
-  },
-
   "featuredDetails": "Ver detalhes",
-  "@featuredDetails": {
-    "description": "Botão do filme em destaque que abre a tela de detalhes, com o trailer."
-  },
-
   "genreAll": "Todos",
-  "@genreAll": {
-    "description": "Primeiro chip da fileira de gêneros da tela inicial: tira o filtro de gênero."
-  },
-
   "assistantCardTitle": "Sem ideia do que assistir?",
-  "@assistantCardTitle": {
-    "description": "Título do cartão da tela inicial que leva ao assistente MovieAI."
-  },
-
   "assistantCardBody": "Conte como você está e o MovieAI sugere filmes para o seu momento.",
-  "@assistantCardBody": {
-    "description": "Texto do cartão da tela inicial que leva ao assistente MovieAI. Não traduza o nome MovieAI."
-  },
-
   "assistantCardAction": "Perguntar ao MovieAI",
-  "@assistantCardAction": {
-    "description": "Botão do cartão da tela inicial que abre a aba do assistente MovieAI. Não traduza o nome MovieAI."
-  },
-
   "searchHint": "Digite o nome do filme",
-  "@searchHint": {
-    "description": "Texto de exemplo dentro do campo de pesquisa vazio."
-  },
-
   "advancedFilter": "Filtro avançado",
-  "@advancedFilter": {
-    "description": "Botão da tela inicial e título da folha que filtra os filmes por gênero."
-  },
-
   "applyFilters": "Aplicar filtros",
-  "@applyFilters": {
-    "description": "Botão da folha de filtro avançado que aplica os gêneros marcados."
-  },
-
   "clearFilters": "Limpar filtros",
-  "@clearFilters": {
-    "description": "Dica e rótulo de acessibilidade do botão de X no campo de pesquisa, que apaga a pesquisa e os gêneros marcados."
-  },
-
   "genresLoadError": "Não foi possível carregar os gêneros.",
-  "@genresLoadError": {
-    "description": "Erro da folha de filtro avançado quando a lista de gêneros não carrega."
-  },
 
   "detailsFallbackTitle": "Detalhes",
-  "@detailsFallbackTitle": {
-    "description": "Título da barra superior da tela de detalhes enquanto o nome do filme não é conhecido."
-  },
-
   "detailsLoadError": "Não foi possível carregar este filme.",
-  "@detailsLoadError": {
-    "description": "Erro da tela de detalhes quando as informações do filme não carregam. O detalhe técnico vai só para o log."
-  },
-
   "detailsNotFound": "Não encontramos informações sobre este filme.",
-  "@detailsNotFound": {
-    "description": "Aviso da tela de detalhes quando o carregamento termina sem erro, mas sem dados."
-  },
-
   "synopsisTitle": "Sinopse",
-  "@synopsisTitle": {
-    "description": "Título da seção da tela de detalhes com o resumo do filme."
-  },
-
   "trailerUnavailable": "Trailer não disponível",
-  "@trailerUnavailable": {
-    "description": "Aviso no lugar do player quando o filme não tem trailer publicado."
-  },
 
   "watchProvidersTitle": "Onde assistir",
-  "@watchProvidersTitle": {
-    "description": "Título da seção da tela de detalhes que lista os serviços de streaming do filme."
-  },
-
   "watchProvidersSubscription": "Assinatura",
-  "@watchProvidersSubscription": {
-    "description": "Grupo de serviços em que o filme está incluído na assinatura (ex.: Netflix, Max)."
-  },
-
   "watchProvidersFree": "Grátis",
-  "@watchProvidersFree": {
-    "description": "Grupo de serviços em que o filme é gratuito, com ou sem anúncios."
-  },
-
   "watchProvidersRent": "Alugar",
-  "@watchProvidersRent": {
-    "description": "Grupo de serviços em que o filme pode ser alugado."
-  },
-
   "watchProvidersBuy": "Comprar",
-  "@watchProvidersBuy": {
-    "description": "Grupo de serviços em que o filme pode ser comprado."
-  },
-
   "watchProvidersUnavailable": "Indisponível em streaming na sua região",
-  "@watchProvidersUnavailable": {
-    "description": "Aviso exibido quando o filme não está em nenhum serviço de streaming na região do usuário."
-  },
-
   "watchProvidersSeeWhere": "Ver onde assistir",
-  "@watchProvidersSeeWhere": {
-    "description": "Botão que abre, fora do app, a página do TMDB com os links para cada serviço de streaming."
-  },
-
   "watchProvidersAttribution": "Fonte: JustWatch",
-  "@watchProvidersAttribution": {
-    "description": "Crédito obrigatório pelos termos do TMDB: os dados de streaming vêm da JustWatch. Não traduza o nome JustWatch."
-  },
-
   "watchProvidersLoadError": "Não foi possível carregar onde assistir",
-  "@watchProvidersLoadError": {
-    "description": "Aviso na seção \"Onde assistir\" quando a consulta falha. Diferente de watchProvidersUnavailable: aqui não se sabe se o filme está em algum serviço."
-  },
-
   "castTitle": "Elenco",
-  "@castTitle": {
-    "description": "Título da seção da tela de detalhes com os atores principais."
-  },
-
   "castSeeAll": "Ver todos",
-  "@castSeeAll": {
-    "description": "Botão ao lado do título \"Elenco\" que abre a lista completa do elenco."
-  },
-
   "crewTitle": "Direção e equipe",
-  "@crewTitle": {
-    "description": "Título do cartão da tela de detalhes com direção, roteiro e trilha sonora do filme."
-  },
-
   "crewDirector": "Direção",
-  "@crewDirector": {
-    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem dirigiu o filme."
-  },
-
   "crewWriter": "Roteiro",
-  "@crewWriter": {
-    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem escreveu o roteiro."
-  },
-
   "crewMusic": "Trilha sonora",
-  "@crewMusic": {
-    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem compôs a trilha sonora."
-  },
-
   "readMore": "ler mais",
-  "@readMore": {
-    "description": "Botão abaixo da sinopse cortada, que mostra o texto inteiro."
-  },
-
   "readLess": "ler menos",
-  "@readLess": {
-    "description": "Botão abaixo da sinopse aberta, que volta a cortá-la."
-  },
-
   "actionFavorite": "Favoritar",
-  "@actionFavorite": {
-    "description": "Atalho da tela de detalhes, abaixo do título, que salva o filme nos favoritos. Mantenha curto: divide a linha com outros dois atalhos."
-  },
-
   "actionFavorited": "Nos favoritos",
-  "@actionFavorited": {
-    "description": "O mesmo atalho de actionFavorite quando o filme já está nos favoritos; tocar o tira de lá."
-  },
-
   "actionRate": "Avaliar",
-  "@actionRate": {
-    "description": "Atalho da tela de detalhes que rola até a seção \"Sua avaliação\"."
-  },
-
   "actionRated": "Avaliado",
-  "@actionRated": {
-    "description": "O mesmo atalho de actionRate quando o usuário já deu nota ou humor ao filme."
-  },
-
   "actionWatch": "Assistir",
-  "@actionWatch": {
-    "description": "Atalho da tela de detalhes que rola até a seção \"Onde assistir\"."
-  },
-
   "certificationLabel": "Classificação indicativa: {certification}",
-  "@certificationLabel": {
-    "description": "Dica e rótulo de acessibilidade do selo com a classificação indicativa do país do usuário (ex.: 14, L, PG-13).",
-    "placeholders": {
-      "certification": {"type": "String"}
-    }
-  },
-
   "favoritesTitle": "Favoritos",
-  "@favoritesTitle": {
-    "description": "Título da tela com a lista de favoritos (watchlist) e dica do botão da tela inicial que a abre."
-  },
-
   "favoritesEmpty": "Nenhum filme nos favoritos ainda. Toque no coração na tela de um filme para salvá-lo aqui.",
-  "@favoritesEmpty": {
-    "description": "Mensagem da tela de favoritos quando a lista está vazia. Explica como adicionar um filme."
-  },
-
   "favoritesLoadError": "Não foi possível carregar os favoritos.",
-  "@favoritesLoadError": {
-    "description": "Mensagem da tela de favoritos quando a leitura da lista salva no aparelho falha."
-  },
-
   "favoriteAdd": "Adicionar aos favoritos",
-  "@favoriteAdd": {
-    "description": "Dica do botão de coração (vazio) da tela de detalhes, que salva o filme nos favoritos."
-  },
-
   "favoriteRemove": "Remover dos favoritos",
-  "@favoriteRemove": {
-    "description": "Dica do botão de coração (cheio) da tela de detalhes, que tira o filme dos favoritos."
-  },
-
   "favoriteRemoved": "{title} saiu dos favoritos",
-  "@favoriteRemoved": {
-    "description": "Aviso na parte de baixo da tela de favoritos depois de remover um filme, ao lado do botão \"Desfazer\".",
-    "placeholders": {
-      "title": {"type": "String"}
-    }
-  },
-
   "undo": "Desfazer",
-  "@undo": {
-    "description": "Ação do aviso de filme removido: devolve o filme à lista, no mesmo lugar."
-  },
-
   "ratingTitle": "Sua avaliação",
-  "@ratingTitle": {
-    "description": "Título da seção da tela de detalhes onde o usuário dá nota e reação de humor ao filme."
-  },
-
   "ratingHint": "Já assistiu? Dê uma nota e conte como foi.",
-  "@ratingHint": {
-    "description": "Linha abaixo de \"Sua avaliação\". Explica que a avaliação é para filmes já assistidos."
-  },
-
   "ratingStars": "{count, plural, =1{1 estrela} other{{count} estrelas}}",
-  "@ratingStars": {
-    "description": "Dica e rótulo de acessibilidade de cada estrela da avaliação (de 1 a 5).",
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-
   "moodLoved": "Amei",
-  "@moodLoved": {
-    "description": "Reação de humor ao filme, ao lado do emoji 😍."
-  },
-
   "moodFunny": "Divertido",
-  "@moodFunny": {
-    "description": "Reação de humor ao filme, ao lado do emoji 😂."
-  },
-
   "moodMoved": "Emocionante",
-  "@moodMoved": {
-    "description": "Reação de humor ao filme, ao lado do emoji 😢. O filme comoveu o usuário."
-  },
-
   "moodTense": "Tenso",
-  "@moodTense": {
-    "description": "Reação de humor ao filme, ao lado do emoji 😱. Suspense, medo."
-  },
-
   "moodBored": "Entediante",
-  "@moodBored": {
-    "description": "Reação de humor ao filme, ao lado do emoji 😴."
-  }
+  "chatEmptyTitle": "Qual é o seu clima para hoje?",
+  "chatEmptyBody": "Conte como você está se sentindo ou qual tipo de filme gostaria de assistir.",
+  "chatInputHint": "Descreva seu humor...",
+  "chatSendTooltip": "Enviar mensagem",
+  "chatMovieSuggestions": "Separei estes filmes para você:",
+
+  "profileTitle": "Perfil",
+  "loginTitle": "Entrar",
+  "signUpTitle": "Criar conta",
+  "emailLabel": "E-mail",
+  "passwordLabel": "Senha",
+  "nameLabel": "Nome completo",
+  "loginSocialGoogle": "Entrar com Google",
+  "loginSocialApple": "Entrar com Apple",
+  "orDivider": "ou",
+  "noAccountPrompt": "Não tem uma conta?",
+  "hasAccountPrompt": "Já tem uma conta?",
+  "logoutAction": "Sair da conta",
+  "saveProfile": "Salvar alterações",
+  "accountCreatedSuccess": "Conta criada com sucesso!",
+
+  "onboardingTitle": "Monte seu Perfil de Gosto",
+  "onboardingStepLabel": "Etapa {step} de {total}",
+  "onboardingGenresTitle": "Quais são seus gêneros favoritos?",
+  "onboardingGenresSubtitle": "Selecione os estilos de filme que você mais gosta de assistir.",
+  "onboardingActorsTitle": "Atores e Atrizes que você curte",
+  "onboardingActorsSubtitle": "Escolha os artistas que te fazem querer assistir um filme.",
+  "onboardingDirectorsTitle": "Diretores marcantes",
+  "onboardingDirectorsSubtitle": "Selecione cineastas cujo estilo de direção você admira.",
+  "btnBack": "Voltar",
+  "btnSkip": "Pular",
+  "btnNext": "Avançar",
+  "btnFinish": "Concluir",
+  "profileLoginPrompt": "Faça login para salvar seus filmes e preferências",
+  "profileUpdatedSuccess": "Perfil atualizado com sucesso!",
+  "btnCancel": "Cancelar",
+  "emailRequiredError": "Digite seu e-mail",
+  "emailInvalidError": "E-mail inválido",
+  "passwordRequiredError": "Digite sua senha",
+  "nameRequiredError": "Digite seu nome completo",
+  "passwordTooShortError": "A senha deve ter pelo menos 6 caracteres",
+
+  "tastePreferencesTitle": "Preferências de gosto",
+  "tastePreferencesSubtitle": "Editar gêneros, atores e diretores favoritos",
+  "tastePreferencesUpdatedSuccess": "Preferências de gosto atualizadas! A IA já ajustou suas recomendações."
 }

@@ -3,29 +3,26 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 
-/// Estrutura principal do app: as abas Início, MovieAI e Favoritos, com a
-/// barra de navegação inferior.
-///
-/// Recebe as páginas já montadas, para continuar sem conhecer view models nem
-/// repositórios. Cada aba só é construída na primeira visita e depois fica
-/// viva, guardando rolagem e estado ao trocar de aba.
+/// Estrutura principal do app: as abas Início, MovieAI, Favoritos e Perfil,
+/// com a barra de navegação inferior.
 class AppShell extends StatefulWidget {
   const AppShell({
     super.key,
     required this.home,
     required this.assistant,
     required this.favorites,
+    this.profile,
   });
 
   final Widget home;
   final Widget assistant;
   final Widget favorites;
+  final Widget? profile;
 
   /// Índice da aba MovieAI, para [AppShellState.selectTab].
   static const assistantTab = 1;
 
-  /// Estrutura que envolve [context], ou `null` fora dela (como nos testes que
-  /// montam uma página sozinha).
+  /// Estrutura que envolve [context], ou `null` fora dela.
   static AppShellState? maybeOf(BuildContext context) =>
       context.findAncestorStateOfType<AppShellState>();
 
@@ -46,9 +43,13 @@ class AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final tabs = [widget.home, widget.assistant, widget.favorites];
+    final tabs = [
+      widget.home,
+      widget.assistant,
+      widget.favorites,
+      if (widget.profile != null) widget.profile!,
+    ];
 
-    // Fora do Início, o "voltar" do sistema leva ao Início antes de fechar.
     return PopScope(
       canPop: _index == 0,
       onPopInvokedWithResult: (didPop, _) {
@@ -78,6 +79,11 @@ class AppShellState extends State<AppShell> {
               icon: const Icon(LucideIcons.bookmark),
               label: l10n.favoritesTitle,
             ),
+            if (widget.profile != null)
+              NavigationDestination(
+                icon: const Icon(LucideIcons.user),
+                label: l10n.profileTitle,
+              ),
           ],
         ),
       ),

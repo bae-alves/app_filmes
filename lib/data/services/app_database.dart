@@ -5,33 +5,21 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart'
     show databaseFactoryFfiWeb;
 
 /// Banco SQLite local do app.
-///
-/// Guarda a lista de favoritos (veja `FavoritesRepositoryLocal`) e as
-/// avaliações dos filmes (veja `RatingsRepositoryLocal`). Mudanças de esquema
-/// entram como uma nova [version] com um `onUpgrade`, nunca editando o
-/// `CREATE TABLE` de uma versão já publicada.
 abstract final class AppDatabase {
-  /// Nome do arquivo do banco (no Android) ou da base no IndexedDB (na web).
   static const fileName = 'app_filmes.db';
 
-  /// Versão do esquema. 1: favoritos (MOVIEAI-24). 2: avaliações (MOVIEAI-22).
-  static const version = 2;
+  /// Versão do esquema.
+  /// 1: favoritos (MOVIEAI-24).
+  /// 2: avaliações (MOVIEAI-22).
+  /// 3: usuários e listas por usuário (MOVIEAI-AUTH).
+  /// 4: preferências do onboarding (MOVIEAI-ONBOARDING).
+  static const version = 4;
 
-  /// Tabela de favoritos.
   static const favoritesTable = 'favorites';
-
-  /// Tabela de avaliações.
   static const ratingsTable = 'ratings';
+  static const usersTable = 'users';
+  static const onboardingTable = 'user_onboarding_preferences';
 
-  /// Abre (criando, se preciso) o banco do app.
-  ///
-  /// No Android usa o sqflite nativo. Na web usa o `sqflite_common_ffi_web`,
-  /// que roda o SQLite em WebAssembly e persiste no IndexedDB — por isso
-  /// `web/sqlite3.wasm` e `web/sqflite_sw.js` precisam existir (veja
-  /// docs/explicacao/plataformas.md).
-  ///
-  /// [factory] e [path] existem para os testes, que abrem um banco em memória
-  /// com o `sqflite_common_ffi`.
   static Future<Database> open({DatabaseFactory? factory, String? path}) async {
     final dbFactory =
         factory ?? (kIsWeb ? databaseFactoryFfiWeb : databaseFactory);
@@ -54,7 +42,8 @@ abstract final class AppDatabase {
   static Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $favoritesTable (
-        movie_id INTEGER PRIMARY KEY,
+        movie_id INTEGER NOT NULL,
+        user_id TEXT NOT NULL DEFAULT 'default_user',
         title TEXT,
         original_title TEXT,
         overview TEXT,
@@ -63,24 +52,68 @@ abstract final class AppDatabase {
         release_date TEXT,
         vote_average REAL,
         vote_count INTEGER,
-        added_at INTEGER NOT NULL
+        added_at INTEGER NOT NULL,
+        PRIMARY KEY (movie_id, user_id)
       )
     ''');
-    await _createRatings(db);
+    await db.execute('''
+      CREATE TABLE $ratingsTable (
+        movie_id INTEGER NOT NULL,
+        user_id TEXT NOT NULL DEFAULT 'default_user',
+        stars INTEGER CHECK (stars BETWEEN 1 AND 5),
+        mood TEXT,
+        rated_at INTEGER NOT NULL,
+        PRIMARY KEY (movie_id, user_id)
+      )
+    ''');
+    await _createUsers(db);
+    await _createOnboardingTable(db);
   }
 
   static Future<void> _onUpgrade(Database db, int from, int to) async {
     if (from < 2) await _createRatings(db);
+    if (from < 3) {
+      await _createUsers(db);
+      await db.execute(
+        "ALTER TABLE $favoritesTable ADD COLUMN user_id TEXT NOT NULL DEFAULT 'default_user'",
+      );
+      await db.execute(
+        "ALTER TABLE $ratingsTable ADD COLUMN user_id TEXT NOT NULL DEFAULT 'default_user'",
+      );
+    }
+    if (from < 4) {
+      await _createOnboardingTable(db);
+    }
   }
 
-  /// Versão 2. `stars` e `mood` podem ser nulos, mas não os dois: o
-  /// repositório apaga a linha em vez de gravar uma avaliação vazia.
   static Future<void> _createRatings(Database db) => db.execute('''
     CREATE TABLE $ratingsTable (
       movie_id INTEGER PRIMARY KEY,
       stars INTEGER CHECK (stars BETWEEN 1 AND 5),
       mood TEXT,
       rated_at INTEGER NOT NULL
+    )
+  ''');
+
+  static Future<void> _createUsers(Database db) => db.execute('''
+    CREATE TABLE $usersTable (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT,
+      auth_provider TEXT NOT NULL,
+      photo_url TEXT,
+      created_at INTEGER NOT NULL
+    )
+  ''');
+
+  static Future<void> _createOnboardingTable(Database db) => db.execute('''
+    CREATE TABLE $onboardingTable (
+      user_id TEXT PRIMARY KEY,
+      genres TEXT,
+      actors TEXT,
+      directors TEXT,
+      is_completed INTEGER NOT NULL DEFAULT 0
     )
   ''');
 }

@@ -5,26 +5,29 @@ import '../services/app_database.dart';
 import 'ratings_repository.dart';
 
 /// [RatingsRepository] guardado no SQLite do aparelho (veja [AppDatabase]).
-///
-/// Guarda só o id do filme: quem for usar as avaliações (o algoritmo de
-/// recomendação) busca os dados do filme no TMDB.
 class RatingsRepositoryLocal implements RatingsRepository {
-  RatingsRepositoryLocal({required Database database}) : _database = database;
+  RatingsRepositoryLocal({
+    required Database database,
+    String? Function()? currentUserIdProvider,
+  }) : _database = database,
+       _currentUserIdProvider = currentUserIdProvider;
 
   final Database _database;
+  final String? Function()? _currentUserIdProvider;
+
+  String get _activeUserId => _currentUserIdProvider?.call() ?? 'default_user';
 
   @override
   Future<Result<List<Rating>>> getRatings() async {
     try {
       final rows = await _database.query(
         AppDatabase.ratingsTable,
+        where: 'user_id = ?',
+        whereArgs: [_activeUserId],
         orderBy: 'rated_at DESC',
       );
 
-      return Result.ok([
-        for (final row in rows)
-          _ratingFromRow(row)!,
-      ]);
+      return Result.ok([for (final row in rows) _ratingFromRow(row)!]);
     } on Exception catch (error) {
       return Result.error(
         Exception('Falha ao carregar o histórico de avaliações ($error).'),
@@ -37,8 +40,8 @@ class RatingsRepositoryLocal implements RatingsRepository {
     try {
       final rows = await _database.query(
         AppDatabase.ratingsTable,
-        where: 'movie_id = ?',
-        whereArgs: [movieId],
+        where: 'movie_id = ? AND user_id = ?',
+        whereArgs: [movieId, _activeUserId],
       );
       return Result.ok(rows.isEmpty ? null : _ratingFromRow(rows.single));
     } on Exception catch (error) {
@@ -53,6 +56,7 @@ class RatingsRepositoryLocal implements RatingsRepository {
     try {
       await _database.insert(AppDatabase.ratingsTable, {
         'movie_id': rating.movieId,
+        'user_id': _activeUserId,
         'stars': rating.stars,
         'mood': rating.mood?.name,
         'rated_at': rating.ratedAt.millisecondsSinceEpoch,
@@ -70,8 +74,8 @@ class RatingsRepositoryLocal implements RatingsRepository {
     try {
       await _database.delete(
         AppDatabase.ratingsTable,
-        where: 'movie_id = ?',
-        whereArgs: [movieId],
+        where: 'movie_id = ? AND user_id = ?',
+        whereArgs: [movieId, _activeUserId],
       );
       return const Result.ok(null);
     } on Exception catch (error) {
@@ -83,7 +87,6 @@ class RatingsRepositoryLocal implements RatingsRepository {
 
   static Rating? _ratingFromRow(Map<String, Object?> row) {
     final stars = row['stars'] as int?;
-    // Um humor que o app não tem mais vira "sem humor", em vez de erro.
     final mood = Mood.values.asNameMap()[row['mood']];
     if (stars == null && mood == null) return null;
     return Rating(

@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 import '../../data/api_models/movie.dart';
-import '../../data/services/gemini_service.dart';
-import '../../data/services/recommendation_context_service.dart';
 import '../../data/repositories/movies_repository.dart';
+import '../../data/services/gemini_service.dart';
+import '../../data/services/genre_mapper.dart';
+import '../../data/services/recommendation_context_service.dart';
 import '../../utils/result.dart';
 import 'chat_message.dart';
 
@@ -29,43 +30,6 @@ class ChatViewModel extends ChangeNotifier {
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
-
-  // Future<void> sendMessage(String message) async {
-  //   final text = message.trim();
-
-  //   if (text.isEmpty || _isLoading) return;
-
-  //   _messages.add(
-  //     ChatMessage(
-  //       text: text,
-  //       role: ChatMessageRole.user,
-  //     ),
-  //   );
-
-  //   _isLoading = true;
-  //   _errorMessage = null;
-  //   notifyListeners();
-
-  //   try {
-  //     final result = await _geminiService.interpretPreferences(text);
-
-  //     final explanation = result['explanation'] as String? ??
-  //         'Vamos encontrar filmes para você!';
-
-  //     _messages.add(
-  //       ChatMessage(
-  //         text: explanation,
-  //         role: ChatMessageRole.assistant,
-  //       ),
-  //     );
-  //   } catch (error) {
-  //     _errorMessage =
-  //         'Não consegui consultar a IA. Verifique sua conexão e tente novamente.';
-  //   } finally {
-  //     _isLoading = false;
-  //     notifyListeners();
-  //   }
-  // }
 
   Future<void> sendMessage(String message) async {
     final text = message.trim();
@@ -99,47 +63,26 @@ class ChatViewModel extends ChangeNotifier {
       final preferredGenres = recommendationContext.favoriteGenres;
       final dislikedGenres = recommendationContext.dislikedGenres;
 
-      final genresToSearch = requestedGenres.isNotEmpty
-          ? requestedGenres
-          : preferredGenres;
+      // 2. Mapeamento padronizado de gêneros para IDs do TMDB.
+      final requestedGenreIds = GenreMapper.toGenreIds(requestedGenres);
+      final preferredGenreIds = GenreMapper.toGenreIds(preferredGenres);
+      final dislikedGenreIds = GenreMapper.toGenreIds(dislikedGenres);
 
-      if (requestedGenres.isEmpty) {
-        throw Exception('Não consegui identificar os gêneros desejados.');
+      List<int> genreIds;
+      if (requestedGenreIds.isNotEmpty) {
+        genreIds = requestedGenreIds;
+      } else {
+        genreIds = preferredGenreIds
+            .where((id) => !dislikedGenreIds.contains(id))
+            .toList();
       }
 
-      // 2. Consultamos os gêneros disponíveis no TMDB.
-      final genresResult = await _moviesRepository.getMovieGenres();
-
-      final genreIds = switch (genresResult) {
-        Ok(:final value) => value
-            .where((genre) {
-              final name = genre.name.trim().toLowerCase();
-
-              final isRequested = requestedGenres.any(
-                (requested) => requested.trim().toLowerCase() == name,
-              );
-
-              final isPreferred = genresToSearch.any(
-                (preferred) => preferred.trim().toLowerCase() == name,
-              );
-
-              final isDisliked = dislikedGenres.any(
-                (disliked) => disliked.trim().toLowerCase() == name,
-              );
-
-              if (requestedGenres.isNotEmpty) {
-                return isRequested;
-              }
-
-              return isPreferred && !isDisliked;
-            })
-            .map((genre) => genre.id)
-            .toList(),
-        Error(:final error) => throw error,
-      };
-
+      // Se o mapeamento direto por ID falhar, consulta a lista completa do TMDB como fallback.
       if (genreIds.isEmpty) {
-        throw Exception('Não encontrei os gêneros solicitados no TMDB.');
+        final genresResult = await _moviesRepository.getMovieGenres();
+        if (genresResult case Ok(:final value)) {
+          genreIds = value.take(3).map((g) => g.id).toList();
+        }
       }
 
       // 3. Buscamos filmes reais pelos gêneros identificados.
@@ -177,6 +120,7 @@ class ChatViewModel extends ChangeNotifier {
         ),
       );
     } catch (error) {
+      debugPrint("Error chat: $error");
       _errorMessage = 'Não consegui encontrar os filmes. Tente novamente.';
     } finally {
       _isLoading = false;

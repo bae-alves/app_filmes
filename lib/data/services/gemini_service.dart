@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
 import 'dart:convert';
-import '../models/recommendation_context.dart';
+import 'package:dio/dio.dart';
 
+import '../models/recommendation_context.dart';
 
 class GeminiService {
   GeminiService({required String Function() apiKey, Dio? dio})
@@ -16,34 +16,40 @@ class GeminiService {
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta';
 
-    Future<Map<String, dynamic>> interpretPreferences(
-      String message, {
-      RecommendationContext? context,
-    }) async {
+  Future<Map<String, dynamic>> interpretPreferences(
+    String message, {
+    RecommendationContext? context,
+    String language = 'pt-BR',
+  }) async {
     if (message.trim().isEmpty) {
       throw ArgumentError('Digite seu humor ou suas preferências.');
     }
-    final contextInformation = context?.toPromptContext() ??
-    'Não há informações históricas disponíveis para este usuário.';
+    final contextInformation =
+        context?.toPromptContext() ??
+        'Não há informações históricas disponíveis para este usuário.';
 
+    final languageInstruction = language.startsWith('en')
+        ? 'Respond in English.'
+        : 'Responda no idioma Português (pt-BR).';
 
     final response = await _dio.post<Map<String, dynamic>>(
-      '$_baseUrl/models/gemini-2.5-flash:generateContent',
+      '$_baseUrl/models/gemini-3.5-flash-lite:generateContent',
       options: Options(
         headers: {
           'x-goog-api-key': _apiKey(),
           'Content-Type': 'application/json',
         },
-        receiveTimeout: const Duration(seconds: 5),
-        sendTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
       ),
       data: {
         'system_instruction': {
           'parts': [
             {
-              'text': '''
-
+              'text':
+                  '''
               Você é um assistente inteligente de recomendações de filmes.
+              $languageInstruction
 
               Sua função é interpretar o pedido atual do usuário e combinar
               suas preferências com seu histórico de avaliações e contexto temporal.
@@ -96,7 +102,7 @@ class GeminiService {
                 "explanation": "Sugestões leves para relaxar durante a noite."
               }
 
-              Use nomes de gêneros reconhecíveis pelo TMDB.''',
+              Use nomes de gêneros conhecidos de cinema (ex.: Comédia, Ação, Animação, Terror, Suspense, Drama, Ficção Científica, Romance, Aventura, Fantasia, Crime, Documentário, Família, História, Música, Mistério, Guerra, Faroeste).''',
             },
           ],
         },
@@ -105,7 +111,8 @@ class GeminiService {
             'role': 'user',
             'parts': [
               {
-                'text': '''
+                'text':
+                    '''
             Contexto personalizado do usuário:
 
             $contextInformation
@@ -113,8 +120,8 @@ class GeminiService {
             Pedido atual:
             $message
             ''',
-                  },
-                ],
+              },
+            ],
           },
         ],
         'generationConfig': {

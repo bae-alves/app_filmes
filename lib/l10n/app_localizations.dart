@@ -98,395 +98,647 @@ abstract class AppLocalizations {
     Locale('pt'),
   ];
 
-  /// Botão das telas de erro que repete o carregamento.
+  /// No description provided for @retry.
   ///
   /// In pt, this message translates to:
   /// **'Tentar novamente'**
   String get retry;
 
-  /// Substitui o título de um filme que o TMDB devolve sem nome.
+  /// No description provided for @untitled.
   ///
   /// In pt, this message translates to:
   /// **'Sem título'**
   String get untitled;
 
-  /// Substitui a sinopse de um filme que o TMDB devolve sem texto (cartão da home e tela de detalhes).
+  /// No description provided for @synopsisUnavailable.
   ///
   /// In pt, this message translates to:
   /// **'Sinopse não disponível.'**
   String get synopsisUnavailable;
 
-  /// Duração do filme com horas e minutos (ex.: 2h 46min). Mantenha curto: aparece numa linha de metadados.
+  /// No description provided for @runtimeHoursMinutes.
   ///
   /// In pt, this message translates to:
   /// **'{hours}h {minutes}min'**
-  String runtimeHoursMinutes(int hours, int minutes);
+  String runtimeHoursMinutes(Object hours, Object minutes);
 
-  /// Duração do filme exata em horas (ex.: 2h).
+  /// No description provided for @runtimeHours.
   ///
   /// In pt, this message translates to:
   /// **'{hours}h'**
-  String runtimeHours(int hours);
+  String runtimeHours(Object hours);
 
-  /// Duração de um filme com menos de uma hora (ex.: 45min).
+  /// No description provided for @runtimeMinutes.
   ///
   /// In pt, this message translates to:
   /// **'{minutes}min'**
-  String runtimeMinutes(int minutes);
+  String runtimeMinutes(Object minutes);
 
-  /// Aba da barra inferior que leva à tela inicial. Mantenha curto: divide a barra com outras duas abas.
+  /// No description provided for @navHome.
   ///
   /// In pt, this message translates to:
   /// **'Início'**
   String get navHome;
 
-  /// Título da tela inicial, que lista os filmes populares do momento.
+  /// No description provided for @homeTitle.
   ///
   /// In pt, this message translates to:
   /// **'Filmes populares'**
   String get homeTitle;
 
-  /// Aviso da tela inicial quando a lista (populares, pesquisa ou filtro) volta vazia.
+  /// No description provided for @homeEmpty.
   ///
   /// In pt, this message translates to:
   /// **'Nenhum filme encontrado no momento.'**
   String get homeEmpty;
 
-  /// Erro da tela inicial quando a lista de filmes não carrega. O detalhe técnico vai só para o log.
+  /// No description provided for @homeLoadError.
   ///
   /// In pt, this message translates to:
   /// **'Não foi possível carregar os filmes.'**
   String get homeLoadError;
 
-  /// Título da grade da tela inicial quando há pesquisa ou filtro de gênero ativo (sem filtro, o título é homeTitle).
+  /// No description provided for @homeResults.
   ///
   /// In pt, this message translates to:
   /// **'Resultados'**
   String get homeResults;
 
-  /// Selo do filme em destaque no topo da tela inicial: o primeiro da lista de populares do TMDB.
+  /// No description provided for @featuredBadge.
   ///
   /// In pt, this message translates to:
   /// **'#1 em alta'**
   String get featuredBadge;
 
-  /// Botão do filme em destaque que abre a tela de detalhes, com o trailer.
+  /// No description provided for @featuredDetails.
   ///
   /// In pt, this message translates to:
   /// **'Ver detalhes'**
   String get featuredDetails;
 
-  /// Primeiro chip da fileira de gêneros da tela inicial: tira o filtro de gênero.
+  /// No description provided for @genreAll.
   ///
   /// In pt, this message translates to:
   /// **'Todos'**
   String get genreAll;
 
-  /// Título do cartão da tela inicial que leva ao assistente MovieAI.
+  /// No description provided for @assistantCardTitle.
   ///
   /// In pt, this message translates to:
   /// **'Sem ideia do que assistir?'**
   String get assistantCardTitle;
 
-  /// Texto do cartão da tela inicial que leva ao assistente MovieAI. Não traduza o nome MovieAI.
+  /// No description provided for @assistantCardBody.
   ///
   /// In pt, this message translates to:
   /// **'Conte como você está e o MovieAI sugere filmes para o seu momento.'**
   String get assistantCardBody;
 
-  /// Botão do cartão da tela inicial que abre a aba do assistente MovieAI. Não traduza o nome MovieAI.
+  /// No description provided for @assistantCardAction.
   ///
   /// In pt, this message translates to:
   /// **'Perguntar ao MovieAI'**
   String get assistantCardAction;
 
-  /// Texto de exemplo dentro do campo de pesquisa vazio.
+  /// No description provided for @searchHint.
   ///
   /// In pt, this message translates to:
   /// **'Digite o nome do filme'**
   String get searchHint;
 
-  /// Botão da tela inicial e título da folha que filtra os filmes por gênero.
+  /// No description provided for @advancedFilter.
   ///
   /// In pt, this message translates to:
   /// **'Filtro avançado'**
   String get advancedFilter;
 
-  /// Botão da folha de filtro avançado que aplica os gêneros marcados.
+  /// No description provided for @applyFilters.
   ///
   /// In pt, this message translates to:
   /// **'Aplicar filtros'**
   String get applyFilters;
 
-  /// Dica e rótulo de acessibilidade do botão de X no campo de pesquisa, que apaga a pesquisa e os gêneros marcados.
+  /// No description provided for @clearFilters.
   ///
   /// In pt, this message translates to:
   /// **'Limpar filtros'**
   String get clearFilters;
 
-  /// Erro da folha de filtro avançado quando a lista de gêneros não carrega.
+  /// No description provided for @genresLoadError.
   ///
   /// In pt, this message translates to:
   /// **'Não foi possível carregar os gêneros.'**
   String get genresLoadError;
 
-  /// Título da barra superior da tela de detalhes enquanto o nome do filme não é conhecido.
+  /// No description provided for @detailsFallbackTitle.
   ///
   /// In pt, this message translates to:
   /// **'Detalhes'**
   String get detailsFallbackTitle;
 
-  /// Erro da tela de detalhes quando as informações do filme não carregam. O detalhe técnico vai só para o log.
+  /// No description provided for @detailsLoadError.
   ///
   /// In pt, this message translates to:
   /// **'Não foi possível carregar este filme.'**
   String get detailsLoadError;
 
-  /// Aviso da tela de detalhes quando o carregamento termina sem erro, mas sem dados.
+  /// No description provided for @detailsNotFound.
   ///
   /// In pt, this message translates to:
   /// **'Não encontramos informações sobre este filme.'**
   String get detailsNotFound;
 
-  /// Título da seção da tela de detalhes com o resumo do filme.
+  /// No description provided for @synopsisTitle.
   ///
   /// In pt, this message translates to:
   /// **'Sinopse'**
   String get synopsisTitle;
 
-  /// Aviso no lugar do player quando o filme não tem trailer publicado.
+  /// No description provided for @trailerUnavailable.
   ///
   /// In pt, this message translates to:
   /// **'Trailer não disponível'**
   String get trailerUnavailable;
 
-  /// Título da seção da tela de detalhes que lista os serviços de streaming do filme.
+  /// No description provided for @watchProvidersTitle.
   ///
   /// In pt, this message translates to:
   /// **'Onde assistir'**
   String get watchProvidersTitle;
 
-  /// Grupo de serviços em que o filme está incluído na assinatura (ex.: Netflix, Max).
+  /// No description provided for @watchProvidersSubscription.
   ///
   /// In pt, this message translates to:
   /// **'Assinatura'**
   String get watchProvidersSubscription;
 
-  /// Grupo de serviços em que o filme é gratuito, com ou sem anúncios.
+  /// No description provided for @watchProvidersFree.
   ///
   /// In pt, this message translates to:
   /// **'Grátis'**
   String get watchProvidersFree;
 
-  /// Grupo de serviços em que o filme pode ser alugado.
+  /// No description provided for @watchProvidersRent.
   ///
   /// In pt, this message translates to:
   /// **'Alugar'**
   String get watchProvidersRent;
 
-  /// Grupo de serviços em que o filme pode ser comprado.
+  /// No description provided for @watchProvidersBuy.
   ///
   /// In pt, this message translates to:
   /// **'Comprar'**
   String get watchProvidersBuy;
 
-  /// Aviso exibido quando o filme não está em nenhum serviço de streaming na região do usuário.
+  /// No description provided for @watchProvidersUnavailable.
   ///
   /// In pt, this message translates to:
   /// **'Indisponível em streaming na sua região'**
   String get watchProvidersUnavailable;
 
-  /// Botão que abre, fora do app, a página do TMDB com os links para cada serviço de streaming.
+  /// No description provided for @watchProvidersSeeWhere.
   ///
   /// In pt, this message translates to:
   /// **'Ver onde assistir'**
   String get watchProvidersSeeWhere;
 
-  /// Crédito obrigatório pelos termos do TMDB: os dados de streaming vêm da JustWatch. Não traduza o nome JustWatch.
+  /// No description provided for @watchProvidersAttribution.
   ///
   /// In pt, this message translates to:
   /// **'Fonte: JustWatch'**
   String get watchProvidersAttribution;
 
-  /// Aviso na seção "Onde assistir" quando a consulta falha. Diferente de watchProvidersUnavailable: aqui não se sabe se o filme está em algum serviço.
+  /// No description provided for @watchProvidersLoadError.
   ///
   /// In pt, this message translates to:
   /// **'Não foi possível carregar onde assistir'**
   String get watchProvidersLoadError;
 
-  /// Título da seção da tela de detalhes com os atores principais.
+  /// No description provided for @castTitle.
   ///
   /// In pt, this message translates to:
   /// **'Elenco'**
   String get castTitle;
 
-  /// Botão ao lado do título "Elenco" que abre a lista completa do elenco.
+  /// No description provided for @castSeeAll.
   ///
   /// In pt, this message translates to:
   /// **'Ver todos'**
   String get castSeeAll;
 
-  /// Título do cartão da tela de detalhes com direção, roteiro e trilha sonora do filme.
+  /// No description provided for @crewTitle.
   ///
   /// In pt, this message translates to:
   /// **'Direção e equipe'**
   String get crewTitle;
 
-  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem dirigiu o filme.
+  /// No description provided for @crewDirector.
   ///
   /// In pt, this message translates to:
   /// **'Direção'**
   String get crewDirector;
 
-  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem escreveu o roteiro.
+  /// No description provided for @crewWriter.
   ///
   /// In pt, this message translates to:
   /// **'Roteiro'**
   String get crewWriter;
 
-  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem compôs a trilha sonora.
+  /// No description provided for @crewMusic.
   ///
   /// In pt, this message translates to:
   /// **'Trilha sonora'**
   String get crewMusic;
 
-  /// Botão abaixo da sinopse cortada, que mostra o texto inteiro.
+  /// No description provided for @readMore.
   ///
   /// In pt, this message translates to:
   /// **'ler mais'**
   String get readMore;
 
-  /// Botão abaixo da sinopse aberta, que volta a cortá-la.
+  /// No description provided for @readLess.
   ///
   /// In pt, this message translates to:
   /// **'ler menos'**
   String get readLess;
 
-  /// Atalho da tela de detalhes, abaixo do título, que salva o filme nos favoritos. Mantenha curto: divide a linha com outros dois atalhos.
+  /// No description provided for @actionFavorite.
   ///
   /// In pt, this message translates to:
   /// **'Favoritar'**
   String get actionFavorite;
 
-  /// O mesmo atalho de actionFavorite quando o filme já está nos favoritos; tocar o tira de lá.
+  /// No description provided for @actionFavorited.
   ///
   /// In pt, this message translates to:
   /// **'Nos favoritos'**
   String get actionFavorited;
 
-  /// Atalho da tela de detalhes que rola até a seção "Sua avaliação".
+  /// No description provided for @actionRate.
   ///
   /// In pt, this message translates to:
   /// **'Avaliar'**
   String get actionRate;
 
-  /// O mesmo atalho de actionRate quando o usuário já deu nota ou humor ao filme.
+  /// No description provided for @actionRated.
   ///
   /// In pt, this message translates to:
   /// **'Avaliado'**
   String get actionRated;
 
-  /// Atalho da tela de detalhes que rola até a seção "Onde assistir".
+  /// No description provided for @actionWatch.
   ///
   /// In pt, this message translates to:
   /// **'Assistir'**
   String get actionWatch;
 
-  /// Dica e rótulo de acessibilidade do selo com a classificação indicativa do país do usuário (ex.: 14, L, PG-13).
+  /// No description provided for @certificationLabel.
   ///
   /// In pt, this message translates to:
   /// **'Classificação indicativa: {certification}'**
-  String certificationLabel(String certification);
+  String certificationLabel(Object certification);
 
-  /// Título da tela com a lista de favoritos (watchlist) e dica do botão da tela inicial que a abre.
+  /// No description provided for @favoritesTitle.
   ///
   /// In pt, this message translates to:
   /// **'Favoritos'**
   String get favoritesTitle;
 
-  /// Mensagem da tela de favoritos quando a lista está vazia. Explica como adicionar um filme.
+  /// No description provided for @favoritesEmpty.
   ///
   /// In pt, this message translates to:
   /// **'Nenhum filme nos favoritos ainda. Toque no coração na tela de um filme para salvá-lo aqui.'**
   String get favoritesEmpty;
 
-  /// Mensagem da tela de favoritos quando a leitura da lista salva no aparelho falha.
+  /// No description provided for @favoritesLoadError.
   ///
   /// In pt, this message translates to:
   /// **'Não foi possível carregar os favoritos.'**
   String get favoritesLoadError;
 
-  /// Dica do botão de coração (vazio) da tela de detalhes, que salva o filme nos favoritos.
+  /// No description provided for @favoriteAdd.
   ///
   /// In pt, this message translates to:
   /// **'Adicionar aos favoritos'**
   String get favoriteAdd;
 
-  /// Dica do botão de coração (cheio) da tela de detalhes, que tira o filme dos favoritos.
+  /// No description provided for @favoriteRemove.
   ///
   /// In pt, this message translates to:
   /// **'Remover dos favoritos'**
   String get favoriteRemove;
 
-  /// Aviso na parte de baixo da tela de favoritos depois de remover um filme, ao lado do botão "Desfazer".
+  /// No description provided for @favoriteRemoved.
   ///
   /// In pt, this message translates to:
   /// **'{title} saiu dos favoritos'**
-  String favoriteRemoved(String title);
+  String favoriteRemoved(Object title);
 
-  /// Ação do aviso de filme removido: devolve o filme à lista, no mesmo lugar.
+  /// No description provided for @undo.
   ///
   /// In pt, this message translates to:
   /// **'Desfazer'**
   String get undo;
 
-  /// Título da seção da tela de detalhes onde o usuário dá nota e reação de humor ao filme.
+  /// No description provided for @ratingTitle.
   ///
   /// In pt, this message translates to:
   /// **'Sua avaliação'**
   String get ratingTitle;
 
-  /// Linha abaixo de "Sua avaliação". Explica que a avaliação é para filmes já assistidos.
+  /// No description provided for @ratingHint.
   ///
   /// In pt, this message translates to:
   /// **'Já assistiu? Dê uma nota e conte como foi.'**
   String get ratingHint;
 
-  /// Dica e rótulo de acessibilidade de cada estrela da avaliação (de 1 a 5).
+  /// No description provided for @ratingStars.
   ///
   /// In pt, this message translates to:
   /// **'{count, plural, =1{1 estrela} other{{count} estrelas}}'**
-  String ratingStars(int count);
+  String ratingStars(num count);
 
-  /// Reação de humor ao filme, ao lado do emoji 😍.
+  /// No description provided for @moodLoved.
   ///
   /// In pt, this message translates to:
   /// **'Amei'**
   String get moodLoved;
 
-  /// Reação de humor ao filme, ao lado do emoji 😂.
+  /// No description provided for @moodFunny.
   ///
   /// In pt, this message translates to:
   /// **'Divertido'**
   String get moodFunny;
 
-  /// Reação de humor ao filme, ao lado do emoji 😢. O filme comoveu o usuário.
+  /// No description provided for @moodMoved.
   ///
   /// In pt, this message translates to:
   /// **'Emocionante'**
   String get moodMoved;
 
-  /// Reação de humor ao filme, ao lado do emoji 😱. Suspense, medo.
+  /// No description provided for @moodTense.
   ///
   /// In pt, this message translates to:
   /// **'Tenso'**
   String get moodTense;
 
-  /// Reação de humor ao filme, ao lado do emoji 😴.
+  /// No description provided for @moodBored.
   ///
   /// In pt, this message translates to:
   /// **'Entediante'**
   String get moodBored;
+
+  /// No description provided for @chatEmptyTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qual é o seu clima para hoje?'**
+  String get chatEmptyTitle;
+
+  /// No description provided for @chatEmptyBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conte como você está se sentindo ou qual tipo de filme gostaria de assistir.'**
+  String get chatEmptyBody;
+
+  /// No description provided for @chatInputHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descreva seu humor...'**
+  String get chatInputHint;
+
+  /// No description provided for @chatSendTooltip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar mensagem'**
+  String get chatSendTooltip;
+
+  /// No description provided for @chatMovieSuggestions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Separei estes filmes para você:'**
+  String get chatMovieSuggestions;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perfil'**
+  String get profileTitle;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get loginTitle;
+
+  /// No description provided for @signUpTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar conta'**
+  String get signUpTitle;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'E-mail'**
+  String get emailLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha'**
+  String get passwordLabel;
+
+  /// No description provided for @nameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome completo'**
+  String get nameLabel;
+
+  /// No description provided for @loginSocialGoogle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar com Google'**
+  String get loginSocialGoogle;
+
+  /// No description provided for @loginSocialApple.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar com Apple'**
+  String get loginSocialApple;
+
+  /// No description provided for @orDivider.
+  ///
+  /// In pt, this message translates to:
+  /// **'ou'**
+  String get orDivider;
+
+  /// No description provided for @noAccountPrompt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não tem uma conta?'**
+  String get noAccountPrompt;
+
+  /// No description provided for @hasAccountPrompt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já tem uma conta?'**
+  String get hasAccountPrompt;
+
+  /// No description provided for @logoutAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair da conta'**
+  String get logoutAction;
+
+  /// No description provided for @saveProfile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar alterações'**
+  String get saveProfile;
+
+  /// No description provided for @accountCreatedSuccess.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conta criada com sucesso!'**
+  String get accountCreatedSuccess;
+
+  /// No description provided for @onboardingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu Perfil de Gosto'**
+  String get onboardingTitle;
+
+  /// No description provided for @onboardingStepLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Etapa {step} de {total}'**
+  String onboardingStepLabel(Object step, Object total);
+
+  /// No description provided for @onboardingGenresTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quais são seus gêneros favoritos?'**
+  String get onboardingGenresTitle;
+
+  /// No description provided for @onboardingGenresSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecione os estilos de filme que você mais gosta de assistir.'**
+  String get onboardingGenresSubtitle;
+
+  /// No description provided for @onboardingActorsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atores e Atrizes que você curte'**
+  String get onboardingActorsTitle;
+
+  /// No description provided for @onboardingActorsSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha os artistas que te fazem querer assistir um filme.'**
+  String get onboardingActorsSubtitle;
+
+  /// No description provided for @onboardingDirectorsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Diretores marcantes'**
+  String get onboardingDirectorsTitle;
+
+  /// No description provided for @onboardingDirectorsSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecione cineastas cujo estilo de direção você admira.'**
+  String get onboardingDirectorsSubtitle;
+
+  /// No description provided for @btnBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voltar'**
+  String get btnBack;
+
+  /// No description provided for @btnSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular'**
+  String get btnSkip;
+
+  /// No description provided for @btnNext.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avançar'**
+  String get btnNext;
+
+  /// No description provided for @btnFinish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluir'**
+  String get btnFinish;
+
+  /// No description provided for @profileLoginPrompt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faça login para salvar seus filmes e preferências'**
+  String get profileLoginPrompt;
+
+  /// No description provided for @profileUpdatedSuccess.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perfil atualizado com sucesso!'**
+  String get profileUpdatedSuccess;
+
+  /// No description provided for @btnCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar'**
+  String get btnCancel;
+
+  /// No description provided for @emailRequiredError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite seu e-mail'**
+  String get emailRequiredError;
+
+  /// No description provided for @emailInvalidError.
+  ///
+  /// In pt, this message translates to:
+  /// **'E-mail inválido'**
+  String get emailInvalidError;
+
+  /// No description provided for @passwordRequiredError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite sua senha'**
+  String get passwordRequiredError;
+
+  /// No description provided for @nameRequiredError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite seu nome completo'**
+  String get nameRequiredError;
+
+  /// No description provided for @passwordTooShortError.
+  ///
+  /// In pt, this message translates to:
+  /// **'A senha deve ter pelo menos 6 caracteres'**
+  String get passwordTooShortError;
+
+  /// No description provided for @tastePreferencesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preferências de gosto'**
+  String get tastePreferencesTitle;
+
+  /// No description provided for @tastePreferencesSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar gêneros, atores e diretores favoritos'**
+  String get tastePreferencesSubtitle;
+
+  /// No description provided for @tastePreferencesUpdatedSuccess.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preferências de gosto atualizadas! A IA já ajustou suas recomendações.'**
+  String get tastePreferencesUpdatedSuccess;
 }
 
 class _AppLocalizationsDelegate

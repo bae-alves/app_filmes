@@ -1,6 +1,7 @@
 import '../models/recommendation_context.dart';
 import '../repositories/favorites_repository.dart';
 import '../repositories/movies_repository.dart';
+import '../repositories/onboarding_repository.dart';
 import '../repositories/ratings_repository.dart';
 import '../../utils/result.dart';
 
@@ -9,15 +10,21 @@ class RecommendationContextService {
     required FavoritesRepository favoritesRepository,
     required RatingsRepository ratingsRepository,
     required MoviesRepository moviesRepository,
+    OnboardingRepository? onboardingRepository,
+    String? Function()? currentUserIdProvider,
     DateTime Function()? now,
   }) : _favoritesRepository = favoritesRepository,
        _ratingsRepository = ratingsRepository,
        _moviesRepository = moviesRepository,
+       _onboardingRepository = onboardingRepository,
+       _currentUserIdProvider = currentUserIdProvider,
        _now = now ?? DateTime.now;
 
   final FavoritesRepository _favoritesRepository;
   final RatingsRepository _ratingsRepository;
   final MoviesRepository _moviesRepository;
+  final OnboardingRepository? _onboardingRepository;
+  final String? Function()? _currentUserIdProvider;
   final DateTime Function() _now;
 
   Future<RecommendationContext> build() async {
@@ -34,13 +41,26 @@ class RecommendationContextService {
       Error(:final error) => throw error,
     };
 
-    // Evita consultar o mesmo filme duas vezes.
+    // Consulta de preferências salvas no onboarding (se disponível)
+    List<String> onboardingGenres = [];
+    List<String> favoriteActors = [];
+    List<String> favoriteDirectors = [];
+
+    final userId = _currentUserIdProvider?.call();
+    if (_onboardingRepository != null && userId != null && userId.isNotEmpty) {
+      final onboardingRes = await _onboardingRepository.getPreferences(userId);
+      if (onboardingRes case Ok(:final value)) {
+        onboardingGenres = value.genres;
+        favoriteActors = value.actors;
+        favoriteDirectors = value.directors;
+      }
+    }
+
     final movieIds = <int>{
       ...favorites.map((favorite) => favorite.movie.id),
       ...ratings.map((rating) => rating.movieId),
     };
 
-    // Busca os detalhes para descobrir os gêneros de cada filme.
     final detailsResults = await Future.wait(
       movieIds.map((id) => _moviesRepository.getMovieDetails(id)),
     );
@@ -55,12 +75,10 @@ class RecommendationContextService {
               if (genre.name != null && genre.name!.isNotEmpty) genre.name!,
           ];
         case Error():
-          // Um detalhe indisponível não impede as demais recomendações.
           continue;
       }
     }
 
-    // Calcula o peso de cada gênero.
     final genreScores = <String, double>{};
 
     void addGenreWeight(List<String> genres, double weight) {
@@ -73,12 +91,10 @@ class RecommendationContextService {
       }
     }
 
-    // Favoritos indicam interesse positivo.
     for (final favorite in favorites) {
       addGenreWeight(genresByMovie[favorite.movie.id] ?? [], 1);
     }
 
-    // Avaliações positivas e negativas ajustam a preferência.
     for (final rating in ratings) {
       final starsWeight = switch (rating.stars) {
         5 => 2.0,
@@ -107,7 +123,6 @@ class RecommendationContextService {
         .map((entry) => entry.key)
         .toList();
 
-    // Histórico recente: até cinco avaliações.
     final recentRatings = ratings.take(5).map((rating) {
       final genres = genresByMovie[rating.movieId] ?? [];
       final stars = rating.stars == null ? 'Sem nota' : '${rating.stars}/5';
@@ -125,6 +140,9 @@ class RecommendationContextService {
       favoriteGenres: favoriteGenres,
       dislikedGenres: dislikedGenres,
       recentRatings: recentRatings,
+      onboardingGenres: onboardingGenres,
+      favoriteActors: favoriteActors,
+      favoriteDirectors: favoriteDirectors,
       weekday: _weekdayName(now.weekday),
       timeOfDay: _timeOfDay(now.hour),
       currentHour: now.hour,

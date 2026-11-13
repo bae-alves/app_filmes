@@ -1,16 +1,24 @@
 # app_filmes
 
 Aplicativo Flutter que lista os filmes populares do
-[TMDB](https://developer.themoviedb.org/docs/getting-started) e abre uma tela
-de detalhes com o trailer, as informações de cada filme e onde assisti-lo.
-Os filmes podem ser salvos numa lista de favoritos e avaliados com nota e
-humor, tudo guardado no aparelho.
-Roda em Android e na web, em português e em inglês.
+[TMDB](https://developer.themoviedb.org/docs/getting-started), exibe detalhes com
+trailer, informações de elenco e onde assisti-los.
+Conta com **autenticação de usuário (Email/Senha e Supabase)**, **assistente inteligente MovieAI (Google Gemini)**, **onboarding visual de gosto em 3 etapas**, lista de favoritos e avaliações emocionais.
+Roda em Android, iOS e na web, em português e em inglês.
+
+## Funcionalidades Principais
+
+- **Filmes Populares e Destaque:** Lista atualizada do TMDB com busca em tempo real e filtro por múltiplos gêneros.
+- **Detalhes e Trailer:** Player de vídeo integrado, sinopse, elenco, equipe e disponibilidade em streaming (JustWatch).
+- **Autenticação e Perfil:** Cadastro e login por e-mail/senha ou Supabase Auth, com gestão de dados da conta.
+- **Onboarding Visual (3 Etapas):** Seleção de gêneros, atores e diretores favoritos na primeira utilização.
+- **Assistente MovieAI:** Recomendação generativa via Google Gemini combinando perfil de gosto, histórico de avaliações e contexto do momento.
+- **Favoritos e Avaliações:** Salve filmes e dê notas de 1 a 5 estrelas com reações emocionais, com escopo e persistência por usuário.
 
 ## Começo rápido
 
 ```sh
-cp .env.example .env          # preencha TMDB_READ e TMDB_API_KEY
+cp .env.example .env          # preencha TMDB_READ, GEMINI_API_KEY e (opcional) SUPABASE_URL / SUPABASE_ANON_KEY
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter run -d chrome
@@ -25,16 +33,13 @@ flutter analyze
 flutter test
 ```
 
-Os testes rodam offline, com fakes no lugar do TMDB. Veja a
-[referência de testes](docs/referencia/testes.md).
+Os testes rodam offline com fakes para TMDB, Gemini e banco SQLite em memória. Veja a [referência de testes](docs/referencia/testes.md).
 
 ## Antes do push
 
 O hook [`.githooks/pre-push`](.githooks/pre-push) roda `dart format`,
-`flutter analyze` e `flutter test`, e bloqueia o push se o formatador mudar
-algum arquivo, se a análise achar problemas ou se algum teste falhar. Depois
-de uma formatação, faça commit dela e repita o push. Ative o hook uma vez por
-clone:
+`flutter analyze` e `flutter test`, e bloqueia o push se houver algum problema.
+Ative o hook uma vez por clone:
 
 ```sh
 git config core.hooksPath .githooks
@@ -43,8 +48,7 @@ git config core.hooksPath .githooks
 ## CI
 
 O GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
-roda em cada pull request para a `main`, em cada push na `main` e sob demanda
-(aba Actions → CI → Run workflow).
+roda em cada pull request para a `main`, em cada push na `main` e sob demanda.
 
 | Etapa | O que faz |
 | --- | --- |
@@ -55,55 +59,27 @@ roda em cada pull request para a `main`, em cada push na `main` e sob demanda
 | Smoke web | abre o build num Chrome headless e fecha |
 | Smoke Android | instala o APK num emulador, abre o app e fecha |
 
-Lint e testes rodam em paralelo; os builds só começam se os dois passarem, e
-cada smoke usa o build da sua plataforma. O CI grava um `.env` com um token
-falso: os smoke tests provam que o app abre sem erro, não que o TMDB responde.
-O hook, o CI e a proteção da `main` estão explicados em [`dev-ops.md`](dev-ops.md).
-
-Para rodar os smoke tests na sua máquina:
-
-```sh
-npm ci --prefix tool/smoke
-flutter build web && node tool/smoke/web_smoke.mjs build/web
-flutter build apk && tool/smoke/android_smoke.sh   # com um aparelho no adb
-```
-
 ## Organização do trabalho
 
-- **Tarefas:** cada tarefa é um ticket do Jira com a chave `MOVIEAI`. O
-  commit começa pela chave do ticket, como em `MOVIEAI-22: avalia filmes…`.
-- **Branches:** cada integrante trabalha numa branch própria por sprint,
-  `sprint-<n>-<integrante>` (por exemplo, `sprint-2-ber`).
-- **`main`:** é a linha principal. As branches de sprint entram nela por pull
-  request, que só entra com o CI verde e a aprovação de outro integrante.
-
-## Documentação
-
-Toda a documentação está em [`docs/`](docs/README.md):
-
-- **Tutorial:** [crie um widget traduzido](docs/tutoriais/criar-um-widget-traduzido.md)
-- **Guias:** configurar o ambiente, adicionar textos, idiomas e endpoints,
-  verificar no app
-- **Referência:** configuração, repositório, widgets, testes
-- **Explicação:** [arquitetura](docs/explicacao/arquitetura.md),
-  plataformas, [internacionalização](docs/explicacao/internacionalizacao.md),
-  onde assistir, [favoritos](docs/explicacao/favoritos.md),
-  [avaliações](docs/explicacao/avaliacoes.md)
+- **Tarefas:** cada tarefa é um ticket do Jira com a chave `MOVIEAI`.
+- **Branches:** cada integrante trabalha numa branch própria por sprint, `sprint-<n>-<integrante>`.
+- **`main`:** linha principal protegida por PR e CI.
 
 ## Estrutura
 
 ```
 lib/
 ├── data/
-│   ├── api_models/     # modelos do JSON do TMDB (json_serializable)
-│   ├── repositories/   # MoviesRepository, FavoritesRepository e RatingsRepository (contratos + implementações)
-│   └── services/       # TmdbRestClient (retrofit), Dio e o banco SQLite (AppDatabase)
+│   ├── api_models/     # modelos JSON do TMDB (json_serializable)
+│   ├── models/         # UserAccount, UserOnboardingPreferences, RecommendationContext
+│   ├── repositories/   # MoviesRepository, FavoritesRepository, RatingsRepository, AuthRepository e OnboardingRepository
+│   └── services/       # TmdbRestClient (retrofit), GeminiService, RecommendationContextService, AppDatabase (SQLite)
 ├── l10n/               # textos traduzidos (.arb) e AppLocalizations gerado
 ├── ui/
-│   ├── view/           # telas e widgets
-│   └── view_model/     # estado das telas (ChangeNotifier)
-├── utils/              # Result, Env, localidade do usuário, formatadores, URLs de imagem do TMDB
+│   ├── view/           # HomePage, ChatPage, FavoritesPage, ProfilePage, LoginPage, SignUpPage, OnboardingPage
+│   └── view_model/     # HomeViewModel, ChatViewModel, FavoritesViewModel, AuthViewModel, OnboardingViewModel
+├── utils/              # Result, Env, localidade do usuário, formatadores, URLs de imagem
 └── main.dart           # composição das dependências
 docs/                   # documentação (Diátaxis)
-test/                   # testes e fakes
+test/                   # testes unitários e fakes
 ```
