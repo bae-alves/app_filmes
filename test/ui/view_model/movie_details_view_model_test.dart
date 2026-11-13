@@ -175,6 +175,35 @@ void main() {
     expect(viewModel.directorNames, ['Lana Wachowski']);
   });
 
+  test('writerNames e composerNames juntam as funções sem repetir', () async {
+    final viewModel = MovieDetailsViewModel(
+      moviesRepository: FakeMoviesRepository(
+        detailsById: const {
+          matrixId: MovieDetails(
+            id: matrixId,
+            credits: Credits(
+              crew: [
+                CrewMember(name: 'Lana Wachowski', job: 'Director'),
+                CrewMember(name: 'Lana Wachowski', job: 'Writer'),
+                CrewMember(name: 'Lilly Wachowski', job: 'Screenplay'),
+                CrewMember(name: 'Lana Wachowski', job: 'Screenplay'),
+                CrewMember(name: 'Don Davis', job: 'Original Music Composer'),
+                CrewMember(name: 'Bill Pope', job: 'Director of Photography'),
+              ],
+            ),
+          ),
+        },
+      ),
+      movieId: matrixId,
+      watchRegion: 'BR',
+    );
+
+    await viewModel.load();
+
+    expect(viewModel.writerNames, ['Lana Wachowski', 'Lilly Wachowski']);
+    expect(viewModel.composerNames, ['Don Davis']);
+  });
+
   test('cast segue a ordem dos créditos, sem ordem no fim', () async {
     final viewModel = MovieDetailsViewModel(
       moviesRepository: FakeMoviesRepository(

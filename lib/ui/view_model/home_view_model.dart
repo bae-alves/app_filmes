@@ -115,6 +115,13 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Atalho dos chips de gênero da home: marca ou desmarca [genreId] e já
+  /// aplica. Sem nenhum gênero marcado, volta aos populares.
+  Future<Result<List<Movie>>> quickToggleGenre(int genreId) {
+    toggleGenre(genreId);
+    return _selectedGenreIds.isEmpty ? clearFilters() : applyGenreFilter();
+  }
+
   /// Aplica os gêneros selecionados. Apaga a pesquisa, pelo mesmo motivo de
   /// [search].
   Future<Result<List<Movie>>> applyGenreFilter() async {

@@ -22,7 +22,12 @@ class RatingSection extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.ratingTitle, style: theme.textTheme.titleMedium),
+            Text(
+              l10n.ratingTitle,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             const SizedBox(height: 4),
             Text(
               l10n.ratingHint,

@@ -9,7 +9,7 @@ import 'widgets/movie_card.dart';
 import 'widgets/trailer_player.dart';
 
 /// Lista de favoritos (watchlist): os filmes que o usuário salvou para ver
-/// depois. Aberta pelo coração da AppBar da tela inicial.
+/// depois. É a aba Favoritos da barra inferior (veja AppShell).
 ///
 /// Um filme sai da lista pelo botão de lixeira do cartão, arrastando o cartão
 /// para a esquerda, ou pelo coração da tela de detalhes. As duas primeiras
@@ -48,7 +48,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
   void initState() {
     super.initState();
     // Lê de novo ao abrir: a primeira leitura, no main.dart, pode ter falhado.
-    widget.viewModel.load();
+    // Só depois do quadro: `load` avisa os ouvintes na hora, e a home, que
+    // também ouve os favoritos, não pode ser marcada no meio de um build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.viewModel.load();
+    });
   }
 
   /// Remove [movie] e oferece desfazer.

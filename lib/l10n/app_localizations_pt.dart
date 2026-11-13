@@ -33,6 +33,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get navHome => 'Início';
+
+  @override
   String get homeTitle => 'Filmes populares';
 
   @override
@@ -42,13 +45,29 @@ class AppLocalizationsPt extends AppLocalizations {
   String get homeLoadError => 'Não foi possível carregar os filmes.';
 
   @override
-  String get searchLabel => 'Nome do filme';
+  String get homeResults => 'Resultados';
+
+  @override
+  String get featuredBadge => '#1 em alta';
+
+  @override
+  String get featuredDetails => 'Ver detalhes';
+
+  @override
+  String get genreAll => 'Todos';
+
+  @override
+  String get assistantCardTitle => 'Sem ideia do que assistir?';
+
+  @override
+  String get assistantCardBody =>
+      'Conte como você está e o MovieAI sugere filmes para o seu momento.';
+
+  @override
+  String get assistantCardAction => 'Perguntar ao MovieAI';
 
   @override
   String get searchHint => 'Digite o nome do filme';
-
-  @override
-  String get searchTooltip => 'Pesquisar';
 
   @override
   String get advancedFilter => 'Filtro avançado';
@@ -113,9 +132,37 @@ class AppLocalizationsPt extends AppLocalizations {
   String get castSeeAll => 'Ver todos';
 
   @override
-  String directedBy(String names) {
-    return 'Direção: $names';
-  }
+  String get crewTitle => 'Direção e equipe';
+
+  @override
+  String get crewDirector => 'Direção';
+
+  @override
+  String get crewWriter => 'Roteiro';
+
+  @override
+  String get crewMusic => 'Trilha sonora';
+
+  @override
+  String get readMore => 'ler mais';
+
+  @override
+  String get readLess => 'ler menos';
+
+  @override
+  String get actionFavorite => 'Favoritar';
+
+  @override
+  String get actionFavorited => 'Nos favoritos';
+
+  @override
+  String get actionRate => 'Avaliar';
+
+  @override
+  String get actionRated => 'Avaliado';
+
+  @override
+  String get actionWatch => 'Assistir';
 
   @override
   String certificationLabel(String certification) {

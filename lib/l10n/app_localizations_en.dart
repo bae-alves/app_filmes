@@ -33,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get navHome => 'Home';
+
+  @override
   String get homeTitle => 'Popular movies';
 
   @override
@@ -42,13 +45,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeLoadError => 'Couldn\'t load the movies.';
 
   @override
-  String get searchLabel => 'Movie title';
+  String get homeResults => 'Results';
+
+  @override
+  String get featuredBadge => '#1 trending';
+
+  @override
+  String get featuredDetails => 'See details';
+
+  @override
+  String get genreAll => 'All';
+
+  @override
+  String get assistantCardTitle => 'Not sure what to watch?';
+
+  @override
+  String get assistantCardBody =>
+      'Tell MovieAI how you feel and get movies for the moment.';
+
+  @override
+  String get assistantCardAction => 'Ask MovieAI';
 
   @override
   String get searchHint => 'Type a movie title';
-
-  @override
-  String get searchTooltip => 'Search';
 
   @override
   String get advancedFilter => 'Advanced filter';
@@ -113,9 +132,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get castSeeAll => 'See all';
 
   @override
-  String directedBy(String names) {
-    return 'Directed by $names';
-  }
+  String get crewTitle => 'Director and crew';
+
+  @override
+  String get crewDirector => 'Director';
+
+  @override
+  String get crewWriter => 'Writing';
+
+  @override
+  String get crewMusic => 'Music';
+
+  @override
+  String get readMore => 'read more';
+
+  @override
+  String get readLess => 'read less';
+
+  @override
+  String get actionFavorite => 'Favorite';
+
+  @override
+  String get actionFavorited => 'Favorited';
+
+  @override
+  String get actionRate => 'Rate';
+
+  @override
+  String get actionRated => 'Rated';
+
+  @override
+  String get actionWatch => 'Watch';
 
   @override
   String certificationLabel(String certification) {

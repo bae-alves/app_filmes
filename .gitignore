@@ -46,6 +46,10 @@ app.*.map.json
 /android/app/release
 
 .env
+.devin/*.local.json
+
+# Telas e código exportados do Stitch, só como referência local de design.
+design/
 
 # Dependências do smoke test (tool/smoke)
 node_modules/

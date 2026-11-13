@@ -1,5 +1,7 @@
 import 'package:app_filmes/data/repositories/ratings_repository.dart';
 import 'package:app_filmes/l10n/app_localizations.dart';
+import 'package:app_filmes/ui/view/app_shell.dart';
+import 'package:app_filmes/ui/view/favorites_page.dart';
 import 'package:app_filmes/ui/view/home_page.dart';
 import 'package:app_filmes/ui/view_model/favorites_view_model.dart';
 import 'package:app_filmes/ui/view_model/home_view_model.dart';
@@ -27,24 +29,37 @@ void main() {
       popularMovies: const [dunaMovie, matrixMovie],
       detailsById: const {dunaId: dunaDetails, matrixId: matrixDetails},
     );
+    final favoritesViewModel = FavoritesViewModel(
+      favoritesRepository: favorites ?? FakeFavoritesRepository(),
+    )..load();
+    MovieDetailsViewModel details(int movieId) => MovieDetailsViewModel(
+      moviesRepository: movies,
+      movieId: movieId,
+      watchRegion: 'BR',
+    );
+    MovieRatingViewModel rating(int movieId) =>
+        MovieRatingViewModel(ratingsRepository: ratings, movieId: movieId);
+    Widget noTrailer(BuildContext context, String youtubeKey) =>
+        const SizedBox();
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
-      home: HomePage(
-        viewModel: HomeViewModel(moviesRepository: movies),
-        favoritesViewModel: FavoritesViewModel(
-          favoritesRepository: favorites ?? FakeFavoritesRepository(),
-        )..load(),
-        detailsViewModelFactory: (movieId) => MovieDetailsViewModel(
-          moviesRepository: movies,
-          movieId: movieId,
-          watchRegion: 'BR',
+      home: AppShell(
+        home: HomePage(
+          viewModel: HomeViewModel(moviesRepository: movies),
+          favoritesViewModel: favoritesViewModel,
+          detailsViewModelFactory: details,
+          ratingViewModelFactory: rating,
+          trailerPlayerBuilder: noTrailer,
         ),
-        ratingViewModelFactory: (movieId) =>
-            MovieRatingViewModel(ratingsRepository: ratings, movieId: movieId),
-        trailerPlayerBuilder: (context, youtubeKey) => const SizedBox(),
-        onOpenChat: () {},
+        assistant: const SizedBox(),
+        favorites: FavoritesPage(
+          viewModel: favoritesViewModel,
+          detailsViewModelFactory: details,
+          ratingViewModelFactory: rating,
+          trailerPlayerBuilder: noTrailer,
+        ),
       ),
     );
   }

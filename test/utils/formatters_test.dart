@@ -61,4 +61,22 @@ void main() {
       expect(formatRating(0, 'pt'), isNull);
     });
   });
+
+  group('formatVoteCount', () {
+    test('abrevia milhares no formato do idioma', () {
+      // O intl separa com espaço não separável, que não quebra a linha.
+      expect(formatVoteCount(5000, 'pt'), '5\u00a0mil');
+      expect(formatVoteCount(5000, 'en'), '5K');
+      expect(formatVoteCount(42500, 'en'), '42.5K');
+    });
+
+    test('mostra números pequenos inteiros', () {
+      expect(formatVoteCount(312, 'pt'), '312');
+    });
+
+    test('devolve null sem votos', () {
+      expect(formatVoteCount(null, 'pt'), isNull);
+      expect(formatVoteCount(0, 'pt'), isNull);
+    });
+  });
 }

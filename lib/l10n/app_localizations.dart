@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'{minutes}min'**
   String runtimeMinutes(int minutes);
 
+  /// Aba da barra inferior que leva à tela inicial. Mantenha curto: divide a barra com outras duas abas.
+  ///
+  /// In pt, this message translates to:
+  /// **'Início'**
+  String get navHome;
+
   /// Título da tela inicial, que lista os filmes populares do momento.
   ///
   /// In pt, this message translates to:
@@ -152,23 +158,53 @@ abstract class AppLocalizations {
   /// **'Não foi possível carregar os filmes.'**
   String get homeLoadError;
 
-  /// Rótulo do campo de pesquisa da tela inicial.
+  /// Título da grade da tela inicial quando há pesquisa ou filtro de gênero ativo (sem filtro, o título é homeTitle).
   ///
   /// In pt, this message translates to:
-  /// **'Nome do filme'**
-  String get searchLabel;
+  /// **'Resultados'**
+  String get homeResults;
+
+  /// Selo do filme em destaque no topo da tela inicial: o primeiro da lista de populares do TMDB.
+  ///
+  /// In pt, this message translates to:
+  /// **'#1 em alta'**
+  String get featuredBadge;
+
+  /// Botão do filme em destaque que abre a tela de detalhes, com o trailer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver detalhes'**
+  String get featuredDetails;
+
+  /// Primeiro chip da fileira de gêneros da tela inicial: tira o filtro de gênero.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos'**
+  String get genreAll;
+
+  /// Título do cartão da tela inicial que leva ao assistente MovieAI.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem ideia do que assistir?'**
+  String get assistantCardTitle;
+
+  /// Texto do cartão da tela inicial que leva ao assistente MovieAI. Não traduza o nome MovieAI.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conte como você está e o MovieAI sugere filmes para o seu momento.'**
+  String get assistantCardBody;
+
+  /// Botão do cartão da tela inicial que abre a aba do assistente MovieAI. Não traduza o nome MovieAI.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perguntar ao MovieAI'**
+  String get assistantCardAction;
 
   /// Texto de exemplo dentro do campo de pesquisa vazio.
   ///
   /// In pt, this message translates to:
   /// **'Digite o nome do filme'**
   String get searchHint;
-
-  /// Dica e rótulo de acessibilidade do botão de lupa que dispara a pesquisa.
-  ///
-  /// In pt, this message translates to:
-  /// **'Pesquisar'**
-  String get searchTooltip;
 
   /// Botão da tela inicial e título da folha que filtra os filmes por gênero.
   ///
@@ -290,11 +326,71 @@ abstract class AppLocalizations {
   /// **'Ver todos'**
   String get castSeeAll;
 
-  /// Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.
+  /// Título do cartão da tela de detalhes com direção, roteiro e trilha sonora do filme.
   ///
   /// In pt, this message translates to:
-  /// **'Direção: {names}'**
-  String directedBy(String names);
+  /// **'Direção e equipe'**
+  String get crewTitle;
+
+  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem dirigiu o filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Direção'**
+  String get crewDirector;
+
+  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem escreveu o roteiro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Roteiro'**
+  String get crewWriter;
+
+  /// Rótulo, no cartão de equipe, acima do(s) nome(s) de quem compôs a trilha sonora.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trilha sonora'**
+  String get crewMusic;
+
+  /// Botão abaixo da sinopse cortada, que mostra o texto inteiro.
+  ///
+  /// In pt, this message translates to:
+  /// **'ler mais'**
+  String get readMore;
+
+  /// Botão abaixo da sinopse aberta, que volta a cortá-la.
+  ///
+  /// In pt, this message translates to:
+  /// **'ler menos'**
+  String get readLess;
+
+  /// Atalho da tela de detalhes, abaixo do título, que salva o filme nos favoritos. Mantenha curto: divide a linha com outros dois atalhos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Favoritar'**
+  String get actionFavorite;
+
+  /// O mesmo atalho de actionFavorite quando o filme já está nos favoritos; tocar o tira de lá.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nos favoritos'**
+  String get actionFavorited;
+
+  /// Atalho da tela de detalhes que rola até a seção "Sua avaliação".
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliar'**
+  String get actionRate;
+
+  /// O mesmo atalho de actionRate quando o usuário já deu nota ou humor ao filme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliado'**
+  String get actionRated;
+
+  /// Atalho da tela de detalhes que rola até a seção "Onde assistir".
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistir'**
+  String get actionWatch;
 
   /// Dica e rótulo de acessibilidade do selo com a classificação indicativa do país do usuário (ex.: 14, L, PG-13).
   ///

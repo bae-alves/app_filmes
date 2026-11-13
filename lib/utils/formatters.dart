@@ -49,3 +49,10 @@ String? formatRating(double? voteAverage, String locale) {
     decimalDigits: 1,
   ).format(voteAverage);
 }
+
+/// Abrevia a quantidade de votos do TMDB no formato de [locale] (`5 mil` em
+/// `pt`, `5K` em `en`). `null` quando o filme ainda não tem votos.
+String? formatVoteCount(int? voteCount, String locale) {
+  if (voteCount == null || voteCount <= 0) return null;
+  return NumberFormat.compact(locale: locale).format(voteCount);
+}

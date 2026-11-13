@@ -2,14 +2,47 @@
 
 Todos exigem os delegates de `AppLocalizations` no `MaterialApp`.
 
+## `AppShell`
+
+`lib/ui/view/app_shell.dart`. Raiz do app: barra inferior (`NavigationBar`)
+com as abas Início, MovieAI e Favoritos. O rótulo de cada aba também é o seu
+tooltip. Cada aba só é construída na primeira visita e depois fica viva
+(`IndexedStack`). Fora do Início, o "voltar" do sistema volta ao Início.
+
+| Parâmetro | Tipo | Descrição |
+| --- | --- | --- |
+| `home` | `Widget` | Aba Início; no app, a `HomePage`. |
+| `assistant` | `Widget` | Aba MovieAI; no app, a `ChatPage`. |
+| `favorites` | `Widget` | Aba Favoritos; no app, a `FavoritesPage`. |
+
+| Membro | Descrição |
+| --- | --- |
+| `AppShell.maybeOf(context)` | `AppShellState` que envolve `context`, ou `null` fora da estrutura. |
+| `AppShellState.selectTab(index)` | Mostra a aba, como um toque na barra. |
+| `AppShell.assistantTab` | Índice da aba MovieAI (`1`). |
+
 ## `HomePage`
 
-`lib/ui/view/home_page.dart`. Lista de filmes, pesquisa e filtro por gênero.
+`lib/ui/view/home_page.dart`. AppBar com o logo e "MovieAI", e uma única
+rolagem (`CustomScrollView`, com puxar para atualizar), de cima para baixo:
+
+- Campo de pesquisa em pílula, com limpar e filtro avançado. A pesquisa parte
+  pela tecla de pesquisar do teclado.
+- Sem pesquisa nem gênero: o primeiro dos populares em destaque (selo
+  "#1 em alta", nota, título, sinopse curta, "Ver detalhes" e coração), com a
+  chave `ValueKey(movie.id)`.
+- Fileira de gêneros (`ChoiceChip`s), carregada no `initState`: um toque já
+  filtra (`HomeViewModel.quickToggleGenre`), e "Todos" tira o filtro. Some se
+  os gêneros não carregarem.
+- Dentro do `AppShell` e sem filtro: o cartão "Perguntar ao MovieAI", que
+  abre a aba do assistente.
+- "Filmes populares" (ou "Resultados", com filtro) em `PosterCard`s, duas
+  colunas. Sem filtro, a grade não repete o filme do destaque.
 
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `viewModel` | `HomeViewModel` | — | Estado e comandos. |
-| `favoritesViewModel` | `FavoritesViewModel` | — | Lista de favoritos. O coração da barra abre a `FavoritesPage`. |
+| `favoritesViewModel` | `FavoritesViewModel` | — | Lista de favoritos: corações do destaque, da grade e da tela de detalhes. |
 | `detailsViewModelFactory` | `MovieDetailsViewModel Function(int movieId)` | — | Cria a view model da tela de detalhes. |
 | `ratingViewModelFactory` | `MovieRatingViewModel Function(int movieId)` | — | Cria a view model da avaliação, mostrada nos detalhes. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Repassado à tela de detalhes. |
@@ -17,8 +50,14 @@ Todos exigem os delegates de `AppLocalizations` no `MaterialApp`.
 ## `MovieDetailsPage`
 
 `lib/ui/view/movie_details_page.dart`. Trailer, informações e onde assistir.
-Abaixo da sinopse fica a `RatingSection`. A fileira do elenco mostra os 10
-primeiros. Com mais gente, o botão "Ver todos" abre a lista completa.
+Abaixo do trailer: etiquetas de gênero, título, frase de efeito e a linha
+ano • classificação • duração • nota (com os votos abreviados). Depois, três
+atalhos: "Favoritar" (o mesmo efeito do coração da barra), "Avaliar" e
+"Assistir", que rolam até as seções. As seções ficam em cartões: sinopse
+(cortada em 4 linhas, com "ler mais"), `RatingSection`, elenco, "Direção e
+equipe" (direção, roteiro e trilha sonora, só as que têm alguém) e onde
+assistir. A fileira do elenco mostra os 10 primeiros. Com mais gente, o botão
+"Ver todos" abre a lista completa.
 
 | Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
@@ -55,7 +94,8 @@ favoritos"), arrastando o cartão para a esquerda (`Dismissible`) ou pelo
 coração da tela de detalhes. Os dois primeiros mostram um SnackBar
 "<título> saiu dos favoritos" com "Desfazer", que some sozinho depois de
 `FavoritesPage.undoDuration` (10s); desfazer devolve o filme ao mesmo
-lugar. Chama `load()` no `initState`. Mostra um aviso
+lugar. Chama `load()` logo depois do primeiro quadro (a home também ouve os
+favoritos e não pode ser avisada no meio de um build). Mostra um aviso
 quando a lista está vazia, e erro com "Tentar novamente" quando a leitura
 falha.
 
@@ -65,6 +105,18 @@ falha.
 | `detailsViewModelFactory` | `MovieDetailsViewModel Function(int movieId)` | — | Cria a view model da tela de detalhes. |
 | `ratingViewModelFactory` | `MovieRatingViewModel Function(int movieId)` | — | Cria a view model da avaliação, mostrada nos detalhes. |
 | `trailerPlayerBuilder` | `TrailerPlayerBuilder` | `defaultTrailerPlayerBuilder` | Repassado à tela de detalhes. |
+
+## `PosterCard`
+
+`lib/ui/view/widgets/poster_card.dart`. Cartão da grade da home: pôster 2:3
+com a nota no canto direito e um coração (tooltip "Adicionar aos favoritos" /
+"Remover dos favoritos") no esquerdo; título e ano embaixo.
+
+| Parâmetro | Tipo | Descrição |
+| --- | --- | --- |
+| `movie` | `Movie` | Filme exibido. |
+| `favoritesViewModel` | `FavoritesViewModel` | Liga e desliga o coração. |
+| `onTap` | `VoidCallback` | Chamado no toque fora do coração. |
 
 ## `MovieCard`
 
@@ -76,8 +128,9 @@ falha.
 | `onTap` | `VoidCallback` | Chamado no toque. |
 | `trailing` | `Widget?` | Canto superior direito. A `FavoritesPage` põe ali a lixeira. |
 
-A `HomePage` dá a cada cartão a chave `ValueKey(movie.id)`. Na
-`FavoritesPage`, a chave fica no `Dismissible` que envolve o cartão.
+A `HomePage` não usa mais o `MovieCard`: dá a chave `ValueKey(movie.id)` a
+cada `PosterCard` e ao destaque. Na `FavoritesPage`, a chave fica no
+`Dismissible` que envolve o `MovieCard`.
 
 ## `WatchProvidersSection`
 
@@ -124,3 +177,4 @@ precisa de WebView.
 | `formatReleaseYear(date)` | `2024` | `2024` | Data ausente ou inválida |
 | `formatRuntime(minutes, l10n)` | `2h 46min`, `2h`, `45min` | `2h 46m`, `2h`, `45m` | `null` ou ≤ 0 |
 | `formatRating(average, locale)` | `8,2` | `8.2` | `null` ou ≤ 0 |
+| `formatVoteCount(count, locale)` | `5 mil` | `5K`, `42.5K` | `null` ou ≤ 0 |

@@ -41,6 +41,11 @@
     }
   },
 
+  "navHome": "Início",
+  "@navHome": {
+    "description": "Aba da barra inferior que leva à tela inicial. Mantenha curto: divide a barra com outras duas abas."
+  },
+
   "homeTitle": "Filmes populares",
   "@homeTitle": {
     "description": "Título da tela inicial, que lista os filmes populares do momento."
@@ -56,19 +61,44 @@
     "description": "Erro da tela inicial quando a lista de filmes não carrega. O detalhe técnico vai só para o log."
   },
 
-  "searchLabel": "Nome do filme",
-  "@searchLabel": {
-    "description": "Rótulo do campo de pesquisa da tela inicial."
+  "homeResults": "Resultados",
+  "@homeResults": {
+    "description": "Título da grade da tela inicial quando há pesquisa ou filtro de gênero ativo (sem filtro, o título é homeTitle)."
+  },
+
+  "featuredBadge": "#1 em alta",
+  "@featuredBadge": {
+    "description": "Selo do filme em destaque no topo da tela inicial: o primeiro da lista de populares do TMDB."
+  },
+
+  "featuredDetails": "Ver detalhes",
+  "@featuredDetails": {
+    "description": "Botão do filme em destaque que abre a tela de detalhes, com o trailer."
+  },
+
+  "genreAll": "Todos",
+  "@genreAll": {
+    "description": "Primeiro chip da fileira de gêneros da tela inicial: tira o filtro de gênero."
+  },
+
+  "assistantCardTitle": "Sem ideia do que assistir?",
+  "@assistantCardTitle": {
+    "description": "Título do cartão da tela inicial que leva ao assistente MovieAI."
+  },
+
+  "assistantCardBody": "Conte como você está e o MovieAI sugere filmes para o seu momento.",
+  "@assistantCardBody": {
+    "description": "Texto do cartão da tela inicial que leva ao assistente MovieAI. Não traduza o nome MovieAI."
+  },
+
+  "assistantCardAction": "Perguntar ao MovieAI",
+  "@assistantCardAction": {
+    "description": "Botão do cartão da tela inicial que abre a aba do assistente MovieAI. Não traduza o nome MovieAI."
   },
 
   "searchHint": "Digite o nome do filme",
   "@searchHint": {
     "description": "Texto de exemplo dentro do campo de pesquisa vazio."
-  },
-
-  "searchTooltip": "Pesquisar",
-  "@searchTooltip": {
-    "description": "Dica e rótulo de acessibilidade do botão de lupa que dispara a pesquisa."
   },
 
   "advancedFilter": "Filtro avançado",
@@ -171,12 +201,59 @@
     "description": "Botão ao lado do título \"Elenco\" que abre a lista completa do elenco."
   },
 
-  "directedBy": "Direção: {names}",
-  "@directedBy": {
-    "description": "Linha da tela de detalhes com o(s) diretor(es) do filme, já separados por vírgula.",
-    "placeholders": {
-      "names": {"type": "String"}
-    }
+  "crewTitle": "Direção e equipe",
+  "@crewTitle": {
+    "description": "Título do cartão da tela de detalhes com direção, roteiro e trilha sonora do filme."
+  },
+
+  "crewDirector": "Direção",
+  "@crewDirector": {
+    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem dirigiu o filme."
+  },
+
+  "crewWriter": "Roteiro",
+  "@crewWriter": {
+    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem escreveu o roteiro."
+  },
+
+  "crewMusic": "Trilha sonora",
+  "@crewMusic": {
+    "description": "Rótulo, no cartão de equipe, acima do(s) nome(s) de quem compôs a trilha sonora."
+  },
+
+  "readMore": "ler mais",
+  "@readMore": {
+    "description": "Botão abaixo da sinopse cortada, que mostra o texto inteiro."
+  },
+
+  "readLess": "ler menos",
+  "@readLess": {
+    "description": "Botão abaixo da sinopse aberta, que volta a cortá-la."
+  },
+
+  "actionFavorite": "Favoritar",
+  "@actionFavorite": {
+    "description": "Atalho da tela de detalhes, abaixo do título, que salva o filme nos favoritos. Mantenha curto: divide a linha com outros dois atalhos."
+  },
+
+  "actionFavorited": "Nos favoritos",
+  "@actionFavorited": {
+    "description": "O mesmo atalho de actionFavorite quando o filme já está nos favoritos; tocar o tira de lá."
+  },
+
+  "actionRate": "Avaliar",
+  "@actionRate": {
+    "description": "Atalho da tela de detalhes que rola até a seção \"Sua avaliação\"."
+  },
+
+  "actionRated": "Avaliado",
+  "@actionRated": {
+    "description": "O mesmo atalho de actionRate quando o usuário já deu nota ou humor ao filme."
+  },
+
+  "actionWatch": "Assistir",
+  "@actionWatch": {
+    "description": "Atalho da tela de detalhes que rola até a seção \"Onde assistir\"."
   },
 
   "certificationLabel": "Classificação indicativa: {certification}",
