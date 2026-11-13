@@ -12,6 +12,9 @@ import 'data/repositories/ratings_repository_local.dart';
 import 'data/services/app_database.dart';
 import 'data/services/tmdb_dio.dart';
 import 'data/services/tmdb_rest_client.dart';
+import 'data/repositories/favorites_repository.dart';
+import 'data/services/recommendation_context_service.dart';
+
 import 'ui/view/home_page.dart';
 import 'ui/view_model/favorites_view_model.dart';
 import 'ui/view_model/home_view_model.dart';
@@ -63,32 +66,55 @@ class _AppFilmesState extends State<AppFilmes> {
   late final GeminiService _geminiService;
   late final ChatViewModel _chatViewModel;
   late final FavoritesViewModel _favoritesViewModel;
+  late final FavoritesRepository _favoritesRepository;
+  late final RecommendationContextService _recommendationContextService;
 
   @override
   void initState() {
     super.initState();
 
     final dio = createTmdbDio(readAccessToken: Env.tmdbReadToken);
+
     _moviesRepository = MoviesRepositoryRemote(
       restClient: TmdbRestClient(dio),
-      // Mesmo idioma que o MaterialApp vai escolher para a interface.
       language: currentTmdbLanguage(),
       preferences: widget.preferences,
     );
-    _homeViewModel = HomeViewModel(moviesRepository: _moviesRepository);
 
-    _geminiService = GeminiService(apiKey: () => Env.geminiApiKey);
+    _homeViewModel = HomeViewModel(
+      moviesRepository: _moviesRepository,
+    );
 
+    _geminiService = GeminiService(
+      apiKey: () => Env.geminiApiKey,
+    );
+
+    // Repositórios locais
+    _favoritesRepository = FavoritesRepositoryLocal(
+      database: widget.database,
+    );
+
+    _ratingsRepository = RatingsRepositoryLocal(
+      database: widget.database,
+    );
+
+    // Serviço que monta o contexto personalizado
+    _recommendationContextService = RecommendationContextService(
+      favoritesRepository: _favoritesRepository,
+      ratingsRepository: _ratingsRepository,
+      moviesRepository: _moviesRepository,
+    );
+
+    _favoritesViewModel = FavoritesViewModel(
+      favoritesRepository: _favoritesRepository,
+    )..load();
+
+    // Chat recebe o serviço de contexto personalizado
     _chatViewModel = ChatViewModel(
       geminiService: _geminiService,
       moviesRepository: _moviesRepository,
+      recommendationContextService: _recommendationContextService,
     );
-    // Sem login, os favoritos ficam só no aparelho. Veja FavoritesRepository.
-    _favoritesViewModel = FavoritesViewModel(
-      favoritesRepository: FavoritesRepositoryLocal(database: widget.database),
-    )..load();
-    // Também só no aparelho, pelo mesmo motivo. Veja RatingsRepository.
-    _ratingsRepository = RatingsRepositoryLocal(database: widget.database);
   }
 
   @override
@@ -102,6 +128,7 @@ class _AppFilmesState extends State<AppFilmes> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'App Filmes',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
