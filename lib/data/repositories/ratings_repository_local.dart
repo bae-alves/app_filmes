@@ -14,6 +14,25 @@ class RatingsRepositoryLocal implements RatingsRepository {
   final Database _database;
 
   @override
+  Future<Result<List<Rating>>> getRatings() async {
+    try {
+      final rows = await _database.query(
+        AppDatabase.ratingsTable,
+        orderBy: 'rated_at DESC',
+      );
+
+      return Result.ok([
+        for (final row in rows)
+          _ratingFromRow(row)!,
+      ]);
+    } on Exception catch (error) {
+      return Result.error(
+        Exception('Falha ao carregar o histórico de avaliações ($error).'),
+      );
+    }
+  }
+
+  @override
   Future<Result<Rating?>> getRating(int movieId) async {
     try {
       final rows = await _database.query(

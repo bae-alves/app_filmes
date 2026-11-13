@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 
+import '../../data/api_models/movie.dart';
 import '../../data/services/gemini_service.dart';
+import '../../data/services/recommendation_context_service.dart';
 import '../../data/repositories/movies_repository.dart';
 import '../../utils/result.dart';
 import 'chat_message.dart';
@@ -9,11 +11,14 @@ class ChatViewModel extends ChangeNotifier {
   ChatViewModel({
     required GeminiService geminiService,
     required MoviesRepository moviesRepository,
+    required RecommendationContextService recommendationContextService,
   }) : _geminiService = geminiService,
-       _moviesRepository = moviesRepository;
+       _moviesRepository = moviesRepository,
+       _recommendationContextService = recommendationContextService;
 
   final GeminiService _geminiService;
   final MoviesRepository _moviesRepository;
+  final RecommendationContextService _recommendationContextService;
 
   final List<ChatMessage> _messages = [];
 
@@ -75,8 +80,12 @@ class ChatViewModel extends ChangeNotifier {
 
     try {
       // 1. A Gemini interpreta o pedido.
-      final interpretation = await _geminiService.interpretPreferences(text);
+      final recommendationContext = await _recommendationContextService.build();
 
+      final interpretation = await _geminiService.interpretPreferences(
+        text,
+        context: recommendationContext,
+      );
       final explanation =
           interpretation['explanation'] as String? ??
           'Encontrei alguns critérios para sua busca.';
@@ -87,6 +96,13 @@ class ChatViewModel extends ChangeNotifier {
           ? rawGenres.whereType<String>().toList()
           : <String>[];
 
+      final preferredGenres = recommendationContext.favoriteGenres;
+      final dislikedGenres = recommendationContext.dislikedGenres;
+
+      final genresToSearch = requestedGenres.isNotEmpty
+          ? requestedGenres
+          : preferredGenres;
+
       if (requestedGenres.isEmpty) {
         throw Exception('Não consegui identificar os gêneros desejados.');
       }
@@ -95,17 +111,30 @@ class ChatViewModel extends ChangeNotifier {
       final genresResult = await _moviesRepository.getMovieGenres();
 
       final genreIds = switch (genresResult) {
-        Ok(:final value) =>
-          value
-              .where(
-                (genre) => requestedGenres.any(
-                  (requested) =>
-                      genre.name.trim().toLowerCase() ==
-                      requested.trim().toLowerCase(),
-                ),
-              )
-              .map((genre) => genre.id)
-              .toList(),
+        Ok(:final value) => value
+            .where((genre) {
+              final name = genre.name.trim().toLowerCase();
+
+              final isRequested = requestedGenres.any(
+                (requested) => requested.trim().toLowerCase() == name,
+              );
+
+              final isPreferred = genresToSearch.any(
+                (preferred) => preferred.trim().toLowerCase() == name,
+              );
+
+              final isDisliked = dislikedGenres.any(
+                (disliked) => disliked.trim().toLowerCase() == name,
+              );
+
+              if (requestedGenres.isNotEmpty) {
+                return isRequested;
+              }
+
+              return isPreferred && !isDisliked;
+            })
+            .map((genre) => genre.id)
+            .toList(),
         Error(:final error) => throw error,
       };
 
@@ -118,10 +147,18 @@ class ChatViewModel extends ChangeNotifier {
         genreIds: genreIds,
       );
 
-      final movies = switch (moviesResult) {
-        Ok(:final value) => value.take(3).toList(),
+      final candidateMovies = switch (moviesResult) {
+        Ok(:final value) => value.take(8).toList(),
         Error(:final error) => throw error,
       };
+
+      final durationPreference =
+          interpretation['durationPreference'] as String? ?? 'any';
+
+      final movies = await _orderMoviesByDuration(
+        candidateMovies,
+        durationPreference,
+      );
 
       if (movies.isEmpty) {
         throw Exception('Não encontrei filmes para esses critérios.');
@@ -145,5 +182,81 @@ class ChatViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<List<Movie>> _orderMoviesByDuration(
+    List<Movie> movies,
+    String durationPreference,
+  ) async {
+    if (movies.isEmpty || durationPreference == 'any') {
+      return movies.take(3).toList();
+    }
+
+    final detailsResults = await Future.wait(
+      movies.map((movie) => _moviesRepository.getMovieDetails(movie.id)),
+    );
+
+    final runtimeByMovieId = <int, int>{};
+
+    for (var i = 0; i < movies.length; i++) {
+      switch (detailsResults[i]) {
+        case Ok(:final value):
+          final runtime = value.runtime;
+
+          if (runtime != null && runtime > 0) {
+            runtimeByMovieId[movies[i].id] = runtime;
+          }
+
+        case Error():
+          break;
+      }
+    }
+
+    int durationScore(int? runtime) {
+      if (runtime == null) return 0;
+
+      switch (durationPreference) {
+        case 'short':
+          if (runtime <= 90) return 3;
+          if (runtime <= 110) return 2;
+          if (runtime <= 130) return 1;
+          return 0;
+
+        case 'medium':
+          if (runtime >= 100 && runtime <= 130) return 3;
+          if (runtime >= 90 && runtime <= 140) return 2;
+          return 1;
+
+        case 'long':
+          if (runtime > 140) return 3;
+          if (runtime > 120) return 2;
+          if (runtime >= 100) return 1;
+          return 0;
+
+        default:
+          return 0;
+      }
+    }
+
+    final originalOrder = {
+      for (var i = 0; i < movies.length; i++) movies[i].id: i,
+    };
+
+    final orderedMovies = [...movies];
+
+    orderedMovies.sort((a, b) {
+      final scoreA = durationScore(runtimeByMovieId[a.id]);
+      final scoreB = durationScore(runtimeByMovieId[b.id]);
+
+      final scoreComparison = scoreB.compareTo(scoreA);
+
+      if (scoreComparison != 0) {
+        return scoreComparison;
+      }
+
+      return originalOrder[a.id]!.compareTo(originalOrder[b.id]!);
+    });
+
+    return orderedMovies.take(3).toList();
   }
 }

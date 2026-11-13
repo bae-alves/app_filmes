@@ -19,6 +19,14 @@ class FakeRatingsRepository implements RatingsRepository {
   Exception? writeError;
 
   @override
+  Future<Result<List<Rating>>> getRatings() async {
+    if (readError case final error?) return Result.error(error);
+    final allRatings = ratings.values.toList()
+      ..sort((a, b) => b.ratedAt.compareTo(a.ratedAt));
+    return Result.ok(allRatings);
+  }
+
+  @override
   Future<Result<Rating?>> getRating(int movieId) async {
     if (readError case final error?) return Result.error(error);
     return Result.ok(ratings[movieId]);
